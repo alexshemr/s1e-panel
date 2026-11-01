@@ -1,5 +1,7 @@
 # Local API
 
+[Русская версия](docs/ru/api.md) · [← Back to README](README.md)
+
 The panel serves HTTPS on port **8443** with a self-signed certificate. Pin its SHA-256 fingerprint (`certificate_sha256` from `/api/v1/info`) instead of turning certificate checks off.
 
 Every endpoint except `/api/v1/info` and pairing needs a paired client: a browser gets a Secure, HttpOnly cookie; other clients get a revocable Bearer key. Pairing always needs a confirmation on the panel's screen. Credentials never go into URLs.

@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S1E constructor</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&family=Noto+Sans+Display:wght@500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Constructor: any widgets from the stands on one panel screen. Each widget is the stand itself in an iframe
+   (embed mode, see tools/stand_bridge), so it looks and behaves exactly like its stand and keeps its own settings. */
+:root {
+  --page: #0b0e12; --tray: #101317; --raised: #171b21; --hover: #1d2229; --line: #2a3039;
+  --text: #f3f0e9; --muted: #9da2aa; --accent: #dfb98a; --bad: #ff9991;
+  --display: "Noto Sans Display", "Noto Sans", system-ui, sans-serif;
+  --body: "Noto Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  color-scheme: dark;
+}
+html, body { margin: 0; background: var(--page); color: var(--text); }
+body { font-family: var(--body); font-size: 14px; line-height: 1.5; }
+.wrap { max-width: 1480px; margin: 0 auto; padding-block: 20px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 18px; }
+header { display: grid; gap: 4px; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+h1 { font-family: var(--display); font-weight: 600; font-size: clamp(24px, 3vw, 32px); line-height: 1.15; margin: 0; text-wrap: balance; }
+h2 { font-size: 13px; font-weight: 500; color: var(--muted); margin: 0; letter-spacing: .02em; }
+.lede { color: var(--muted); max-width: 80ch; margin: 0; }
+.controls { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px); padding-block: 10px; border-bottom: 1px solid var(--line); display: grid; gap: 10px; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--page); }
+@media (max-width: 700px) { .controls { position: static; backdrop-filter: none; } }
+.row { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+.group { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.label { font-size: 12px; color: var(--muted); margin-right: 2px; }
+.seg { display: inline-flex; flex-wrap: wrap; background: var(--raised); border: 1px solid var(--line); border-radius: 10px; padding: 2px; }
+.seg button { font: inherit; font-size: 13px; color: var(--muted); background: none; border: 0; border-radius: 8px; padding: 4px 12px; cursor: pointer; font-variant-numeric: tabular-nums; }
+.seg button[aria-pressed="true"] { background: #2c3037; color: var(--text); }
+.chip { font: inherit; font-size: 13px; color: var(--text); background: var(--raised); border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; cursor: pointer; font-variant-numeric: tabular-nums; }
+.chip:hover:not(:disabled) { border-color: #3a414c; }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #17130e; font-weight: 600; }
+.chip:disabled { opacity: .4; cursor: default; }
+.chip.danger { color: var(--bad); }
+button:focus-visible, .tile:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.readout { font-family: var(--mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+.bench { display: grid; grid-template-columns: 522px minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 1060px) { .bench { grid-template-columns: minmax(0, 1fr); } }
+.device { background: #05070a; border: 1px solid var(--line); border-radius: 22px; padding: 20px; display: grid; gap: 10px; justify-items: center; justify-self: start; }
+.caption { font-family: var(--mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; text-align: center; }
+
+/* the panel screen at true pixels: 8 columns × 8 rows, step 59 × 53.5 (firmware grid), cards inset 8 px */
+.screen { position: relative; width: 480px; height: 480px; background: #101317; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; }
+@media (max-width: 540px) { .device { padding: 8px; border-radius: 16px; } .screen-scroll { max-width: calc(100vw - 52px); overflow-x: auto; } }
+.cells { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .15s; }
+.edit .cells { opacity: 1; }
+.cell { position: absolute; border-radius: 8px; border: 1px dashed #262b33; box-sizing: border-box; }
+.slot { position: absolute; }
+.slot iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; background: transparent; display: block; color-scheme: normal; }
+.slot.full iframe { border-radius: 0; }
+.cover { position: absolute; inset: 0; border-radius: 20px; cursor: grab; display: none; }
+.slot.full .cover { border-radius: 0; }
+.edit .cover { display: block; }
+.cover:hover { box-shadow: inset 0 0 0 1px #4a515c; }
+.slot.sel .cover { box-shadow: inset 0 0 0 2px var(--accent); }
+.slot.bad .cover { box-shadow: inset 0 0 0 2px var(--bad); }
+.slot.loading .cover::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: #20242a; }
+.gear { position: absolute; top: 6px; right: 6px; width: 30px; height: 30px; border-radius: 10px; border: 0; padding: 0; background: rgba(16,19,23,.82); color: var(--text); cursor: pointer; display: none; place-items: center; z-index: 1; }
+.gear svg { width: 18px; height: 18px; fill: currentColor; }
+.edit .slot:hover .gear, .edit .slot.sel .gear { display: grid; }
+.ghost { position: absolute; border-radius: 20px; border: 2px solid var(--accent); background: color-mix(in srgb, var(--accent) 14%, transparent); pointer-events: none; box-sizing: border-box; display: none; }
+.ghost.bad { border-color: var(--bad); background: color-mix(in srgb, var(--bad) 14%, transparent); }
+.empty { position: absolute; inset: 8px 8px 52px; display: grid; place-items: center; text-align: center; color: #818792; font-size: 14px; pointer-events: none; padding: 0 40px; }
+.dots { position: absolute; left: 0; right: 0; bottom: 14px; display: flex; justify-content: center; gap: 8px; }
+.dots button { width: 18px; height: 18px; padding: 0; border: 0; background: none; cursor: pointer; display: grid; place-items: center; }
+.dots button::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #3a3f47; }
+.dots button[aria-current="true"]::before { background: #f3f0e9; }
+
+.side { display: grid; gap: 14px; min-width: 0; }
+.panel { background: var(--tray); border: 1px solid var(--line); border-radius: 18px; padding: 16px; display: grid; gap: 12px; min-width: 0; }
+.catalog { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.tile { display: grid; grid-template-columns: 36px 1fr; gap: 2px 10px; align-items: center; text-align: left; padding: 10px 12px; border-radius: 14px; background: var(--raised); border: 1px solid var(--line); color: inherit; font: inherit; cursor: pointer; }
+.tile:hover { background: var(--hover); border-color: #3a414c; }
+.tile .icon { grid-row: span 2; width: 36px; height: 36px; border-radius: 10px; background: #2a2620; display: grid; place-items: center; }
+.tile .icon svg { width: 22px; height: 22px; fill: var(--accent); }
+.tile .icon i { width: 22px; height: 22px; background: var(--accent); -webkit-mask: var(--m) center / contain no-repeat; mask: var(--m) center / contain no-repeat; }
+.tile b { font-weight: 500; font-size: 14px; line-height: 1.25; }
+.tile small { color: var(--muted); font-family: var(--mono); font-size: 11px; }
+.inspector { display: grid; gap: 10px; }
+.inspector .title { display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+.inspector .title b { font-size: 16px; font-weight: 600; }
+.note { color: var(--muted); font-size: 13px; max-width: 80ch; margin: 0; }
+.note strong { color: var(--text); font-weight: 500; }
+.toast { min-height: 1.5em; font-size: 13px; color: var(--bad); margin: 0; }
+
+/* settings: the widget's own stand controls, opened over the page */
+.sheet { position: fixed; inset: 0; z-index: 50; background: rgba(5,7,10,.72); display: grid; place-items: center; padding: 16px; }
+.sheet[hidden] { display: none; }
+.sheet-box { width: min(1180px, 100%); height: min(860px, calc(100vh - 32px)); background: var(--page); border: 1px solid var(--line); border-radius: 18px; display: grid; grid-template-rows: auto 1fr; overflow: hidden; }
+.sheet-bar { display: flex; align-items: center; gap: 12px; padding: 10px 12px 10px 18px; border-bottom: 1px solid var(--line); }
+.sheet-bar b { font-weight: 600; font-size: 15px; }
+.sheet-bar .readout { flex: 1; }
+.sheet-bar button { font: inherit; font-size: 13px; font-weight: 600; color: #17130e; background: var(--accent); border: 0; border-radius: 10px; padding: 7px 16px; cursor: pointer; }
+.sheet-hole { min-height: 0; }
+.slot.open { position: fixed; z-index: 51; }
+.slot.open .cover, .slot.open .gear { display: none !important; }
+[hidden] { display: none !important; }
+@media (prefers-reduced-motion: reduce) { .cells { transition: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="eyebrow" href="index.html" style="color:inherit;text-decoration:none" data-i18n="back">← Все стенды</a>
+    <div class="eyebrow" data-i18n="eyebrow">Aqara S1E · конструктор</div>
+    <h1 data-i18n="title">Конструктор</h1>
+    <p class="lede" data-i18n="lede">Любые карточки и заставки из стендов на одном экране панели. Каждый виджет — сам стенд: выглядит и работает так же, а настройки у каждого свои и задаются внутри него, по шестерёнке. Здесь общее только язык панели.</p>
+  </header>
+
+  <section class="controls" data-i18n-aria="controls" aria-label="Параметры">
+    <div class="row">
+      <div class="group"><span class="label" data-i18n="lang">Язык панели</span>
+        <div class="seg" id="lang"><button type="button" data-v="ru">Русский</button><button type="button" data-v="en">English</button></div>
+      </div>
+      <div class="group"><span class="label" data-i18n="mode">Режим</span>
+        <div class="seg" id="mode"><button type="button" data-v="edit" data-i18n="edit">Расстановка</button><button type="button" data-v="play" data-i18n="play">Касание</button></div>
+      </div>
+      <div class="group"><span class="label" data-i18n="page">Страница</span>
+        <div class="seg" id="pages"></div>
+        <button type="button" class="chip" id="addPage" data-i18n="addPage">+ страница</button>
+        <button type="button" class="chip danger" id="delPage" data-i18n="delPage">Удалить страницу</button>
+      </div>
+    </div>
+  </section>
+
+  <main class="bench">
+    <div class="device">
+      <div class="screen-scroll">
+        <div class="screen edit" id="screen" data-i18n-aria="screen" aria-label="Экран панели 480 × 480">
+          <div class="cells" id="cells"></div>
+          <div class="empty" id="empty" data-i18n="empty">Страница пустая. Добавьте виджеты из списка справа.</div>
+          <div id="slots"></div>
+          <div class="ghost" id="ghost"></div>
+          <div class="dots" id="dots"></div>
+        </div>
+      </div>
+      <div class="caption" id="caption"></div>
+    </div>
+
+    <div class="side">
+      <section class="panel" aria-labelledby="selH">
+        <h2 id="selH" data-i18n="selH">Выбранный виджет</h2>
+        <div class="inspector" id="inspector"></div>
+      </section>
+      <section class="panel" aria-labelledby="addH">
+        <h2 id="addH" data-i18n="addH">Добавить на страницу</h2>
+        <div class="catalog" id="catalog"></div>
+        <p class="toast" id="toast" role="status"></p>
+      </section>
+      <p class="note" data-i18n-html="help"><strong>Расстановка:</strong> тяните виджет по сетке, двойной щелчок или шестерёнка открывает его настройки, стрелки двигают выбранный, Delete удаляет. <strong>Касание:</strong> виджеты работают как на панели. Расстановка, страницы и настройки виджетов сохраняются в этом браузере.</p>
+    </div>
+  </main>
+</div>
+
+<div class="sheet" id="sheet" hidden role="dialog" aria-modal="true" aria-labelledby="sheetName">
+  <div class="sheet-box">
+    <div class="sheet-bar"><b id="sheetName"></b><span class="readout" id="sheetSize"></span><button type="button" id="sheetDone" data-i18n="done">Готово</button></div>
+    <div class="sheet-hole" id="sheetHole"></div>
+  </div>
+</div>
+
+<script>
+const ALL = ["2x2", "2x4", "2x6", "2x8", "4x2", "4x4", "4x6", "8x2", "8x4", "8x6", "8x8"];
+const svg = (d) => `<svg viewBox="0 0 24 24"><path d="${d}"/></svg>`;
+const mask = (png) => `<i style="--m:url(data:image/png;base64,${png})"></i>`;
+// Widget types: one per stand. sizes — until the widget itself reports them; def — size when added.
+const TYPES = {
+  light: { name: "Свет", en: "Light", def: "4x4", sizes: ALL, icon: svg("M12 2a7 7 0 0 0-4 12.7V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.3A7 7 0 0 0 12 2M9 21a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1H9v1Z") },
+  cover: { name: "Шторы", en: "Curtains", def: "4x4", sizes: ALL, icon: svg("M23 3H1V1h22v2M2 4h8c0 4-3.4 8.5-1 18H2V4m20 0h-8c0 4 3.4 8.5 1 18h7V4Z") },
+  roller: { name: "Рулонная штора", en: "Roller blind", def: "4x4", sizes: ALL, icon: svg("M20 19V3H4v16H2v2h20v-2h-2M6 5h12v8h-5v1.3c.6.3 1 1 1 1.7a2 2 0 0 1-4 0c0-.7.4-1.4 1-1.7V13H6V5Z") },
+  breezer: { name: "Бризер", en: "Breezer", def: "4x4", sizes: ALL, icon: svg("M12 11a1 1 0 1 0 0 2 1 1 0 0 0 0-2m.5-9c4.5 0 4.6 3.6 2.2 4.8-1 .5-1.4 1.4-1.6 2.2.5.2.9.5 1.2.9 3.7-2 7.7-1.2 7.7 2.6 0 4.5-3.6 4.6-4.8 2.2-.5-1-1.4-1.4-2.2-1.6-.2.5-.5.9-.9 1.2 2 3.7 1.2 7.7-2.6 7.7-4.5 0-4.6-3.6-2.2-4.8 1-.5 1.4-1.4 1.6-2.2-.5-.2-.9-.5-1.2-.9-3.7 2-7.7 1.2-7.7-2.6 0-4.5 3.6-4.6 4.8-2.2.5 1 1.4 1.4 2.2 1.6.2-.5.5-.9.9-1.2C7.4 5.9 8.7 2 12.5 2Z") },
+  climate: { name: "Микроклимат", en: "Climate", def: "4x4", sizes: ALL, icon: svg("M9 15c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2c0-.7.4-1.4 1-1.7V12c0-.6.4-1 1-1s1 .4 1 1v3.3M12 3 2 12h3v8h7.4a5 5 0 0 1-1.4-1.3c-.4.2-.8.3-1.3.3-1.9 0-3.4-1.6-3.4-3.5 0-1 .4-1.9 1.1-2.5V12c0-1.6 1.3-3 3-3s3 1.4 3 3v1c.7.6 1.1 1.5 1.1 2.5 0 .7-.2 1.4-.6 2v.5H19v-6h3L12 3m8 13h-4v-2h4v2Z") },
+  thermostat: { name: "Термостат", en: "Thermostat", def: "2x4", sizes: ALL, icon: mask("iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAABT0lEQVR42rWUsUoDQRRFz4qkiKI2grVapREbP0LUwirxQwQRRAW/INaCoIUgsbD3A9LGSouFQEhQuyCKiMfC0dndJIWIb5ph3z3MnffebCK/izH+CJSocsYdfV5IuWSLUkFhdtVMLUbb1awmbsetOzw+PHJsEDgO6a4HLjtj2SX3fAxfj4pALSQaTuVMVnwLp6xmgVLwfmWSk896qwFpW4pAVdWe0yLOe+GjHU9sqbdWgrGtCJyreijiok+ZC7ecFfdUvYzAvarLIjZyFToRcUnVNAJ91WConwM6IpZVfRFznX4HICl0Ps7De9z2AFgA4CYH3GQy3Qg0AVgDYJvXH/kzOwBsZFS5sk6I+7k77IiTPqhaHWzcaUGuuhuKnmYbF0djdNRGDd/wqA8b79HIseODwKgHlH6b+VqJxSe6yTorzAE9mlzT4C0rSP79r/EJcgo8hqWX5mQAAAAASUVORK5CYII=") },
+  humidifier: { name: "Увлажнитель", en: "Humidifier", def: "4x4", sizes: ALL, icon: mask("iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAABEklEQVR42rWUQU4CQRBF38BwBwMkhBVCjN5Cb+PC23ALMZJgiImaeAo3xAtIGANRJ3kunIGZsUFcULXprq7f1f9XqiP5n9U4NCDeuU8DCHMfOHZl2ZaO7UvR80XfuWGbexwC3Kh3tsu32XaqjkKARO1U0hG76qIYicypQCNAMuYLiHbJ2mfEgoQRPSAlKqZvVFKNxUGB/Ju97LTpUZVDDrhVJ3bseq9eixj77JO1MGCpmVYbupeqXoUBK7UpYkdNRHxR9fUns0r6ERjSosUQeACgAQWlKhVOTdakFw5EPHfmzIvwk/DMqZ9+OPEk0MgtjYuyyN7z4Dq9Tlruf/zHvETUtw/M+z4TV+Swq84vwOE+gW+GQF3YKC+uSwAAAABJRU5ErkJggg==") },
+  fan: { name: "Вентилятор", en: "Fan", def: "4x4", sizes: ALL, icon: mask("iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAABM0lEQVR42rWUvUoDQRCAJ1b+XC7gA9hZBNIoIsTOykZMIYIYCIKN+kCChY2FYMDG9EJeQaLIeRIUPA4u1pprPguX3b3sHkHQ2eJ2bvbb+WUryO9kRv4EOJFYxpLIlSw7NtzVwsg7c0WrD+hjy8p0ILGOp8wWrb4cxnoXy7Z8+XOo0mRB7Xvq9nsC1//Pp04GpKwiCB0F7HrCVUBXHYkIEGrkAJwRcsgtMa/csWMDqU7ygQMutJYX6nVqgKIBoMmm829oqvTm7eekLJkqHRduMv7OafOotcxuXIs+CUN6dKhxCcAn8whVnhRwU9ZpYV8d2UMQ1hgBIxplQMBAAde6rRuEZbO0TqSjHpQ1zqyQDyv9yAUmh68hi5b24hlNx0NmediaHpJQp0tKzjNHvgpW/v3V+AZkYRyjKUMU9gAAAABJRU5ErkJggg==") },
+  button: { name: "Кнопка", en: "Button", def: "2x4", sizes: ["2x2", "2x4", "4x2"], icon: mask("iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAAArUlEQVR42u2TPQoCMRBGJ+odogcSEZQtrCy8gywodoKV4HlsF8UDrLewFFzBH5BnlWRXEtbUOmky8B4M3yQKiauG/KDQ+uibHuZV6TAnYU+Bry5k9A1n8DV1tSwLwwB0J0XTYcET6DohCwipHXgObJ1wDgjaCm3ghBAVK24PeQAZ29tERI4u1iQw0o0pGs2MB9Arx7qpjXVV3YMw4sDVixbsGBhOEfk01P/HfVFvCopBDKZBAnIAAAAASUVORK5CYII=") },
+  time: { name: "Время", en: "Time", def: "4x2", sizes: ["2x4", "4x2", "4x4", "8x2"], icon: svg("M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16m0-18a10 10 0 1 1 0 20 10 10 0 0 1 0-20m.5 5v5.3l4.5 2.6-.8 1.3L11 13V7h1.5Z") },
+  inputs: { name: "Число, выбор, текст", en: "Number, select, text", def: "4x2", sizes: ["2x2", "2x4", "4x2", "4x4", "8x2"], icon: mask("iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAAAn0lEQVR42t2UQRLCIAxFXxQs9+m6C6+hl3M8ZbF26IIiHUqprboxC4ZJwvzk5wdxbLPDxnzUYqQFHtzQXDkBxrtlsaQ0IGslCUIDwBkJ6SWEiKN5pj2obGo/3o5Tj0fIwVhMErGYD2i1gbaM+R7czsH9w4PAUjWbReSt+wKCLqrVjCJxu8RXLqmenKvyboHqRcCbG9dxR3NBxY2Tn/8aA382Jx3QdZbNAAAAAElFTkSuQmCC") },
+  printer: { name: "3D-принтер", en: "3D printer", def: "4x4", sizes: ["2x2", "2x4", "4x2", "4x4", "4x6", "8x2", "8x4", "8x6", "8x8"], icon: mask("iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAAAvElEQVR4Xs2TTQoCMQyFX/xhZuHCO7jxBOLCQ7jzFm49gwfxbIKCIIhUGH1Ch5FmmiDdTbpL+qV57asQZTEq2w5MFFDhbjSo05wGBNW/E4tHGiCQig6O4ICAeVdLAe+GVH6AotORBIIlbkr6BQuIMgf7a8PALp5c9es5AO74icSb26ydCYCHCOzz7YQ4H6gG8bIe0gMaBMwswH64Nca42kZprfHIfh5wcpwVhTW/i2zjzCOnlmRftBvF5vsCovKIGi97iu0AAAAASUVORK5CYII=") },
+  weather: { name: "Погода", en: "Weather", def: "4x2", sizes: [...ALL, "saver"], icon: svg("M12.7 6.1A5 5 0 0 1 22 8.5a5 5 0 0 1-1.6 3.7A4.5 4.5 0 0 1 17.5 20H6a4 4 0 0 1-.9-7.9 6 6 0 0 1 7.6-6ZM6 18h11.5a2.5 2.5 0 0 0 0-5H16v-1a4 4 0 0 0-7.6-1.7l-.4.8-.9-.1H6a2 2 0 0 0 0 4Z") },
+  saver: { name: "Заставки", en: "Screensavers", def: "screen", sizes: ["screen"], icon: mask("iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAAApUlEQVR42rWUzQ7CIBCEPyxGjRdvvpDxZHz/Q681+gS0ETJetEVtlVYcLsvPTIZlWSPGYcYEwp4SlzBKdoDQSamohFGBB0yCGwF20h06BSGumbNkn2YN6zEEjyf0nCmgW48J8wFRT83qp5ceRoFQ1iy9Irzv2ygTn821hMCFLT7Jz5mA0FFVYq0ehOn5cQvqe2Sy1xKAi3QdDZtvhOVA/HD5965xA7EtipJ/e3M5AAAAAElFTkSuQmCC") },
+};
+/* ---------- interface language: follows the panel language ---------- */
+const UI = {
+  ru: {
+    back: "← Все стенды", eyebrow: "Aqara S1E · конструктор", title: "Конструктор", doc: "Конструктор S1E",
+    lede: "Любые карточки и заставки из стендов на одном экране панели. Каждый виджет — сам стенд: выглядит и работает так же, а настройки у каждого свои и задаются внутри него, по шестерёнке. Здесь общее только язык панели.",
+    controls: "Параметры", lang: "Язык панели", mode: "Режим", edit: "Расстановка", play: "Касание", page: "Страница", addPage: "+ страница", delPage: "Удалить страницу",
+    screen: "Экран панели 480 × 480", empty: "Страница пустая. Добавьте виджеты из списка справа.", selH: "Выбранный виджет", addH: "Добавить на страницу", done: "Готово",
+    help: "<strong>Расстановка:</strong> тяните виджет по сетке, двойной щелчок или шестерёнка открывает его настройки, стрелки двигают выбранный, Delete удаляет. <strong>Касание:</strong> виджеты работают как на панели. Расстановка, страницы и настройки виджетов сохраняются в этом браузере.",
+    full: "весь экран", saverSize: "заставка", widget: "виджет", settingsOf: "Настройки", widgetSettings: "Настройки виджета",
+    caption: (p, n, k) => `страница ${p} из ${n} · ${k} ${plural(k, "виджет", "виджета", "виджетов")} · сетка 59 × 53,5`,
+    sizes: (n) => `${n} ${plural(n, "размер", "размера", "размеров")}`,
+    pick: "Щёлкните виджет на экране, чтобы выбрать его.", where: (c, r) => `колонка ${c}, ряд ${r}`, size: "Размер",
+    settings: "Настройки…", copy: "Копия", next: "На следующую страницу", remove: "Удалить", pageN: (i) => `Страница ${i}`,
+    noRoom: (t) => `На странице нет места для «${t}». Освободите место или добавьте страницу.`, noRoomCopy: "На странице нет места для копии такого размера.",
+    noRoomSize: (s) => `Для ${s} на странице нет места.`, noRoomPage: (i) => `На странице ${i} нет места.`,
+    delAsk: (i, n) => `Удалить страницу ${i} вместе с ${n} ${plural(n, "виджетом", "виджетами", "виджетами")}?`,
+  },
+  en: {
+    back: "← All stands", eyebrow: "Aqara S1E · constructor", title: "Constructor", doc: "S1E constructor",
+    lede: "Any cards and screensavers from the stands on one panel screen. Each widget is the stand itself: it looks and works the same, and each one has its own settings, set inside it with the gear. The only shared setting here is the panel language.",
+    controls: "Controls", lang: "Panel language", mode: "Mode", edit: "Arrange", play: "Touch", page: "Page", addPage: "+ page", delPage: "Delete page",
+    screen: "Panel screen 480 × 480", empty: "This page is empty. Add widgets from the list on the right.", selH: "Selected widget", addH: "Add to page", done: "Done",
+    help: "<strong>Arrange:</strong> drag a widget along the grid; double-click or the gear opens its settings, arrow keys move the selected one, Delete removes it. <strong>Touch:</strong> widgets work as on the panel. The layout, pages and widget settings are saved in this browser.",
+    full: "full screen", saverSize: "screensaver", widget: "widget", settingsOf: "Settings", widgetSettings: "Widget settings",
+    caption: (p, n, k) => `page ${p} of ${n} · ${k} ${k === 1 ? "widget" : "widgets"} · grid 59 × 53.5`,
+    sizes: (n) => `${n} ${n === 1 ? "size" : "sizes"}`,
+    pick: "Click a widget on the screen to select it.", where: (c, r) => `column ${c}, row ${r}`, size: "Size",
+    settings: "Settings…", copy: "Duplicate", next: "Move to next page", remove: "Remove", pageN: (i) => `Page ${i}`,
+    noRoom: (t) => `No room on this page for “${t}”. Free some space or add a page.`, noRoomCopy: "No room on this page for a copy of this size.",
+    noRoomSize: (s) => `No room on this page for ${s}.`, noRoomPage: (i) => `No room on page ${i}.`,
+    delAsk: (i, n) => `Delete page ${i} with its ${n} ${n === 1 ? "widget" : "widgets"}?`,
+  },
+};
+const t = (k) => (UI[S.lang] || UI.en)[k], tx = t;     // tx: where a local "t" shadows it
+const tname = (type) => S.lang === "en" ? TYPES[type].en : TYPES[type].name;
+function applyUi() {
+  document.documentElement.lang = S.lang;
+  document.title = t("doc");
+  for (const el of document.querySelectorAll("[data-i18n]")) el.textContent = t(el.dataset.i18n);
+  for (const el of document.querySelectorAll("[data-i18n-aria]")) el.setAttribute("aria-label", t(el.dataset.i18nAria));
+  for (const el of document.querySelectorAll("[data-i18n-html]")) el.innerHTML = t(el.dataset.i18nHtml);
+  renderCatalog();
+  for (const [id, L] of live) { const w = find(id); if (!w) continue; L.frame.title = `${tname(w.type)} — ${t("widget")}`; const g = L.el.querySelector(".gear"); g.title = t("widgetSettings"); g.setAttribute("aria-label", `${t("settingsOf")}: ${tname(w.type)}`); }
+  if (openId) document.getElementById("sheetName").textContent = tname(find(openId).type);
+}
+
+const GEAR = svg("M12 15.5A3.5 3.5 0 0 1 8.5 12 3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97s-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1s.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.66Z");
+
+/* ---------- geometry: the firmware grid ---------- */
+const COLS = 8, ROWS = 8, STEP_X = 59, STEP_Y = 53.5;
+const full = (s) => s === "screen" || s === "saver";
+const dims = (s) => full(s) ? [COLS, ROWS] : s.split("x").map(Number);
+function rect(w) {
+  if (full(w.size)) return { x: 0, y: 0, w: 480, h: 480 };
+  const [cw, ch] = dims(w.size);
+  const y = 8 + Math.floor(w.r * STEP_Y);
+  return { x: 8 + w.c * STEP_X, y, w: cw * STEP_X - 8, h: Math.floor(ch * STEP_Y) - 8 };
+}
+const sizeLabel = (s) => s === "screen" ? t("full") : s === "saver" ? t("saverSize") : s.replace("x", "×");
+
+/* ---------- state ---------- */
+const KEY = "home-stand";
+const store = { get: (k) => { try { return localStorage.getItem(k); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) {} } };
+let S = { lang: "en", mode: "edit", page: 0, pages: [[]] };
+try { Object.assign(S, JSON.parse(store.get(KEY) || "{}")); } catch (e) {}
+{ // links from the documentation pick the language and open the screen ready to touch: ?lang=en&mode=play
+  const q = new URLSearchParams(location.search);
+  if (/^(ru|en)$/.test(q.get("lang"))) S.lang = q.get("lang");
+  if (/^(edit|play)$/.test(q.get("mode"))) S.mode = q.get("mode");
+}
+if (!Array.isArray(S.pages) || !S.pages.length) S.pages = [[]];
+S.pages = S.pages.map((p) => (Array.isArray(p) ? p : []).filter((w) => w && TYPES[w.type] && w.id));
+S.page = Math.max(0, Math.min(S.pages.length - 1, S.page | 0));
+const save = () => store.set(KEY, JSON.stringify(S));
+const live = new Map();          // id → { el, frame, sizes }
+let selected = null, openId = null;
+
+const uid = () => Math.random().toString(36).slice(2, 9);
+const page = () => S.pages[S.page];
+const find = (id) => { for (const p of S.pages) { const w = p.find((x) => x.id === id); if (w) return w; } return null; };
+const pageOf = (id) => S.pages.findIndex((p) => p.some((x) => x.id === id));
+
+/* ---------- placement ---------- */
+function cellsOf(c, r, size) {
+  const [cw, ch] = dims(size), out = [];
+  if (full(size)) { c = 0; r = 0; }
+  for (let i = 0; i < cw; i++) for (let j = 0; j < ch; j++) out.push(`${c + i},${r + j}`);
+  return out;
+}
+function fits(list, c, r, size, skip) {
+  const [cw, ch] = dims(size);
+  if (!full(size) && (c < 0 || r < 0 || c + cw > COLS || r + ch > ROWS)) return false;
+  const busy = new Set();
+  for (const w of list) if (w.id !== skip) for (const k of cellsOf(w.c, w.r, w.size)) busy.add(k);
+  return cellsOf(c, r, size).every((k) => !busy.has(k));
+}
+function freeSpot(list, size, skip) {
+  if (full(size)) return fits(list, 0, 0, size, skip) ? [0, 0] : null;
+  for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) if (fits(list, c, r, size, skip)) return [c, r];
+  return null;
+}
+const sizesOf = (w) => live.get(w.id)?.sizes || TYPES[w.type].sizes;
+
+/* ---------- widgets ---------- */
+const src = (w) => `${w.type}-stand.html?embed=${encodeURIComponent(w.id)}&size=${encodeURIComponent(w.size)}&lang=${S.lang}`;
+function post(w, msg) { const L = live.get(w.id); if (L && L.frame.contentWindow) L.frame.contentWindow.postMessage({ target: "s1e-embed", ...msg }, "*"); }
+function mount(w) {
+  const el = document.createElement("div"); el.className = "slot loading"; el.dataset.id = w.id;
+  const frame = document.createElement("iframe");
+  frame.src = src(w); frame.title = `${tname(w.type)} — ${t("widget")}`; frame.setAttribute("scrolling", "no"); frame.loading = "eager";
+  frame.addEventListener("load", () => el.classList.remove("loading"));
+  const cover = document.createElement("div"); cover.className = "cover"; cover.tabIndex = -1;
+  const gear = document.createElement("button"); gear.type = "button"; gear.className = "gear"; gear.innerHTML = GEAR; gear.title = t("widgetSettings"); gear.setAttribute("aria-label", `${t("settingsOf")}: ${tname(w.type)}`);
+  gear.addEventListener("pointerdown", (e) => e.stopPropagation());
+  gear.addEventListener("click", () => openSettings(w.id));
+  cover.addEventListener("pointerdown", (e) => startDrag(e, w.id));
+  cover.addEventListener("dblclick", () => openSettings(w.id));
+  el.append(frame, cover, gear);
+  document.getElementById("slots").append(el);
+  live.set(w.id, { el, frame, sizes: null });
+}
+function place(w) {
+  const L = live.get(w.id); if (!L) return;
+  const R = rect(w), el = L.el, onPage = pageOf(w.id) === S.page;
+  if (w.id !== openId) Object.assign(el.style, { left: R.x + "px", top: R.y + "px", width: R.w + "px", height: R.h + "px" });
+  el.hidden = !onPage && w.id !== openId;
+  el.classList.toggle("full", full(w.size));
+  el.classList.toggle("sel", w.id === selected);
+  const others = S.pages[pageOf(w.id)] || [];
+  el.classList.toggle("bad", !fits(others, w.c, w.r, w.size, w.id));
+}
+function layoutAll() {
+  for (const p of S.pages) for (const w of p) { if (!live.has(w.id)) mount(w); place(w); }
+  for (const [id, L] of live) if (!find(id)) { L.el.remove(); live.delete(id); }
+  document.getElementById("empty").hidden = page().length > 0;
+  renderPages(); renderInspector();
+  const n = page().length;
+  document.getElementById("caption").textContent = t("caption")(S.page + 1, S.pages.length, n);
+  save();
+}
+const plural = (n, a, b, c) => (n % 10 === 1 && n % 100 !== 11 ? a : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? b : c);
+
+function add(type) {
+  const T = TYPES[type], list = page();
+  const order = [T.def, ...T.sizes.filter((s) => s !== T.def).sort((a, b) => dims(a)[0] * dims(a)[1] - dims(b)[0] * dims(b)[1])];
+  for (const size of order) {
+    const at = freeSpot(list, size);
+    if (at) {
+      const w = { id: uid(), type, size, c: at[0], r: at[1] };
+      list.push(w); selected = w.id; toast("");
+      layoutAll(); return w;
+    }
+  }
+  toast(t("noRoom")(tname(type)));
+}
+function remove(id) {
+  const p = S.pages[pageOf(id)]; if (!p) return;
+  p.splice(p.findIndex((x) => x.id === id), 1);
+  forgetStorage(id);
+  if (selected === id) selected = null;
+  layoutAll();
+}
+function duplicate(id) {
+  const w = find(id); if (!w) return;
+  const list = page(), at = freeSpot(list, w.size);
+  if (!at) return toast(t("noRoomCopy"));
+  const copy = { ...w, id: uid(), c: at[0], r: at[1] };
+  copyStorage(w.id, copy.id);
+  list.push(copy); selected = copy.id; layoutAll();
+}
+function resize(id, size) {
+  const w = find(id), list = S.pages[pageOf(id)];
+  if (!w || w.size === size) return;
+  let c = w.c, r = w.r;
+  if (!fits(list, c, r, size, id)) {
+    const [cw, ch] = dims(size); c = Math.min(c, COLS - cw); r = Math.min(r, ROWS - ch);       // keep it near: pull back inside the grid
+    if (!fits(list, c, r, size, id)) { const at = freeSpot(list, size, id); if (!at) return toast(t("noRoomSize")(sizeLabel(size))); [c, r] = at; }
+  }
+  Object.assign(w, { size, c, r }); toast("");
+  post(w, { type: "size", size });
+  layoutAll();
+}
+// Every widget keeps its settings under "<stand key>@<widget id>" (see tools/stand_bridge).
+function storageKeys(id) { const out = []; try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (k && k.endsWith("@" + id)) out.push(k); } } catch (e) {} return out; }
+function forgetStorage(id) { for (const k of storageKeys(id)) try { localStorage.removeItem(k); } catch (e) {} }
+function copyStorage(from, to) { for (const k of storageKeys(from)) store.set(k.slice(0, -from.length) + to, store.get(k)); }
+
+/* ---------- messages from widgets ---------- */
+addEventListener("message", (e) => {
+  const d = e.data;
+  if (!d || d.source !== "s1e-embed") return;
+  const w = find(d.id), L = live.get(d.id);
+  if (!w || !L || e.source !== L.frame.contentWindow) return;
+  L.sizes = d.sizes && d.sizes.length ? d.sizes : null;
+  if (d.size && d.size !== w.size && (!L.sizes || L.sizes.includes(d.size))) {
+    w.size = d.size;                       // the stand changed it itself (e.g. «Число» → «Текст» has other sizes)
+    const list = S.pages[pageOf(w.id)];
+    if (!fits(list, w.c, w.r, w.size, w.id)) { const at = freeSpot(list, w.size, w.id); if (at) [w.c, w.r] = at; }
+  }
+  layoutAll();
+  if (openId === w.id) document.getElementById("sheetSize").textContent = sizeLabel(w.size);
+});
+
+/* ---------- dragging ---------- */
+let drag = null;
+function startDrag(e, id) {
+  if (e.button !== 0 || S.mode !== "edit") return;
+  e.preventDefault();
+  select(id);
+  const w = find(id), R = rect(w), scr = document.getElementById("screen").getBoundingClientRect();
+  drag = { id, dx: e.clientX - scr.left - R.x, dy: e.clientY - scr.top - R.y, moved: false, sx: e.clientX, sy: e.clientY, c: w.c, r: w.r };
+  e.target.setPointerCapture(e.pointerId);
+  e.target.style.cursor = "grabbing";
+}
+function dragMove(e) {
+  if (!drag) return;
+  const w = find(drag.id);
+  if (!drag.moved && Math.hypot(e.clientX - drag.sx, e.clientY - drag.sy) < 4) return;
+  drag.moved = true;
+  if (full(w.size)) return;
+  const scr = document.getElementById("screen").getBoundingClientRect(), [cw, ch] = dims(w.size);
+  const x = e.clientX - scr.left - drag.dx - 8, y = e.clientY - scr.top - drag.dy - 8;
+  drag.c = Math.max(0, Math.min(COLS - cw, Math.round(x / STEP_X)));
+  drag.r = Math.max(0, Math.min(ROWS - ch, Math.round(y / STEP_Y)));
+  const L = live.get(drag.id); Object.assign(L.el.style, { left: x + 8 + "px", top: y + 8 + "px" }); L.el.style.zIndex = 3;
+  const G = rect({ ...w, c: drag.c, r: drag.r }), g = document.getElementById("ghost");
+  Object.assign(g.style, { display: "block", left: G.x + "px", top: G.y + "px", width: G.w + "px", height: G.h + "px" });
+  g.classList.toggle("bad", !fits(page(), drag.c, drag.r, w.size, w.id));
+}
+function dragEnd(e) {
+  if (!drag) return;
+  const w = find(drag.id), L = live.get(drag.id);
+  e.target.style.cursor = ""; L.el.style.zIndex = "";
+  document.getElementById("ghost").style.display = "none";
+  if (drag.moved && fits(page(), drag.c, drag.r, w.size, w.id)) { w.c = drag.c; w.r = drag.r; }
+  drag = null; layoutAll();
+}
+addEventListener("pointermove", dragMove);
+addEventListener("pointerup", dragEnd);
+addEventListener("pointercancel", dragEnd);
+
+function select(id) { selected = id; layoutAll(); }
+document.getElementById("screen").addEventListener("pointerdown", (e) => { if (e.target.id === "screen" || e.target.classList.contains("empty")) select(null); });
+addEventListener("keydown", (e) => {
+  if (openId) { if (e.key === "Escape") closeSettings(); return; }
+  if (!selected || S.mode !== "edit" || /input|select|textarea/i.test(e.target.tagName)) return;
+  const w = find(selected); if (!w) return;
+  const mv = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key];
+  if (mv) { e.preventDefault(); if (fits(page(), w.c + mv[0], w.r + mv[1], w.size, w.id)) { w.c += mv[0]; w.r += mv[1]; layoutAll(); } }
+  else if (e.key === "Delete" || e.key === "Backspace") { e.preventDefault(); remove(w.id); }
+  else if (e.key === "Enter") { e.preventDefault(); openSettings(w.id); }
+});
+
+/* ---------- settings: the widget opens in its own stand controls ---------- */
+function openSettings(id) {
+  const w = find(id); if (!w) return;
+  openId = id; selected = id;
+  const sheet = document.getElementById("sheet"); sheet.hidden = false;
+  document.getElementById("sheetName").textContent = tname(w.type);
+  document.getElementById("sheetSize").textContent = sizeLabel(w.size);
+  const L = live.get(id); L.el.hidden = false; L.el.classList.add("open");
+  fitSheet(); post(w, { type: "mode", mode: "settings" });
+  document.getElementById("sheetDone").focus();
+}
+function fitSheet() {
+  if (!openId) return;
+  const L = live.get(openId), R = document.getElementById("sheetHole").getBoundingClientRect();
+  Object.assign(L.el.style, { left: R.left + "px", top: R.top + "px", width: R.width + "px", height: R.height + "px" });
+}
+function closeSettings() {
+  if (!openId) return;
+  const id = openId, w = find(id), L = live.get(id);
+  openId = null; document.getElementById("sheet").hidden = true;
+  L.el.classList.remove("open");
+  post(w, { type: "mode", mode: "card" });
+  layoutAll();
+}
+document.getElementById("sheetDone").onclick = closeSettings;
+document.getElementById("sheet").addEventListener("pointerdown", (e) => { if (e.target.id === "sheet") closeSettings(); });
+addEventListener("resize", fitSheet);
+
+/* ---------- side panels ---------- */
+function renderInspector() {
+  const box = document.getElementById("inspector"), w = selected && find(selected);
+  box.replaceChildren();
+  if (!w) { const p = document.createElement("p"); p.className = "note"; p.textContent = tx("pick"); box.append(p); return; }
+  const t = document.createElement("div"); t.className = "title";
+  t.innerHTML = `<b></b><span class="readout"></span>`; t.querySelector("b").textContent = tname(w.type);
+  t.querySelector(".readout").textContent = `${sizeLabel(w.size)} · ${tx("where")(w.c + 1, w.r + 1)}`;
+  const row = document.createElement("div"); row.className = "group"; row.innerHTML = `<span class="label"></span>`; row.firstChild.textContent = tx("size");
+  const list = S.pages[pageOf(w.id)];
+  for (const s of sizesOf(w)) {
+    const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.textContent = sizeLabel(s);
+    b.setAttribute("aria-pressed", String(s === w.size));
+    b.disabled = s !== w.size && !freeSpot(list, s, w.id) && !fits(list, w.c, w.r, s, w.id);
+    b.onclick = () => resize(w.id, s); row.append(b);
+  }
+  const acts = document.createElement("div"); acts.className = "group";
+  const btn = (label, fn, cls = "") => { const b = document.createElement("button"); b.type = "button"; b.className = "chip " + cls; b.textContent = label; b.onclick = fn; acts.append(b); return b; };
+  btn(tx("settings"), () => openSettings(w.id));
+  btn(tx("copy"), () => duplicate(w.id));
+  if (S.pages.length > 1) btn(tx("next"), () => moveToPage(w.id, (S.page + 1) % S.pages.length));
+  btn(tx("remove"), () => remove(w.id), "danger");
+  box.append(t, row, acts);
+}
+function moveToPage(id, to) {
+  const w = find(id), at = freeSpot(S.pages[to], w.size);
+  if (!at) return toast(t("noRoomPage")(to + 1));
+  const from = S.pages[pageOf(id)]; from.splice(from.indexOf(w), 1);
+  [w.c, w.r] = at; S.pages[to].push(w); S.page = to; layoutAll();
+}
+function renderPages() {
+  const box = document.getElementById("pages"), dots = document.getElementById("dots");
+  box.replaceChildren(); dots.replaceChildren();
+  S.pages.forEach((p, i) => {
+    const b = document.createElement("button"); b.type = "button"; b.textContent = i + 1; b.setAttribute("aria-pressed", String(i === S.page)); b.onclick = () => goPage(i); box.append(b);
+    const d = document.createElement("button"); d.type = "button"; d.setAttribute("aria-label", t("pageN")(i + 1)); if (i === S.page) d.setAttribute("aria-current", "true"); d.onclick = () => goPage(i); dots.append(d);
+  });
+  dots.hidden = S.pages.length < 2;
+  document.getElementById("delPage").disabled = S.pages.length < 2;
+}
+function goPage(i) { S.page = i; selected = null; toast(""); layoutAll(); }
+document.getElementById("addPage").onclick = () => { S.pages.push([]); goPage(S.pages.length - 1); };
+document.getElementById("delPage").onclick = () => {
+  if (S.pages.length < 2) return;
+  const n = page().length;
+  if (n && !confirm(t("delAsk")(S.page + 1, n))) return;
+  for (const w of page()) forgetStorage(w.id);
+  S.pages.splice(S.page, 1); goPage(Math.max(0, S.page - 1));
+};
+function toast(t) { document.getElementById("toast").textContent = t; }
+
+function renderCatalog() {
+  const box = document.getElementById("catalog");
+  box.replaceChildren();
+  for (const [type, T] of Object.entries(TYPES)) {
+    const b = document.createElement("button"); b.type = "button"; b.className = "tile";
+    b.innerHTML = `<span class="icon" aria-hidden="true">${T.icon}</span><b></b><small></small>`;
+    b.querySelector("b").textContent = tname(type);
+    b.querySelector("small").textContent = T.def === "screen" ? t("full") : t("sizes")(T.sizes.length);
+    b.onclick = () => add(type);
+    box.append(b);
+  }
+}
+
+/* ---------- main controls ---------- */
+function pressed(box, v) { for (const b of box.querySelectorAll("[data-v]")) b.setAttribute("aria-pressed", String(b.dataset.v === v)); }
+const langBox = document.getElementById("lang"), modeBox = document.getElementById("mode");
+langBox.onclick = (e) => {
+  const v = e.target.dataset?.v; if (!v || v === S.lang) return;
+  S.lang = v; pressed(langBox, v); save();
+  applyUi(); layoutAll();
+  for (const p of S.pages) for (const w of p) post(w, { type: "lang", lang: v });
+};
+modeBox.onclick = (e) => {
+  const v = e.target.dataset?.v; if (!v) return;
+  S.mode = v; pressed(modeBox, v); save();
+  document.getElementById("screen").classList.toggle("edit", v === "edit");
+  if (v === "play") { selected = null; layoutAll(); }
+};
+pressed(langBox, S.lang); pressed(modeBox, S.mode);
+document.getElementById("screen").classList.toggle("edit", S.mode === "edit");
+
+(function grid() {
+  const box = document.getElementById("cells");
+  for (let r = 0; r < ROWS; r++) for (let c = 0; c < COLS; c++) {
+    const R = rect({ c, r, size: "1x1" }), d = document.createElement("div"); d.className = "cell";
+    Object.assign(d.style, { left: R.x + "px", top: R.y + "px", width: R.w + "px", height: R.h + "px" }); box.append(d);
+  }
+})();
+applyUi();
+if (!S.pages.some((p) => p.length) && store.get(KEY) === null) {        // first visit: a sample screen
+  for (const [type, size, c, r] of [["time", "4x2", 0, 0], ["weather", "4x2", 4, 0], ["light", "4x4", 0, 2], ["climate", "4x4", 4, 2], ["thermostat", "2x2", 0, 6], ["button", "2x2", 2, 6], ["cover", "4x2", 4, 6]])
+    S.pages[0].push({ id: uid(), type, size, c, r });
+}
+layoutAll();
+</script>
+</body>
+</html>

@@ -1,0 +1,1358 @@
+[
+  {
+    "components": [
+      "toggle"
+    ],
+    "composite": false,
+    "domains": [
+      "switch",
+      "input_boolean"
+    ],
+    "hidden": false,
+    "icon": "mdi:toggle-switch",
+    "id": "toggle",
+    "name": {
+      "en": "Switch",
+      "ru": "Выключатель"
+    },
+    "sizes": [
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        4,
+        2
+      ]
+    ]
+  },
+  {
+    "components": [
+      "light"
+    ],
+    "composite": false,
+    "domains": [
+      "light"
+    ],
+    "hidden": false,
+    "icon": "mdi:lightbulb",
+    "id": "light",
+    "name": {
+      "en": "Light",
+      "ru": "Свет"
+    },
+    "sizes": [
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        2,
+        6
+      ],
+      [
+        2,
+        8
+      ],
+      [
+        4,
+        2
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        4,
+        6
+      ],
+      [
+        8,
+        2
+      ],
+      [
+        8,
+        4
+      ],
+      [
+        8,
+        6
+      ],
+      [
+        8,
+        8
+      ]
+    ]
+  },
+  {
+    "components": [
+      "fan"
+    ],
+    "composite": false,
+    "domains": [
+      "fan"
+    ],
+    "hidden": false,
+    "icon": "mdi:fan",
+    "id": "fan",
+    "name": {
+      "en": "Fan",
+      "ru": "Вентилятор"
+    },
+    "sizes": [
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        2,
+        6
+      ],
+      [
+        2,
+        8
+      ],
+      [
+        4,
+        2
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        4,
+        6
+      ],
+      [
+        8,
+        2
+      ],
+      [
+        8,
+        4
+      ],
+      [
+        8,
+        6
+      ],
+      [
+        8,
+        8
+      ]
+    ]
+  },
+  {
+    "components": [
+      "cover"
+    ],
+    "composite": false,
+    "domains": [
+      "cover"
+    ],
+    "hidden": false,
+    "icon": "mdi:curtains",
+    "id": "cover",
+    "name": {
+      "en": "Cover",
+      "ru": "Шторы"
+    },
+    "sizes": [
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        2,
+        6
+      ],
+      [
+        2,
+        8
+      ],
+      [
+        4,
+        2
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        4,
+        6
+      ],
+      [
+        8,
+        2
+      ],
+      [
+        8,
+        4
+      ],
+      [
+        8,
+        6
+      ],
+      [
+        8,
+        8
+      ]
+    ]
+  },
+  {
+    "components": [
+      "roller"
+    ],
+    "composite": false,
+    "domains": [
+      "cover"
+    ],
+    "hidden": false,
+    "icon": "mdi:roller-shade",
+    "id": "roller",
+    "name": {
+      "en": "Roller shade",
+      "ru": "Рулонная штора"
+    },
+    "sizes": [
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        2,
+        6
+      ],
+      [
+        2,
+        8
+      ],
+      [
+        4,
+        2
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        4,
+        6
+      ],
+      [
+        8,
+        2
+      ],
+      [
+        8,
+        4
+      ],
+      [
+        8,
+        6
+      ],
+      [
+        8,
+        8
+      ]
+    ]
+  },
+  {
+    "components": [
+      "climate"
+    ],
+    "composite": false,
+    "domains": [
+      "climate"
+    ],
+    "hidden": true,
+    "icon": "mdi:thermostat",
+    "id": "climate",
+    "name": {
+      "en": "Climate",
+      "ru": "Климат"
+    },
+    "sizes": [
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        2,
+        6
+      ],
+      [
+        2,
+        8
+      ],
+      [
+        4,
+        2
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        4,
+        6
+      ],
+      [
+        8,
+        2
+      ],
+      [
+        8,
+        4
+      ],
+      [
+        8,
+        6
+      ],
+      [
+        8,
+        8
+      ]
+    ]
+  },
+  {
+    "components": [
+      "media"
+    ],
+    "composite": false,
+    "domains": [
+      "media_player"
+    ],
+    "hidden": false,
+    "icon": "mdi:music",
+    "id": "media",
+    "name": {
+      "en": "Media",
+      "ru": "Медиаплеер"
+    },
+    "sizes": [
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        2,
+        6
+      ],
+      [
+        2,
+        8
+      ],
+      [
+        4,
+        2
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        4,
+        6
+      ],
+      [
+        8,
+        2
+      ],
+      [
+        8,
+        6
+      ],
+      [
+        8,
+        8
+      ]
+    ]
+  },
+  {
+    "components": [
+      "action"
+    ],
+    "composite": false,
+    "domains": [
+      "scene",
+      "script",
+      "button",
+      "input_button"
+    ],
+    "hidden": false,
+    "icon": "mdi:play-circle",
+    "id": "action",
+    "name": {
+      "en": "Action",
+      "ru": "Действие"
+    },
+    "sizes": [
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        4,
+        2
+      ]
+    ]
+  },
+  {
+    "components": [
+      "number"
+    ],
+    "composite": false,
+    "domains": [
+      "number",
+      "input_number"
+    ],
+    "hidden": false,
+    "icon": "mdi:numeric",
+    "id": "number",
+    "name": {
+      "en": "Number",
+      "ru": "Число"
+    },
+    "sizes": [
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        4,
+        2
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        8,
+        2
+      ]
+    ]
+  },
+  {
+    "components": [
+      "select"
+    ],
+    "composite": false,
+    "domains": [
+      "select",
+      "input_select"
+    ],
+    "hidden": false,
+    "icon": "mdi:format-list-bulleted",
+    "id": "select",
+    "name": {
+      "en": "Select",
+      "ru": "Выбор"
+    },
+    "sizes": [
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        4,
+        2
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        8,
+        2
+      ]
+    ]
+  },
+  {
+    "components": [
+      "text"
+    ],
+    "composite": false,
+    "domains": [
+      "text",
+      "input_text"
+    ],
+    "hidden": false,
+    "icon": "mdi:form-textbox",
+    "id": "text",
+    "name": {
+      "en": "Text",
+      "ru": "Текст"
+    },
+    "sizes": [
+      [
+        4,
+        2
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        8,
+        2
+      ],
+      [
+        8,
+        4
+      ]
+    ]
+  },
+  {
+    "components": [
+      "datetime"
+    ],
+    "composite": false,
+    "domains": [
+      "input_datetime"
+    ],
+    "hidden": false,
+    "icon": "mdi:calendar-clock",
+    "id": "datetime",
+    "name": {
+      "en": "Date and time",
+      "ru": "Дата и время"
+    },
+    "sizes": [
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        2,
+        6
+      ],
+      [
+        2,
+        8
+      ],
+      [
+        4,
+        2
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        4,
+        6
+      ],
+      [
+        8,
+        2
+      ],
+      [
+        8,
+        6
+      ],
+      [
+        8,
+        8
+      ]
+    ]
+  },
+  {
+    "components": [
+      "sensor"
+    ],
+    "composite": false,
+    "domains": [
+      "sensor"
+    ],
+    "hidden": false,
+    "icon": "mdi:gauge",
+    "id": "sensor",
+    "name": {
+      "en": "Reading",
+      "ru": "Показатель"
+    },
+    "sizes": [
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        2,
+        6
+      ],
+      [
+        2,
+        8
+      ],
+      [
+        4,
+        2
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        4,
+        6
+      ],
+      [
+        8,
+        2
+      ],
+      [
+        8,
+        6
+      ],
+      [
+        8,
+        8
+      ]
+    ]
+  },
+  {
+    "components": [
+      "binary"
+    ],
+    "composite": false,
+    "domains": [
+      "binary_sensor"
+    ],
+    "hidden": false,
+    "icon": "mdi:checkbox-marked-circle-outline",
+    "id": "binary",
+    "name": {
+      "en": "Binary sensor",
+      "ru": "Состояние"
+    },
+    "sizes": [
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        2,
+        6
+      ],
+      [
+        2,
+        8
+      ],
+      [
+        4,
+        2
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        4,
+        6
+      ],
+      [
+        8,
+        2
+      ],
+      [
+        8,
+        6
+      ],
+      [
+        8,
+        8
+      ]
+    ]
+  },
+  {
+    "components": [
+      "weather"
+    ],
+    "composite": false,
+    "domains": [
+      "weather"
+    ],
+    "hidden": false,
+    "icon": "mdi:weather-partly-cloudy",
+    "id": "weather",
+    "name": {
+      "en": "Weather",
+      "ru": "Погода"
+    },
+    "sizes": [
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        2,
+        6
+      ],
+      [
+        2,
+        8
+      ],
+      [
+        4,
+        2
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        4,
+        6
+      ],
+      [
+        8,
+        2
+      ],
+      [
+        8,
+        4
+      ],
+      [
+        8,
+        6
+      ],
+      [
+        8,
+        8
+      ]
+    ]
+  },
+  {
+    "components": [
+      "relay"
+    ],
+    "composite": false,
+    "domains": [
+      "local"
+    ],
+    "hidden": false,
+    "icon": "mdi:power",
+    "id": "relay",
+    "name": {
+      "en": "Relay",
+      "ru": "Реле"
+    },
+    "sizes": [
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        4,
+        2
+      ]
+    ]
+  },
+  {
+    "components": [
+      "metrics-row"
+    ],
+    "composite": true,
+    "domains": [
+      "sensor",
+      "binary_sensor"
+    ],
+    "hidden": true,
+    "icon": "mdi:view-sequential",
+    "id": "metrics-row",
+    "name": {
+      "en": "Metrics row",
+      "ru": "Показатели в строку"
+    },
+    "sizes": [
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        2,
+        6
+      ],
+      [
+        2,
+        8
+      ],
+      [
+        4,
+        2
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        4,
+        6
+      ],
+      [
+        8,
+        2
+      ],
+      [
+        8,
+        6
+      ],
+      [
+        8,
+        8
+      ]
+    ]
+  },
+  {
+    "components": [
+      "metrics-grid"
+    ],
+    "composite": true,
+    "domains": [
+      "sensor",
+      "binary_sensor"
+    ],
+    "hidden": true,
+    "icon": "mdi:view-grid-outline",
+    "id": "metrics-grid",
+    "name": {
+      "en": "Metrics grid",
+      "ru": "Сетка показателей"
+    },
+    "sizes": [
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        2,
+        6
+      ],
+      [
+        2,
+        8
+      ],
+      [
+        4,
+        2
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        4,
+        6
+      ],
+      [
+        8,
+        2
+      ],
+      [
+        8,
+        6
+      ],
+      [
+        8,
+        8
+      ]
+    ]
+  },
+  {
+    "components": [
+      "breezer"
+    ],
+    "composite": false,
+    "domains": [
+      "fan"
+    ],
+    "hidden": false,
+    "icon": "mdi:view-dashboard-outline",
+    "id": "breezer",
+    "name": {
+      "en": "breezer",
+      "ru": "Бризер"
+    },
+    "sizes": [
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        2,
+        6
+      ],
+      [
+        2,
+        8
+      ],
+      [
+        4,
+        2
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        4,
+        6
+      ],
+      [
+        8,
+        2
+      ],
+      [
+        8,
+        4
+      ],
+      [
+        8,
+        6
+      ],
+      [
+        8,
+        8
+      ]
+    ]
+  },
+  {
+    "components": [
+      "humidifier"
+    ],
+    "composite": false,
+    "domains": [
+      "humidifier"
+    ],
+    "hidden": false,
+    "icon": "mdi:view-dashboard-outline",
+    "id": "humidifier",
+    "name": {
+      "en": "Humidifier",
+      "ru": "Увлажнитель"
+    },
+    "sizes": [
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        2,
+        6
+      ],
+      [
+        2,
+        8
+      ],
+      [
+        4,
+        2
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        4,
+        6
+      ],
+      [
+        8,
+        2
+      ],
+      [
+        8,
+        4
+      ],
+      [
+        8,
+        6
+      ],
+      [
+        8,
+        8
+      ]
+    ]
+  },
+  {
+    "components": [
+      "thermostat"
+    ],
+    "composite": false,
+    "domains": [
+      "climate"
+    ],
+    "hidden": false,
+    "icon": "mdi:view-dashboard-outline",
+    "id": "thermostat",
+    "name": {
+      "en": "Thermostat",
+      "ru": "Термостат"
+    },
+    "sizes": [
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        2,
+        6
+      ],
+      [
+        2,
+        8
+      ],
+      [
+        4,
+        2
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        4,
+        6
+      ],
+      [
+        8,
+        2
+      ],
+      [
+        8,
+        4
+      ],
+      [
+        8,
+        6
+      ],
+      [
+        8,
+        8
+      ]
+    ]
+  },
+  {
+    "components": [
+      "sensors"
+    ],
+    "composite": true,
+    "domains": [
+      "sensor",
+      "binary_sensor"
+    ],
+    "hidden": false,
+    "icon": "mdi:view-dashboard-outline",
+    "id": "sensors",
+    "name": {
+      "en": "Readings",
+      "ru": "Показатели"
+    },
+    "sizes": [
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        2,
+        6
+      ],
+      [
+        2,
+        8
+      ],
+      [
+        4,
+        2
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        4,
+        6
+      ],
+      [
+        8,
+        2
+      ],
+      [
+        8,
+        6
+      ],
+      [
+        8,
+        8
+      ]
+    ]
+  },
+  {
+    "components": [
+      "button"
+    ],
+    "composite": false,
+    "domains": [
+      "switch",
+      "input_boolean",
+      "local"
+    ],
+    "hidden": true,
+    "icon": "mdi:view-dashboard-outline",
+    "id": "button",
+    "name": {
+      "en": "button",
+      "ru": "Кнопка"
+    },
+    "sizes": [
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        4,
+        2
+      ]
+    ]
+  },
+  {
+    "components": [
+      "microclimate"
+    ],
+    "composite": true,
+    "domains": [
+      "sensor"
+    ],
+    "hidden": false,
+    "icon": "mdi:home-thermometer-outline",
+    "id": "microclimate",
+    "name": {
+      "en": "Microclimate",
+      "ru": "Микроклимат"
+    },
+    "sizes": [
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        2,
+        6
+      ],
+      [
+        2,
+        8
+      ],
+      [
+        4,
+        2
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        4,
+        6
+      ],
+      [
+        8,
+        2
+      ],
+      [
+        8,
+        4
+      ],
+      [
+        8,
+        6
+      ],
+      [
+        8,
+        8
+      ]
+    ]
+  },
+  {
+    "components": [
+      "time"
+    ],
+    "composite": false,
+    "domains": [
+      "input_datetime"
+    ],
+    "hidden": false,
+    "icon": "mdi:calendar-clock",
+    "id": "time",
+    "name": {
+      "en": "Time",
+      "ru": "Время"
+    },
+    "sizes": [
+      [
+        2,
+        4
+      ],
+      [
+        4,
+        2
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        8,
+        2
+      ]
+    ]
+  },
+  {
+    "components": [
+      "printer"
+    ],
+    "composite": false,
+    "domains": [
+      "sensor"
+    ],
+    "hidden": false,
+    "icon": "mdi:printer-3d",
+    "id": "printer",
+    "name": {
+      "en": "3D printer",
+      "ru": "3D-принтер"
+    },
+    "sizes": [
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        4,
+        2
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        4,
+        6
+      ],
+      [
+        8,
+        2
+      ],
+      [
+        8,
+        4
+      ],
+      [
+        8,
+        6
+      ],
+      [
+        8,
+        8
+      ]
+    ]
+  }
+]

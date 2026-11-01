@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Card gallery — S1E Panel for Aqara S1E and Home Assistant</title>
+<meta name="description" content="Every card of S1E Panel, the Home Assistant firmware for the Aqara Magic Switch S1E, live in your browser: light, curtains, thermostat, humidifier, fan, breezer, climate, switches, helpers, weather and a 3D printer.">
+<link rel="canonical" href="https://alexshemr.github.io/s1e-panel/gallery.html">
+<meta property="og:title" content="S1E Panel card gallery">
+<meta property="og:description" content="Interactive Home Assistant cards for the Aqara S1E touch panel.">
+<meta property="og:image" content="https://alexshemr.github.io/s1e-panel/assets/en/hero.png">
+<meta name="theme-color" content="#0b0f14">
+<link rel="icon" href="assets/icon.png">
+<style>
+:root{--bg:#0b0f14;--panel:#141a22;--line:#232c38;--text:#e9eef4;--muted:#9aa7b6;--accent:#ffd966;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif}
+a{color:var(--accent)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px 48px}
+nav{display:flex;align-items:center;gap:16px;padding:16px 0;flex-wrap:wrap}
+nav .brand{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--text);text-decoration:none;margin-right:auto}
+nav .brand img{width:32px;height:32px;border-radius:8px}
+nav a{text-decoration:none;color:var(--muted);font-size:15px}
+h1{font-size:clamp(28px,4.5vw,44px);margin:16px 0 8px;letter-spacing:-.02em}
+.lede{color:var(--muted);max-width:780px;margin:0 0 12px}
+.note{color:var(--muted);font-size:14px;max-width:780px}
+.toc{display:flex;flex-wrap:wrap;gap:8px;margin:20px 0 8px}
+.toc a{border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:14px;color:var(--muted);text-decoration:none;background:var(--panel)}
+section.c{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:20px;margin-top:20px}
+section.c h2{margin:0 0 4px;font-size:24px}
+section.c p{margin:0 0 8px;color:var(--muted)}
+dl{display:grid;grid-template-columns:max-content 1fr;gap:4px 12px;margin:8px 0 16px;font-size:14px}
+dt{color:var(--muted)}
+dd{margin:0}
+code{background:#0b0f14;border:1px solid var(--line);border-radius:6px;padding:0 5px;font-size:13px}
+.stage{display:flex;flex-wrap:wrap;gap:16px;align-items:flex-start;background:#0b0f14;border-radius:16px;padding:16px;overflow-x:auto}
+.stage figure{margin:0}
+.stage figcaption{color:var(--muted);font-size:12px;margin-top:4px;font-family:ui-monospace,monospace}
+.stage iframe{border:0;display:block;background:transparent;color-scheme:normal}
+.stage img{display:block;max-width:100%;height:auto}
+.more{display:inline-block;margin-top:12px;font-weight:600;font-size:15px}
+.lang{margin-left:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav>
+  <a class="brand" href="./"><img src="assets/icon.png" alt="">S1E Panel</a>
+  <a id="nav-demo" href="demo/stands/home-stand.html?lang=en&amp;mode=play">Constructor</a>
+  <a id="nav-docs" href="https://github.com/alexshemr/s1e-panel/blob/main/docs/cards.md">Card reference</a>
+  <a href="https://github.com/alexshemr/s1e-panel">GitHub</a>
+  <a id="nav-lang" class="lang" href="?lang=ru">Русский</a>
+</nav>
+<h1 id="title">Card gallery</h1>
+<p class="lede" id="lede">Every card of S1E Panel, live. Tap, drag and switch: the devices are simulated in your browser. Cards are shown at their real size on the 480 × 480 panel.</p>
+<p class="note" id="note">These are the interactive reference designs every firmware card is built from and checked against; the panel draws them natively with LVGL. Open a card's full demo for all sizes, options and states.</p>
+<div class="toc" id="toc"></div>
+<div id="cards"></div>
+</div>
+<script>
+const ru = new URLSearchParams(location.search).get("lang") === "ru";
+const L = ru ? "ru" : "en";
+const px = (w, h) => [w * 59 - 8, Math.floor(h * 53.5) - 8];       // the firmware grid: 59 × 53.5 px cells, 8 px gaps
+const ALL = { en: "all 11 sizes: 2×2 … 8×8", ru: "все 11 размеров: 2×2 … 8×8" };
+const CARDS = [
+  { id: "light", stand: "light", live: ["2x4", "4x4"], name: { en: "Light", ru: "Свет" }, entities: "light", sizes: ALL,
+    text: { en: "Brightness, colour temperature, colour and effects, with quick presets. Shows only what the lamp supports; the icon glows in the lamp's colour.",
+            ru: "Яркость, цветовая температура, цвет и эффекты, быстрые пресеты. Показывает только то, что умеет лампа; иконка светится её цветом." } },
+  { id: "cover", stand: "cover", live: ["2x4", "4x4"], name: { en: "Curtains", ru: "Шторы" }, entities: "cover", sizes: ALL,
+    text: { en: "Position, open, stop and close. A window with a city and a sky that follows the real sun and moon.",
+            ru: "Положение, открыть, стоп, закрыть. Окно с городом и небом, которое следует за настоящим солнцем и луной." } },
+  { id: "roller", stand: "roller", live: ["2x4", "4x4"], name: { en: "Roller blind", ru: "Рулонная штора" }, entities: "cover", sizes: ALL,
+    text: { en: "The same controls as the curtains; the fabric comes down from its box.",
+            ru: "Те же действия, что у штор; ткань опускается из короба." } },
+  { id: "thermostat", stand: "thermostat", live: ["2x4", "4x4"], name: { en: "Thermostat", ru: "Термостат" }, entities: "climate", sizes: ALL,
+    text: { en: "Target temperature with − and +, heating at a glance, HVAC modes and presets on larger cards.",
+            ru: "Целевая температура кнопками − и +, нагрев виден сразу, режимы и пресеты на больших карточках." } },
+  { id: "humidifier", stand: "humidifier", live: ["2x4", "4x4"], name: { en: "Humidifier", ru: "Увлажнитель" }, entities: "humidifier", sizes: ALL,
+    text: { en: "Target humidity in 5 % steps, modes, mist while it works and an optional water tank.",
+            ru: "Целевая влажность шагом 5 %, режимы, пар во время работы и необязательный бак с водой." } },
+  { id: "fan", stand: "fan", live: ["2x4", "4x4"], name: { en: "Fan", ru: "Вентилятор" }, entities: "fan", sizes: ALL,
+    text: { en: "Speed in steps or smoothly, oscillation, direction and presets. The impeller spins at the real speed.",
+            ru: "Скорость ступенями или плавно, качание, направление и пресеты. Крыльчатка крутится с настоящей скоростью." } },
+  { id: "breezer", stand: "breezer", live: ["2x4", "4x4"], name: { en: "Breezer", ru: "Бризер" }, entities: "fan + air sensors", sizes: ALL,
+    text: { en: "Airflow, modes, the heater and up to three air sensors (CO₂, PM2.5, TVOC) coloured by level.",
+            ru: "Подача воздуха, режимы, обогрев и до трёх датчиков воздуха (CO₂, PM2.5, TVOC) с цветом уровня." } },
+  { id: "climate", stand: "climate", live: ["2x4", "4x4"], name: { en: "Climate", ru: "Микроклимат" }, entities: "sensor (up to six)", sizes: ALL,
+    text: { en: "The room's readings on one card: temperature, humidity, CO₂, PM2.5 and more, coloured by their norms.",
+            ru: "Показатели комнаты на одной карточке: температура, влажность, CO₂, PM2.5 и другие, в цветах норм." } },
+  { id: "button", stand: "button", live: ["2x2", "2x4", "4x2"], name: { en: "Switch, relay and action", ru: "Выключатель, реле и действие" },
+    entities: "switch, input_boolean · the panel's relays · scene, script, button, input_button", sizes: { en: "2×2, 2×4, 4×2", ru: "2×2, 2×4, 4×2" },
+    text: { en: "One-touch cards: the whole card is the button. A wall rocker on 2×4, a run button for scenes and scripts.",
+            ru: "Карточки в одно касание: кнопка — вся карточка. Настенная клавиша на 2×4, кнопка запуска для сцен и скриптов." } },
+  { id: "time", stand: "time", live: ["2x4", "4x2"], name: { en: "Time", ru: "Время" }, entities: "input_datetime", sizes: { en: "2×4, 4×2, 4×4, 8×2", ru: "2×4, 4×2, 4×4, 8×2" },
+    text: { en: "An alarm, reminder or deadline. Hold the hours, minutes or date to set them with scroll drums.",
+            ru: "Будильник, напоминание или срок. Удерживайте часы, минуты или дату, чтобы изменить их барабанами." } },
+  { id: "inputs", stand: "inputs", live: ["2x2", "4x2"], name: { en: "Number, select and text", ru: "Число, выбор и текст" },
+    entities: "number, input_number · select, input_select · text, input_text", sizes: { en: "2×2, 2×4, 4×2, 4×4, 8×2 (text: 4×2 … 8×4)", ru: "2×2, 2×4, 4×2, 4×4, 8×2 (текст: 4×2 … 8×4)" },
+    text: { en: "Home Assistant helpers: a number with buttons or a slider, a choice from a list, a text message.",
+            ru: "Вспомогательные значения Home Assistant: число кнопками или слайдером, выбор из списка, текстовое сообщение." } },
+  { id: "weather", stand: "weather", live: ["2x4", "4x4"], name: { en: "Weather", ru: "Погода" }, entities: "weather", sizes: ALL,
+    text: { en: "An animated sky for every Home Assistant weather condition, by day and by night.",
+            ru: "Анимированное небо для каждого состояния погоды Home Assistant, днём и ночью." } },
+  { id: "printer", stand: "printer", live: ["4x2", "4x4"], name: { en: "3D printer", ru: "3D-принтер" }, entities: "Bambu Lab sensors (ha-bambulab)",
+    sizes: { en: "9 sizes, 2×2 … 8×8", ru: "9 размеров, 2×2 … 8×8" },
+    text: { en: "The current print: status, model, progress, time left, layers, temperatures, pause and stop, live camera.",
+            ru: "Текущая печать: статус, модель, прогресс, остаток времени, слои, температуры, пауза и стоп, камера." } },
+  { id: "media", image: "card-media.png", name: { en: "Media", ru: "Медиаплеер" }, entities: "media_player", sizes: { en: "10 sizes", ru: "10 размеров" },
+    text: { en: "On / off and volume on the card, play / pause in its control sheet. Shown as rendered by the firmware.",
+            ru: "Включение и громкость на карточке, пуск и пауза — в панели управления. Кадр отрисован прошивкой." } },
+  { id: "sensors", image: "card-sensors.png", name: { en: "Reading and Readings", ru: "Показание и показания" }, entities: "sensor, binary_sensor", sizes: { en: "10 sizes", ru: "10 размеров" },
+    text: { en: "Simple value tiles. For readings with norms and colours, use the Climate card. Shown as rendered by the firmware.",
+            ru: "Простые плитки значений. Для показателей с нормами и цветами используйте «Микроклимат». Кадр отрисован прошивкой." } },
+  { id: "saver", stand: "saver", live: ["screen"], name: { en: "Screensavers", ru: "Заставки" }, entities: "weather, sensor, binary_sensor", sizes: { en: "full screen", ru: "весь экран" },
+    text: { en: "Just the time, Home essentials, Living weather and A favorite moment — or a shuffle of them.",
+            ru: "«Только время», «Пульс дома», «Живая погода» и «Любимый момент» — или перемешивание." } },
+];
+const T = {
+  en: { title: "Card gallery", entities: "Entities", sizes: "Sizes", full: "Full demo: all sizes and options →", lang: "Русский", langHref: "?lang=ru",
+        docs: "https://github.com/alexshemr/s1e-panel/blob/main/docs/cards.md", demo: "Constructor", ref: "Card reference",
+        lede: "Every card of S1E Panel, live. Tap, drag and switch: the devices are simulated in your browser. Cards are shown at their real size on the 480 × 480 panel.",
+        note: "These are the interactive reference designs every firmware card is built from and checked against; the panel draws them natively with LVGL. Open a card's full demo for all sizes, options and states." },
+  ru: { title: "Галерея карточек", entities: "Сущности", sizes: "Размеры", full: "Полное демо: все размеры и настройки →", lang: "English", langHref: "?lang=en",
+        docs: "https://github.com/alexshemr/s1e-panel/blob/main/docs/ru/cards.md", demo: "Конструктор", ref: "Справочник карточек",
+        lede: "Все карточки S1E Panel вживую. Нажимайте, тяните, переключайте: устройства имитируются в браузере. Карточки показаны в настоящем размере на экране 480 × 480.",
+        note: "Это интерактивные эталоны, по которым сделана и проверяется каждая карточка прошивки; панель рисует их нативно на LVGL. В полном демо карточки — все размеры, настройки и состояния." },
+}[L];
+document.documentElement.lang = L;
+if (ru) document.title = "Галерея карточек — S1E Panel для Aqara S1E и Home Assistant";
+for (const [id, v] of [["title", T.title], ["lede", T.lede], ["note", T.note], ["nav-demo", T.demo], ["nav-docs", T.ref], ["nav-lang", T.lang]])
+  document.getElementById(id).textContent = v;
+document.getElementById("nav-lang").href = T.langHref;
+document.getElementById("nav-docs").href = T.docs;
+document.getElementById("nav-demo").href = `demo/stands/home-stand.html?lang=${L}&mode=play`;
+const toc = document.getElementById("toc"), box = document.getElementById("cards");
+for (const c of CARDS) {
+  const a = document.createElement("a"); a.href = "#" + c.id; a.textContent = c.name[L]; toc.append(a);
+  const s = document.createElement("section"); s.className = "c"; s.id = c.id;
+  const h = document.createElement("h2"); h.textContent = c.name[L];
+  const p = document.createElement("p"); p.textContent = c.text[L];
+  const dl = document.createElement("dl");
+  for (const [k, v] of [[T.entities, c.entities], [T.sizes, c.sizes[L]]]) {
+    const dt = document.createElement("dt"); dt.textContent = k;
+    const dd = document.createElement("dd"); dd.textContent = v; dl.append(dt, dd);
+  }
+  const stage = document.createElement("div"); stage.className = "stage";
+  if (c.image) {
+    const img = document.createElement("img"); img.src = `assets/${L}/${c.image}`; img.alt = c.name[L]; img.loading = "lazy"; stage.append(img);
+  } else for (const size of c.live) {
+    const [w, hgt] = size === "screen" ? [480, 480] : px(...size.split("x").map(Number));
+    const f = document.createElement("figure"), fr = document.createElement("iframe");
+    fr.src = `demo/stands/${c.stand}-stand.html?embed=gallery-${c.id}-${size}&size=${size}&lang=${L}`;
+    fr.width = w; fr.height = hgt; fr.loading = "lazy"; fr.scrolling = "no"; fr.title = `${c.name[L]} ${size.replace("x", "×")}`;
+    const cap = document.createElement("figcaption"); cap.textContent = size === "screen" ? "480 × 480" : `${size.replace("x", "×")} · ${w} × ${hgt} px`;
+    f.append(fr, cap); stage.append(f);
+  }
+  s.append(h, p, dl, stage);
+  if (c.stand) { const m = document.createElement("a"); m.className = "more"; m.href = `demo/stands/${c.stand}-stand.html?lang=${L}`; if (ru) m.href = `demo/stands/${c.stand}-stand.html`; m.textContent = T.full; s.append(m); }
+  box.append(s);
+}
+</script>
+</body>
+</html>

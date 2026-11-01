@@ -1,0 +1,893 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Стенд 3D-принтера S1E</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&family=Noto+Sans+Display:wght@500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: same workbench as the other stands — sticky controls, the 480×480 panel screen beside every card size. */
+:root {
+  --page: #0b0e12; --tray: #101317; --raised: #171b21; --line: #2a3039; --text: #f3f0e9; --muted: #9da2aa; --accent: #dfb98a;
+  --display: "Noto Sans Display", "Noto Sans", system-ui, sans-serif;
+  --body: "Noto Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  color-scheme: dark;
+  box-sizing: border-box; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+html, body { margin: 0; background: var(--page); color: var(--text); }
+body { font-family: var(--body); font-size: 14px; line-height: 1.5; }
+.wrap { max-width: 1480px; margin: 0 auto; padding-block: 20px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 18px; }
+header { display: grid; gap: 4px; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+h1 { font-family: var(--display); font-weight: 600; font-size: clamp(24px, 3vw, 32px); line-height: 1.15; margin: 0; text-wrap: balance; }
+.lede { color: var(--muted); max-width: 80ch; margin: 0; }
+.controls { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px); padding-block: 10px; border-bottom: 1px solid var(--line); display: grid; gap: 10px; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--page); }
+.row { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+.group { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.label { font-size: 12px; color: var(--muted); margin-right: 2px; }
+.seg { display: inline-flex; flex-wrap: wrap; background: var(--raised); border: 1px solid var(--line); border-radius: 10px; padding: 2px; }
+.seg button { font: inherit; font-size: 13px; color: var(--muted); background: none; border: 0; border-radius: 8px; padding: 4px 12px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: #2c3037; color: var(--text); }
+.chip { font: inherit; font-size: 13px; color: var(--text); background: var(--raised); border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; cursor: pointer; font-variant-numeric: tabular-nums; }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #17130e; font-weight: 600; }
+.swatch { width: 26px; height: 26px; border-radius: 50%; border: 2px solid transparent; outline: 1px solid var(--line); cursor: pointer; padding: 0; }
+.swatch[aria-pressed="true"] { border-color: var(--text); }
+.switch { display: inline-flex; gap: 8px; align-items: center; font-size: 13px; cursor: pointer; }
+.switch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.switch span { width: 34px; height: 20px; border-radius: 999px; background: var(--line); position: relative; transition: background .15s; }
+.switch span::after { content: ""; position: absolute; left: 3px; top: 3px; width: 14px; height: 14px; border-radius: 50%; background: var(--text); transition: transform .15s; }
+.switch input:checked + span { background: var(--accent); }
+.switch input:checked + span::after { transform: translateX(14px); background: #17130e; }
+input[type=range] { accent-color: var(--accent); width: 160px; }
+.text { font: inherit; font-size: 13px; color: var(--text); background: var(--raised); border: 1px solid var(--line); border-radius: 10px; padding: 4px 10px; width: 220px; }
+.readout { font-family: var(--mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; min-width: 4ch; }
+.ha { font-family: var(--mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.ha b { color: var(--text); font-weight: 500; }
+.chip:focus-visible, .seg button:focus-visible, .swatch:focus-visible, .switch input:focus-visible + span, .text:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.bench { display: grid; grid-template-columns: minmax(0, 520px) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 1100px) { .bench { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 700px) { .controls { position: static; backdrop-filter: none; } }
+.device { background: #05070a; border: 1px solid var(--line); border-radius: 22px; padding: 20px; display: grid; gap: 10px; justify-items: center; }
+.device canvas { width: 100%; max-width: 480px; aspect-ratio: 1; display: block; touch-action: none; }
+.caption { font-family: var(--mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; text-align: center; }
+.tray { background: var(--tray); border: 1px solid var(--line); border-radius: 18px; padding: 18px; display: flex; flex-wrap: wrap; gap: 22px 16px; align-items: flex-start; min-width: 0; }
+figure { margin: 0; display: grid; gap: 6px; min-width: 0; max-width: 100%; }
+figure canvas { display: block; max-width: 100%; height: auto; touch-action: none; }
+figcaption { font-family: var(--mono); font-size: 12px; color: var(--muted); display: flex; gap: 8px; font-variant-numeric: tabular-nums; }
+figcaption b { color: var(--text); font-weight: 500; }
+.log { font-family: var(--mono); font-size: 12px; color: var(--muted); min-height: 1.5em; text-align: center; overflow-wrap: anywhere; }
+.ents { border-collapse: collapse; font-size: 12px; color: var(--muted); width: 100%; }
+.ents td { padding: 3px 12px 3px 0; border-bottom: 1px solid var(--line); vertical-align: top; }
+.ents td:first-child { font-family: var(--mono); color: var(--text); white-space: nowrap; }
+.ents td:nth-child(2) { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+details { color: var(--muted); font-size: 13px; }
+summary { cursor: pointer; color: var(--text); }
+@media (prefers-reduced-motion: reduce) { .switch span, .switch span::after { transition: none; } }
+[hidden] { display: none !important; }
+</style>
+
+<div class="wrap">
+  <header>
+    <a class="eyebrow" href="index.html" style="color:inherit;text-decoration:none">← Все стенды</a>
+    <div class="eyebrow">Aqara S1E · 3D-принтер</div>
+    <h1>3D-принтер</h1>
+    <p class="lede">Текущая печать с принтера Bambu Lab: что делает принтер, название модели, прогресс, оставшееся время и изображение с камеры. На больших карточках рядом с камерой картинка печатаемой модели, слои, температуры и кнопки «Пауза» и «Стоп» («Стоп» — удержанием, чтобы не прервать печать случайно). Нажатие на камеру открывает её на весь экран. Сущности — интеграция Bambu Lab (ha-bambulab), принтер A1.</p>
+  </header>
+
+  <section class="controls" aria-label="Параметры">
+    <div class="row">
+      <div class="group"><span class="label">Принтер</span><div class="seg" id="status">
+        <button type="button" data-v="prepare">Подготовка</button><button type="button" data-v="running">Печать</button><button type="button" data-v="pause">Пауза</button><button type="button" data-v="finish">Готово</button><button type="button" data-v="failed">Ошибка</button><button type="button" data-v="idle">Ожидание</button></div></div>
+      <label class="group"><span class="label">Прогресс</span><input type="range" id="progress" min="0" max="100" step="1"><span class="readout" id="progressOut"></span></label>
+      <label class="switch"><input type="checkbox" id="run"><span></span>Печать идёт (×60)</label>
+    </div>
+    <div class="row">
+      <label class="group"><span class="label">Задача</span><input class="text" id="task" maxlength="80" placeholder="Без названия"></label>
+      <div class="group" role="group" aria-label="Цвет пластика"><span class="label">Пластик</span><span class="group" id="filaments"></span></div>
+      <label class="switch"><input type="checkbox" id="camera"><span></span>Камера</label>
+      <label class="switch"><input type="checkbox" id="cover"><span></span>Картинка модели</label>
+      <label class="switch"><input type="checkbox" id="offline"><span></span>Нет связи</label>
+      <label class="switch"><input type="checkbox" id="reduced"><span></span>Меньше движения</label>
+    </div>
+    <div class="row">
+      <div class="group"><span class="label">На экране</span><span class="group" id="sizes"></span></div>
+      <div class="group" role="group" aria-label="Акцент интерфейса"><span class="label">Акцент</span><span class="group" id="swatches"></span></div>
+    </div>
+    <span class="ha" id="haOut"></span>
+  </section>
+
+  <main class="bench">
+    <div class="device">
+      <canvas id="screen" width="480" height="480" aria-label="Экран панели с карточкой 3D-принтера"></canvas>
+      <div class="caption" id="screenCaption"></div>
+      <div class="log" id="log"></div>
+    </div>
+    <div class="tray" id="tray"></div>
+  </main>
+
+  <details>
+    <summary>Какие сущности читает карточка</summary>
+    <table class="ents" id="ents"></table>
+  </details>
+</div>
+
+<!-- embed-bridge -->
+<script>
+/* ---------- constructor bridge (tools/stand_bridge): lets home-stand.html host this stand as a widget ----------
+   Does nothing unless the page is opened as home-stand.html?embed=<id>&size=<WxH>&lang=<ru|en>.
+   Card mode shows only the card cut from the panel screen; settings mode shows the stand's own controls.
+   Settings are stored per widget (localStorage keys get "@<id>"), panel text is translated on the canvas.
+   A stand opened on its own with ?lang=en (the public demo) gets only the translation. */
+(() => {
+  const q = new URLSearchParams(location.search), id = q.get("embed"), solo = !id && q.get("lang") === "en";
+  if (!id && !solo) return;
+  const E = window.EMBED = { id, size: q.get("size") || "", lang: q.get("lang") === "en" ? "en" : "ru", mode: "card", solo };
+  const root = document.documentElement;
+  if (id) root.classList.add("embed", "embed-card");
+
+  /* each widget keeps its own settings */
+  if (id) try {
+    const S = Storage.prototype, gi = S.getItem, si = S.setItem;
+    S.getItem = function (k) { return gi.call(this, `${k}@${id}`); };
+    S.setItem = function (k, v) { return si.call(this, `${k}@${id}`, v); };
+  } catch (e) {}
+
+  /* panel language: Russian strings are translated where they are drawn */
+  const DICT = {"% · цвет":"% · color","(локально, без HA)":"(local, without HA)","(режим дома) и":"(home mode) and","(уставка бойлера, громкость),":"(water heater setpoint, volume),","+ температура":"+ temperature","+ цвет":"+ color",", фаза луны из":", moon phase from",", шаг":", step","1 вне нормы":"1 out of range","3 ступени":"3 steps","3D-принтер":"3D printer","4 ступени":"4 steps",": ошибка отрисовки":": render error",": текст «":": text «","CO₂ высокий":"CO₂ high","CO₂ повышен":"CO₂ elevated","HA подтвердил:":"HA confirmed:","HA подтвердил: print_status =":"HA confirmed: print_status =","HA подтвердил: печать прервана, принтер свободен":"HA confirmed: print cancelled, printer idle","HA подтвердил: цель":"HA confirmed: target","HA: время изменено извне →":"HA: time changed externally →","HA: дата изменена извне →":"HA: date changed externally →","PLA · 38 г":"PLA · 38 g","PM1 высокий":"PM1 high","PM1 превышен":"PM1 exceeded","PM2.5 высокий":"PM2.5 high","PM2.5 превышен":"PM2.5 exceeded","TVOC высокий":"TVOC high","TVOC повышен":"TVOC elevated","box: − и +":"box: − and +","sun.sun недоступен → запасной режим: день с 07:00 до 19:00 по часам панели.":"sun.sun unavailable → fallback: day from 07:00 to 19:00 by the panel clock.","«Время»":"«Time»","°   ·   Влажность 81 %":"°   ·   Humidity 81 %","° · азимут":"° · azimuth","° · восход":"° · sunrise","·  ещё":"·  more","· без HA":"· without HA","· высота":"· elevation","· ещё":"· more","· закат":"· sunset","· обогрев":"· heating","· по нажатию":"· on tap","· по расписанию":"· on schedule","· реле":"· relay","· сейчас":"· now","· сумерки":"· twilight","» выходит за":"» goes beyond","» выходит за карточку":"» goes beyond the card","Абажур":"Shade lamp","Авто":"Auto","Акцент":"Accent","Акцент интерфейса":"Interface accent","Без датчика":"No sensor","Без заголовка":"No title","Без названия":"Untitled","Без фото":"No photo","Белый PLA":"White PLA","Бирюза":"Teal","Бойлер":"Water heater","Бойлер 40…75 °C":"Water heater 40…75 °C","Бра":"Sconce","Бриз":"Breeze","Бризер":"Breezer","Бризер выключен":"Breezer off","Будильник":"Alarm","В комнате":"In the room","Вариантов":"Options","Вентилятор":"Fan","Вентилятор выключен":"Fan off","Весна":"Spring","Ветер и облака":"Wind and clouds","Ветрено":"Windy","Вечер":"Evening","Вид":"View","Вкл":"On","Вкл / выкл":"On / off","Включается…":"Turning on…","Включить":"Turn on","Включён":"On","Включён ·":"On ·","Включён · обогрев":"On · heating","Вкл…":"On…","Влажн.":"Hum.","Влажно":"Humid","Влажность":"Humidity","Влажность в комнате":"Room humidity","Влажность: влажно":"Humidity: humid","Влажность: очень сухо":"Humidity: very dry","Влажность: сухо":"Humidity: dry","Влажность: сыро":"Humidity: damp","Вода":"Water","Вода есть":"Water OK","Вода!":"Water!","Воздух":"Air","Воздух в комнате":"Room air","Волны":"Waves","Время":"Time","Время в HA":"Time in HA","Время по Москве":"Moscow time","Время суток":"Time of day","Все блоки скрыты: остались лампа и питание":"All blocks hidden: lamp and power remain","Все погоды":"All weathers","Все размеры":"All sizes","Всё в норме":"All normal","Вт":"W","Выберите датчики в веб-интерфейсе":"Select sensors in the web interface","Выбор":"Select","Выкл":"Off","Выкл · Обогрев":"Off · Heat","Выкл · Обогрев · Авто":"Off · Heat · Auto","Выкл.":"Off","Выключается…":"Turning off…","Выключатель":"Switch","Выключен":"Off","Выключить":"Turn off","Выкл…":"Off…","Выполняется…":"Running…","Высокий":"High","Гости":"Guests","Гости дома":"Guests home","Гостиная":"Living room","Готово":"Done","Град":"Hail","Греет":"Heating","Греет до":"Heating to","Гроза":"Thunderstorm","Гроза с дождём":"Thunderstorm, rain","Громкость":"Volume","Громкость 0…100 %, шаг 5":"Volume 0…100 %, step 5","Громкость оповещений":"Notification volume","Грязно":"Polluted","Дата":"Date","Дата в HA":"Date in HA","Дату и время":"Date and time","Датчик":"Sensor","Датчики":"Sensors","Датчики «Дома», до 4":"«Home» sensors, up to 4","Датчики на карточке":"Sensors on card","Датчики не выбраны":"No sensors selected","Датчики пульса, до 6":"Pulse sensors, up to 6","Дверь":"Door","Дверь открыта":"Door open","Действие":"Action","День":"Day","Держит":"Holding","Держите…":"Hold…","Дождь":"Rain","Долить воду":"Refill water","Дом":"Home","Дома":"Home","Дома всё в норме":"All normal at home","Душно":"Stuffy","Ед.":"Unit","Есть обогрев":"Has heater","Есть режимы":"Has effects","Жарко":"Hot","Ждёт":"Waiting","Ждёт · держит":"Waiting · holding","Живая погода":"Live weather","Заголовок":"Title","Задача":"Job","Зажмите и ведите":"Press and drag","Закрываются":"Closing","Закрыта":"Closed","Закрыто":"Closed","Закрыть":"Close","Замер мощности":"Power reading","Запуск":"Start","Запустить":"Run","Заставка":"Screensaver","Заставка:":"Screensaver:","Заставки":"Screensavers","Защита: удерживать":"Protection: hold","Зима":"Winter","Значение в Home Assistant":"Value in Home Assistant","Значения датчиков":"Sensor values","Зоны":"Zones","Идёт…":"Running…","Избранное":"Favorite","Иконка":"Icon","Иконка обогрева":"Heater icon","Какие сущности читает карточка":"Entities the card reads","Калибровка стола":"Bed leveling","Камера":"Camera","Камера недоступна":"Camera unavailable","Камин":"Fireplace","Картинка модели":"Model image","Карточка":"Card","Карточка света":"Light card","Карточка штор":"Curtain card","Качание":"Oscillation","Кельвины":"Kelvin","Кнопка":"Button","Кнопка HA":"HA button","Комфорт":"Comfort","Коралл":"Coral","Коснитесь, чтобы открыть дом":"Tap to open home","Котёл":"Boiler","Красный PETG":"Red PETG","Курьер приедет после 18:00 — позвоните в домофон 24, код подъезда 4512":"Courier arrives after 18:00 — ring intercom 24, entrance code 4512","Лампа":"Lamp","Лампа выключена":"Lamp off","Лампа умеет":"Lamp supports","Лампочка":"Bulb","Лето":"Summer","Ливень":"Pouring","Лист":"Leaf","Любимый момент":"Favorite moment","Люстра":"Chandelier","МСК":"MSK","Меньше движения":"Reduce motion","Микроклимат":"Climate","Модель":"Model","Мокрый снег":"Sleet","Мята":"Mint","Мятный PLA":"Mint PLA","На карточке":"On card","На экране":"On screen","Нагрев бойлера":"Water heater heating","Нагрев сопла":"Heating nozzle","Нагрев стола":"Heating bed","Название":"Name","Напольный вентилятор в кабинете":"Floor fan in the study","Направление":"Direction","Настольная":"Desk","Настольная лампа":"Desk lamp","Не греет":"Not heating","Не греет · держит":"Not heating · holding","Не дома":"Away","Не удалось запустить движок:":"Failed to start the engine:","Небо":"Sky","Нейтральный белый":"Neutral white","Нет":"No","Нет sun.sun":"No sun.sun","Нет воды":"No water","Нет воды — долейте":"No water — refill","Нет данных":"No data","Нет датчиков":"No sensors","Нет задачи":"No job","Нет связи":"Offline","Нет связи с HA":"No connection to HA","Норма":"Normal","Норма 20–24 °C":"Normal 20–24 °C","Норма 40–60 %":"Normal 40–60 %","Норма до 10 мкг/м³":"Normal up to 10 µg/m³","Норма до 15 мкг/м³":"Normal up to 15 µg/m³","Норма до 15 мкг/м³ (ВОЗ, за сутки)":"Normal up to 15 µg/m³ (WHO, daily)","Норма до 220 ppb":"Normal up to 220 ppb","Норма до 800 ppm":"Normal up to 800 ppm","Норма до 800 ppm, выше 1200 — проветрить":"Normal up to 800 ppm, above 1200 — ventilate","Норма ≤ 10":"Normal ≤ 10","Норма ≤ 15":"Normal ≤ 15","Норма ≤ 220":"Normal ≤ 220","Норма ≤ 800":"Normal ≤ 800","Нормы датчиков":"Sensor norms","Ночник":"Night light","Ночь":"Night","Облачно":"Cloudy","Обогрев":"Heating","Обратно":"Reverse","Обычный":"Normal","Огонь":"Fire","Одна карточка для всего, что включается одним касанием:":"One card for anything that switches with one tap:","Ожидание":"Idle","Оранжевый PLA":"Orange PLA","Органайзер для отвёрток":"Screwdriver organizer","Особые условия":"Exceptional","Останавливаем…":"Stopping…","Открываются":"Opening","Открыта":"Open","Открыто":"Open","Открыто на":"Open","Открыть":"Open","Отмена":"Cancel","Отменено":"Cancelled","Отопление":"Heating","Отопление, сухо":"Heating, dry","Отправка…":"Sending…","Отпуск":"Vacation","Оттенок":"Hue","Очень длинное название кнопки":"A very long button name","Очень длинное название комнаты":"A very long room name","Очень сухо":"Very dry","Оченьдлинноесловобезпробеловкотороенепомещаетсявстроку и ещё немного текста после него":"Averyverylongwordwithoutspacesthatdoesnotfitintheline and a bit more text after it","Очистка сопла":"Cleaning nozzle","Ошибка":"Error","Ошибка печати":"Print error","Ощущается как":"Feels like","Параметры":"Settings","Пауза":"Pause","Переменная облачность":"Partly cloudy","Песок":"Sand","Печать":"Printing","Печать идёт (×60)":"Printing (×60)","Плавно, %":"Smooth, %","План 59 × 55,5":"Plan 59 × 55.5","Пластик":"Filament","Плоское бра":"Flat sconce","Повышен":"Elevated","Погода":"Weather","Подача":"Airflow","Подача · авто":"Airflow · auto","Подача воздуха ·":"Airflow ·","Подготовка":"Preparing","Показывает значение":"Shows the value","Положение рулонной шторы, % открытия":"Roller blind position, % open","Положение шторы, % открытия":"Curtain position, % open","Потолочный":"Ceiling","Потолочный (контур)":"Ceiling (outline)","Потолочный свет":"Ceiling light","Правка времени: ведите вверх или вниз":"Edit time: drag up or down","Правка даты: ведите вверх или вниз":"Edit date: drag up or down","Превышен":"Exceeded","Пресет":"Preset","Пресеты (Комфорт, Эко, Не дома)":"Presets (Comfort, Eco, Away)","Пример":"Example","Принтер":"Printer","Приоткрыто":"Ajar","Прогресс":"Progress","Продолжаем…":"Resuming…","Продолжить":"Resume","Протечка":"Leak","Протечка!":"Leak!","Прохладно":"Cool","Прошивка 59 × 53,5":"Firmware 59 × 53.5","Прямо":"Forward","Пульс дома":"Home pulse","Пусто":"Empty","Радиатор":"Radiator","Радуга":"Rainbow","Размер":"Size","Рассвет":"Sunrise","Режим":"Mode","Режим «":"Mode «","Режим дома":"Home mode","Режимы":"Modes","Режимы (Авто, Сон, Турбо)":"Modes (Auto, Sleep, Turbo)","Режимы Бриз и Сон":"Breeze and Sleep modes","Реле":"Relay","Реле панели":"Panel relay","Рулонная штора":"Roller blind","Русский":"Russian","Ручной":"Manual","Ручной режим: небо не зависит от Home Assistant.":"Manual mode: the sky ignores Home Assistant.","Свежо":"Fresh","Свет":"Light","Свеча":"Candle","Свой цвет":"Custom color","Свой цвет акцента":"Custom accent color","Сейчас":"Now","Сейчас в комнате":"Now in the room","Серый PLA":"Grey PLA","Сетка":"Grid","Синий PLA":"Blue PLA","Скорости":"Speeds","Скорость":"Speed","Скорость, %":"Speed, %","Скрипт":"Script","Служебная карточка":"Helper card","Смог":"Smog","Смог за окном":"Smog outside","Снег":"Snow","Сон":"Sleep","Сообщение":"Message","Сохраняется…":"Saving…","Ставим на паузу…":"Pausing…","Стенд 59 × 59":"Stand 59 × 59","Стоп":"Stop","Суббота, 31 октября, ☁ 9°":"Saturday, 31 October, ☁ 9°","Сухо":"Dry","Сущность":"Entity","Сущность содержит":"Entity contains","Сцена":"Scene","Сыро":"Damp","Текст":"Text","Текст в HA":"Text in HA","Темп.":"Temp.","Температура":"Temperature","Температура: жарко":"Temperature: hot","Температура: прохладно":"Temperature: cool","Температура: тепло":"Temperature: warm","Температура: холодно":"Temperature: cold","Тепло":"Warm","Термостат":"Thermostat","Тип":"Type","Только «нет воды»":"Only «no water»","Только время":"Time only","Только дату":"Date only","Только чтение":"Read only","Торшер":"Floor lamp","Туман":"Fog","Турбо":"Turbo","Тёплый белый":"Warm white","Тёплый пол":"Floor heating","Увеличить ×2":"Zoom ×2","Увлажнитель":"Humidifier","Увлажнитель в детской спальне":"Humidifier in the nursery","Увлажняет":"Humidifying","Увлажняет до":"Humidifying to","Удерживайте":"Hold","Удерживайте «Стоп», чтобы прервать печать":"Hold «Stop» to cancel the print","Удерживайте, чтобы":"Hold to","Удерживайте, чтобы изменить":"Hold to change","Умеренно":"Moderate","Управление с клавиатуры":"Keyboard control","Уровень, %":"Level, %","Ушёл":"Away","Фиалка":"Violet","Флажок HA":"HA toggle","Фон":"Background","Фото":"Photo","Холодно":"Cold","Холодный белый":"Cool white","Цвет":"Color","Цвет пластика":"Filament color","Цвет шторы":"Curtain color","Цветной свет":"Colored light","Цель":"Target","Чайник":"Kettle","Чем греет":"Heat source","Число":"Number","Число, выбор, текст":"Number, select, text","Чисто":"Clean","Чтение":"Reading","Шаг":"Step","Штора":"Curtain","Шторы":"Curtains","Эко":"Eco","Язык панели":"Panel language","Яркость":"Brightness","Яркость лампы":"Lamp brightness","Ясная ночь":"Clear night","Ясно":"Clear","авг":"Aug","августа":"August","апр":"Apr","апреля":"April","бак долит":"tank refilled","в баке нет воды — увлажнитель остановился":"tank is empty — humidifier stopped","вес модели, г":"model weight, g","вне нормы":"out of range","воскресенье":"Sunday","вс":"Sun","всего слоёв":"total layers","всё в норме":"all normal","вт":"Tue","вторник":"Tuesday","вчера":"yesterday","выкл":"off","выключен":"off","выше цели на":"above target by","готово в":"done at","греет":"heating","датчики не выбраны":"no sensors selected","движок неба не запустился:":"sky engine failed to start:","дек":"Dec","декабря":"December","дн.":"d","до":"to","до цели":"to target","другие размеры недоступны":"other sizes unavailable","ещё":"more","ещё N":"N more","за":"in","за пределами карточки":"outside the card","завтра":"tomorrow","запустить":"run","засор сопла":"nozzle clog","заставка":"screensaver","и":"and","из":"of","изменено":"changed","изображение с камеры":"camera image","июл":"Jul","июля":"July","июн":"Jun","июня":"June","кВт":"kW","как задано":"as set","камера на весь экран: camera.":"camera full screen: camera.","камера недоступна":"camera unavailable","картинка модели из слайсера":"model image from the slicer","карточка":"card","качание":"oscillation","когда закончится":"when it ends","лампа не умеет:":"lamp can't do:","мар":"Mar","марта":"March","мая":"May","меньше 44 × 44 (":"smaller than 44 × 44 (","мин":"min","мин назад":"min ago","мин назад ·":"min ago ·","мкг/м³":"µg/m³","мс/кадр ·":"ms/frame ·","название модели (Task name)":"model name (Task name)","не больше":"at most","не греет":"not heating","нет воды":"no water","нет задачи":"no job","нет ответа от HA — состояние возвращено":"no reply from HA — state reverted","нет связи — цель не отправлена":"offline — target not sent","новый":"new","ноя":"Nov","ноября":"November","обратно":"reverse","окт":"Oct","октября":"October","осталось":"left","осталось, мин":"left, min","панели":"panel","пауза":"paused","переключить":"toggle","перекрываются":"overlap","плитку":"tile","плитку «Дома»":"the «Home» tile","пн":"Mon","подтвердил:":"confirmed:","понедельник":"Monday","прогресс, %":"progress, %","продолжить":"resume","пт":"Fri","пульс":"pulse","пятница":"Friday","реле":"relay","сб":"Sat","сб, 31 окт":"Sat, 31 Oct","сегодня":"today","сейчас":"now","сен":"Sep","сентября":"September","скрипт завершён":"script finished","слой":"layer","служебные карточки":"helper cards","сопло":"nozzle","сопло, °C (и nozzle_target_temperature)":"nozzle, °C (and nozzle_target_temperature)","ср":"Wed","среда":"Wednesday","стол":"bed","стол, °C (и bed_target_temperature)":"bed, °C (and bed_target_temperature)","стоп (на карточке — удержанием)":"stop (on the card — by holding)","суббота":"Saturday","суббота, 31 октября":"Saturday, 31 October","суббота, 31 октября 2026":"Saturday, 31 October 2026","сцен":"scenes","текущий слой":"current layer","у этого типа только эти размеры":"this type has only these sizes","фев":"Feb","февраля":"February","фон в браузере:":"background in browser:","цель":"target","ч":"h","через":"in","четверг":"Thursday","чт":"Thu","что делает принтер: idle, prepare, running, pause, finish, failed":"what the printer is doing: idle, prepare, running, pause, finish, failed","экран":"screen","этап: нагрев стола, калибровка, печать…":"stage: heating bed, leveling, printing…","янв":"Jan","января":"January","— ваше фото с часами, датой и погодой.":"— your photo with clock, date and weather.","← Все стенды":"← All stands"};
+  const CYR = /[А-Яа-яЁё]/, keys = Object.keys(DICT).sort((a, b) => b.length - a.length);
+  const lower = new Map(keys.map((k) => [k.toLowerCase(), DICT[k]]));
+  const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const RE = keys.length ? new RegExp(`(?<![А-Яа-яЁё])(?:${keys.map(esc).join("|")})(?![А-Яа-яЁё])`, "giu") : null;
+  const cap = (src, out) => {
+    if (!out) return src;
+    const up = src[0] !== src[0].toLowerCase(), outUp = out[0] !== out[0].toLowerCase();
+    return up && !outUp ? out[0].toUpperCase() + out.slice(1) : !up && outUp && src[0] !== src[0].toUpperCase() ? out[0].toLowerCase() + out.slice(1) : out;
+  };
+  const cache = new Map();
+  const tr = E.tr = (s) => {
+    if (E.lang !== "en" || typeof s !== "string" || !s) return s;
+    let v = cache.get(s);
+    if (v !== undefined) return v;
+    v = s;
+    if (CYR.test(v)) v = DICT[v] ?? (RE ? v.replace(RE, (m) => DICT[m] ?? cap(m, lower.get(m.toLowerCase()))) : v);
+    v = v.replace(/«/g, "“").replace(/»/g, "”").replace(/(\d),(\d)/g, "$1.$2");
+    if (cache.size > 5000) cache.clear();
+    cache.set(s, v);
+    return v;
+  };
+  for (const P of [window.CanvasRenderingContext2D, window.OffscreenCanvasRenderingContext2D]) {
+    if (!P) continue;
+    for (const m of ["fillText", "strokeText", "measureText"]) {
+      const o = P.prototype[m];
+      P.prototype[m] = function (t, ...a) { return o.call(this, tr(t), ...a); };
+    }
+  }
+
+  /* the stand's own controls (settings mode) in the panel language: text nodes and titles, originals kept */
+  const seen = new WeakMap();                                  // node → { o: original, w: what we wrote }
+  const ATTRS = ["title", "aria-label", "placeholder"];
+  const trText = (s) => { const m = /^(\s*)([\s\S]*?)(\s*)$/.exec(s); return m[1] + tr(m[2]) + m[3]; };
+  const SKIP = /^(SCRIPT|STYLE|TEXTAREA|NOSCRIPT)$/;
+  function domText(n) {
+    if (!n.parentNode || SKIP.test(n.parentNode.nodeName)) return;
+    let r = seen.get(n);
+    if (!r || n.nodeValue !== r.w) { if (!CYR.test(n.nodeValue)) { seen.delete(n); return; } r = { o: n.nodeValue }; seen.set(n, r); }
+    const v = E.lang === "en" ? trText(r.o) : r.o;
+    r.w = v;
+    if (n.nodeValue !== v) n.nodeValue = v;
+  }
+  function domAttrs(el) {
+    for (const a of ATTRS) {
+      if (!el.hasAttribute(a)) continue;
+      const k = "__tr_" + a, cur = el.getAttribute(a);
+      let r = el[k];
+      if (!r || cur !== r.w) { if (!CYR.test(cur)) continue; r = el[k] = { o: cur }; }
+      r.w = E.lang === "en" ? trText(r.o) : r.o;
+      if (cur !== r.w) el.setAttribute(a, r.w);
+    }
+  }
+  function domWalk(root0) {
+    if (!root0) return;
+    if (root0.nodeType === 3) return domText(root0);
+    if (root0.nodeType !== 1 || SKIP.test(root0.tagName)) return;
+    domAttrs(root0);
+    const it = document.createTreeWalker(root0, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT, { acceptNode: (n) => n.nodeType === 1 && SKIP.test(n.tagName) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT });
+    for (let n = it.nextNode(); n; n = it.nextNode()) n.nodeType === 3 ? domText(n) : domAttrs(n);
+  }
+  const domAll = () => { domWalk(document.body); if (document.documentElement.lang) document.documentElement.lang = E.lang; };
+  new MutationObserver((list) => {
+    for (const m of list) {
+      if (m.type === "characterData") domText(m.target);
+      else if (m.type === "attributes") domAttrs(m.target);
+      else for (const n of m.addedNodes) domWalk(n);
+    }
+  }).observe(root, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ATTRS });
+
+  /* layout of the iframe */
+  const css = document.createElement("style");
+  css.textContent = `
+html.embed, html.embed body { background: transparent !important; margin: 0; }
+html.embed body::before { display: none !important; }
+html.embed .embed-hide, html.embed .tray, html.embed .kbd, html.embed .kbd2, html.embed .caption { display: none !important; }
+html.embed .device canvas { border-radius: 0 !important; }
+html.embed-card, html.embed-card body { overflow: hidden !important; width: 100%; height: 100%; }
+html.embed-card .wrap { display: block !important; padding: 0 !important; margin: 0 !important; max-width: none !important; }
+html.embed-card .wrap > :not(.bench) { display: none !important; }
+html.embed-card .bench { display: block !important; }
+html.embed-card .device { display: block !important; padding: 0 !important; border: 0 !important; border-radius: 0 !important; background: none !important; }
+html.embed-card .device > :not(canvas) { display: none !important; }
+html.embed-card .device canvas { position: fixed !important; left: var(--ex, 0px); top: var(--ey, 0px); width: var(--ew, 480px) !important; max-width: none !important; height: auto !important; aspect-ratio: auto !important; }
+html.embed-settings body { overflow: auto; }
+html.embed-settings .wrap { max-width: none !important; padding: 14px 18px 24px !important; gap: 14px !important; }
+html.embed-settings .wrap > :not(.controls):not(.bench) { display: none !important; }
+html.embed-settings .controls { position: static !important; backdrop-filter: none !important; background: none !important; padding-top: 0 !important; }
+html.embed-settings .bench { display: flex !important; justify-content: center; }
+html.embed-settings .device { width: fit-content; max-width: 100%; box-sizing: border-box; }
+html.embed-settings .device canvas { width: var(--sw, 480px) !important; max-width: 100% !important; height: auto !important; aspect-ratio: auto !important; }
+`;
+  (document.head || root).append(css);
+
+  const $ = (s) => document.querySelector(s);
+  const sizeBox = () => document.getElementById("sizes");
+  const canvas = () => $(".device canvas");
+  const fullScreen = (s) => s === "screen" || s === "saver";
+  function sizes() {
+    const box = sizeBox();
+    if (!box) return ["screen"];                               // the screensaver stand: whole panel
+    return [...box.querySelectorAll("[data-v]")].map((b) => b.dataset.v).filter((v) => /^\d+x\d+$/.test(v) || v === "saver");
+  }
+  function current() {
+    try { if (typeof state === "object" && state) return state.screen || state.size || "screen"; } catch (e) {}
+    return E.size;
+  }
+  function applySize(s) {
+    if (!s || s === current()) return;
+    const b = sizeBox() && [...sizeBox().querySelectorAll("[data-v]")].find((x) => x.dataset.v === s);
+    if (b) b.click();
+  }
+  function geometry() {
+    const cv = canvas(), s = current();
+    if (!cv) return;
+    const screenCanvas = cv.id === "screen";                   // card stands draw the card at (8, 8) on the 480 × 480 screen
+    root.style.setProperty("--ex", screenCanvas && !fullScreen(s) ? "-8px" : "0px");
+    root.style.setProperty("--ey", screenCanvas && !fullScreen(s) ? "-8px" : "0px");
+    const w = screenCanvas ? 480 : cv.width;
+    root.style.setProperty("--ew", w + "px");
+    root.style.setProperty("--sw", w + "px");
+  }
+  function applyLang() {
+    cache.clear();
+    domAll();
+    const box = document.getElementById("lang");                // weather stand: the text layers come in both languages
+    const b = box && box.querySelector(`[data-v="${E.lang}"]`);
+    if (b) { if (b.getAttribute("aria-pressed") !== "true") b.click(); return; }
+    try { if (typeof window.rebuild === "function") window.rebuild(); } catch (e) {}
+  }
+  function hideStandOnly() {
+    for (const id of ["sizes", "lang", "view", "zoom", "grid"]) {
+      const el = document.getElementById(id);
+      if (!el) continue;
+      const g = (el.classList.contains("group") ? el.parentElement : el).closest(".group, .switch");
+      (g || el).classList.add("embed-hide");
+    }
+  }
+  let sent = "";
+  function report(force) {
+    geometry();
+    const msg = { source: "s1e-embed", id, type: "info", sizes: sizes(), size: current() };
+    const sig = JSON.stringify(msg);
+    if (!force && sig === sent) return;
+    sent = sig;
+    parent.postMessage(msg, "*");
+  }
+  function setMode(m) {
+    E.mode = m;
+    root.classList.toggle("embed-card", m === "card");
+    root.classList.toggle("embed-settings", m === "settings");
+    if (m === "settings") scrollTo(0, 0);
+    geometry();
+  }
+
+  addEventListener("message", (e) => {
+    const d = e.data;
+    if (!d || d.target !== "s1e-embed") return;
+    if (d.type === "mode") setMode(d.mode);
+    if (d.type === "size") { E.size = d.size; applySize(d.size); }
+    if (d.type === "lang" && d.lang !== E.lang) { E.lang = d.lang === "en" ? "en" : "ru"; applyLang(); }
+    report(true);
+  });
+
+  let tries = 0;
+  function init() {
+    if (sizeBox() && !sizeBox().querySelector("[data-v]") && tries++ < 150) return void setTimeout(init, 100);   // controls built after an async boot
+    if (typeof window.ellipsis === "function") { const o = window.ellipsis; window.ellipsis = (ctx, t, w) => o(ctx, tr(t), w); }
+    if (solo) {
+      applyLang();
+      for (const p of document.querySelectorAll("p")) if (CYR.test(p.textContent)) p.hidden = true;   // prose without an English text yet
+      const h = document.querySelector("h1");
+      if (h) document.title = `${h.textContent.trim()} · S1E Panel demo`;
+      return;
+    }
+    hideStandOnly();
+    domAll();
+    if (E.lang === "en") applyLang();
+    applySize(E.size);
+    report(true);
+    setInterval(() => report(false), 400);
+  }
+  if (document.readyState === "loading") addEventListener("DOMContentLoaded", () => setTimeout(init, 0)); else setTimeout(init, 0);
+})();
+</script>
+<!-- /embed-bridge -->
+<script>
+const ICONS = {"printer-3d-nozzle": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB/j4+Pj4+Pj4+PgAAAAAAAAAAAAAAAAACP////////////8AAAAAAAAAAAAAAAAACP////////////8AAAAAAAAAAAAAAAAACP////////////8AAAAAAAAAAAAAAAAACP////////////8AAAAAAAAAAAAAAAAACP////////////8AAAAAAAAAAAAAAAD4+P/////////////48AAAAAAAAAAAAAD/////////////////+AAAAAAAAAAAAAD/////////////////+AAAAAAAAAAAAAD/////////////////+AAAAAAAAAAAAAD/////////////////+AAAAAAAAAAAAAAAACft////////6SIAAAAAAAAAAAAAAAAAAAA8+P/////2NgAAAAAAAAAAAAAAAAAAAAAAV/7///1QAAAAAAAAAAAAAAAAAAAAAAAAAHf//24AAAAAAAAAAAAAAAAAAAAAAAAAAAAIBwAAAAAAAAAAAAAAAAAAAAAAAAAAAAD89AAAAAAAAAAAAAAAAAAAAAAAAAAAADj/3wAAAAAAAAAAAAAAAAD0+Pj4+Pj4+P//hAAAAAAAAAAAAAAAAAD8/////////+eJBQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "printer-3d": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFgt/3+Pj4+Pj4+Pj4+Pj4995+AwAAAACF////////////////////////fgAAAADj////////////////////PEH/3gAAAAD7////////////////////Mzj/9wAAAAD8////////////////////////+AAAAAD8////AAAAAAAAAAAAAAAE////+AAAAAD8////AAAAAAAAAAAAAAAE////+AAAAAD8////AAAAAAFISQEAAAAE////+AAAAAD8////AAABUc///89RAQAE////+AAAAAAHCAgIAVTS///k5P//0lQBCAgIBwAAAAAAAAAAwP//zFsEBVvM//+/AAAAAAAAAAAAAAAA////wDYAADjB////AAAAAAAAAAAAAAAA///v//+qrv//7v//AAAAAAAAAAAAAAAA//8Uh/b///SFE///AAAAAAAAAAAAAAAA//8EABr/+hcABP//AAAAAAAAAAAAAAAA//8aAAD/+AAAG///AAAAAAAAAAAAAAAA6f/zfgv/+AyA9P/pAAAAAAAAAAAAAAAAJK3//+b//en//60kAAAAAAAAAAAAAAAAAAA4w//////COAAAAAAAAAAAAAAAAAAAAAAAAE7Q0E4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "pause": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA9/f39AAAAAD09/f3AAAAAAAAAAAAAAAA////+wAAAAD7////AAAAAAAAAAAAAAAA////+wAAAAD7////AAAAAAAAAAAAAAAA////+wAAAAD7////AAAAAAAAAAAAAAAA////+wAAAAD7////AAAAAAAAAAAAAAAA////+wAAAAD7////AAAAAAAAAAAAAAAA////+wAAAAD7////AAAAAAAAAAAAAAAA////+wAAAAD7////AAAAAAAAAAAAAAAA////+wAAAAD7////AAAAAAAAAAAAAAAA////+wAAAAD7////AAAAAAAAAAAAAAAA////+wAAAAD7////AAAAAAAAAAAAAAAA////+wAAAAD7////AAAAAAAAAAAAAAAA////+wAAAAD7////AAAAAAAAAAAAAAAA////+wAAAAD7////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "play": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACFCQAAAAAAAAAAAAAAAAAAAAAAAAAAAAD73EMAAAAAAAAAAAAAAAAAAAAAAAAAAAD7//+fEgAAAAAAAAAAAAAAAAAAAAAAAAD7////6VkAAAAAAAAAAAAAAAAAAAAAAAD7//////+2HwAAAAAAAAAAAAAAAAAAAAD7////////9HACAAAAAAAAAAAAAAAAAAD7///////////KLwAAAAAAAAAAAAAAAAD7///////////1bgAAAAAAAAAAAAAAAAD7/////////7ggAAAAAAAAAAAAAAAAAAD7///////rXAAAAAAAAAAAAAAAAAAAAAD7/////6ITAAAAAAAAAAAAAAAAAAAAAAD7///dRQAAAAAAAAAAAAAAAAAAAAAAAAD7/IsKAAAAAAAAAAAAAAAAAAAAAAAAAADJMQAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "stop": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////////////////AAAAAAAAAAAAAAAA////////////////AAAAAAAAAAAAAAAA////////////////AAAAAAAAAAAAAAAA////////////////AAAAAAAAAAAAAAAA////////////////AAAAAAAAAAAAAAAA////////////////AAAAAAAAAAAAAAAA////////////////AAAAAAAAAAAAAAAA////////////////AAAAAAAAAAAAAAAA////////////////AAAAAAAAAAAAAAAA////////////////AAAAAAAAAAAAAAAA////////////////AAAAAAAAAAAAAAAA////////////////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "camera": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB7+Pj4+Pj4eQAAAAAAAAAAAAAAAAAAAIP//////////30AAAAAAAAAAABJ5P/////////////////////iQQAAAADk////////////////////////2gAAAAD/////////////////////////9wAAAAD/////////tUMQEka8////////+AAAAAD///////97AAAAAAABhf//////+AAAAAD//////68AB4zn54sGALr/////+AAAAAD//////zsAjf////+LAEX/////+AAAAAD//////wkA6P/////nABH/////+AAAAAD//////gkA6P/////nABD/////+AAAAAD//////zsAj/////+MAEX/////+AAAAAD//////68ACI/o6I0HALr/////+AAAAAD///////95AAAAAAAAg///////+AAAAAD/////////skEPEES4////////+AAAAAD/////////////////////////9wAAAADk////////////////////////2wAAAABM5f/////////////////////iRAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "layers-triple-outline": "AAAAAAAAAAAAAAicnAgAAAAAAAAAAAAAAAAAAAAAAAAAIM3//80gAAAAAAAAAAAAAAAAAAAAAABK7v/b2//tSQAAAAAAAAAAAAAAAAAAAoH+/7EPD7L//oECAAAAAAAAAAAAAAATuP/9ewEAAAF7/f+4EwAAAAAAAAAAADXh/+tEAAAAAAAARev/4DQAAAAAAAAAZvj/yR0AAAAAAAAAAB3J//hmAAAAAAAAYPf/ziAAAAAAAAAAACHO//dgAAAAAAAAADHe/+1GAAAAAAAAR+3/3jEAAAAAAAAAAAARtv/9ewEAAAF7/f+2EQAAAAAAAAAAAAkAAoH+/7AODrD//oEBAA8AAAAAAAAAU+6AAgBK7v/Z2f/uSgADi/JWAAAAAAAAcPv/txIAIs///88hABa///twAAAAAAAAAD3n/98zAAmgoAkAOOT/5z0AAAAAAAAAAAAZw//4ZAAAAABp+f/DGQAAAAAAAAAAABQABZH//50ICaD//5EEABQAAAAAAAAAXvWUBgBY9P/Oz//0WAAGlPVeAAAAAAAAZ/j/xxwAK9r//9krABzH//hnAAAAAAAAADXh/+pCAA6vrw4AQ+r/4TUAAAAAAAAAAAATuf/8eAEBAAF4/P+5EwAAAAAAAAAAAAAAAoL+/7APD7H//oICAAAAAAAAAAAAAAAAAABL7v/b2//uSgAAAAAAAAAAAAAAAAAAAAAAIc3//80hAAAAAAAAAAAAAAAAAAAAAAAAAAidnQgAAAAAAAAAAAAA", "thermometer": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABYTf34MFAAAAAAAAAAAAAAAAAAAAAAAAif////+GAAAAAAAAAAAAAAAAAAAAAAAA5/9AQP/lAAAAAAAAAAAAAAAAAAAAAAAA//8EBP//AAAAAAAAAAAAAAAAAAAAAAAA//8DA///AAAAAAAAAAAAAAAAAAAAAAAA//8DA///AAAAAAAAAAAAAAAAAAAAAAAA///4+P//AAAAAAAAAAAAAAAAAAAAAAAA////////AAAAAAAAAAAAAAAAAAAAAAAA////////AAAAAAAAAAAAAAAAAAAAAAAA////////AAAAAAAAAAAAAAAAAAAAAAAA////////AAAAAAAAAAAAAAAAAAAAAAB9////////fAAAAAAAAAAAAAAAAAAAAEf//////////0cAAAAAAAAAAAAAAAAAALr//////////7oAAAAAAAAAAAAAAAAAAOz//////////+sAAAAAAAAAAAAAAAAAAO3//////////+0AAAAAAAAAAAAAAAAAALr//////////7kAAAAAAAAAAAAAAAAAAEX//////////0QAAAAAAAAAAAAAAAAAAAB8////////fAAAAAAAAAAAAAAAAAAAAAAARLrs7LpEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "clock-outline": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARRntLr6tGbTQIAAAAAAAAAAAAAAAAAUdr//////////9ZMAAAAAAAAAAAAAAKM///PaCcICShs1P//hQEAAAAAAAAAAI7/+nABAAAAAAAAAXn8/4UAAAAAAAAAVP/6QQAAAAAAAAAAAABJ/P9MAAAAAAAF3P9wAAAAAAD/gAAAAAAAef/WAgAAAABV/80AAAAAAAD/gAAAAAAAAdT/TQAAAACk/2MAAAAAAAD/gAAAAAAAAGz/mwAAAADa/x8AAAAAAAD/gAAAAAAAACj/0QAAAADz/gIAAAAAAAD/gAAAAAAAAAn/6gAAAAD4/QEAAAAAAAD/zCsAAAAAAAj/6wAAAADh/x4AAAAAAABO3/uPDgAAACf/0gAAAACv/18AAAAAAAAACYX56F4AAGj/ngAAAABg/8cAAAAAAAAAAAAmu6gAAc//UQAAAAAI5v9nAAAAAAAAAAAAAAkAcP/aBAAAAAAAUP/4OgAAAAAAAAAAAABB+v9RAAAAAAAAAIv/+GcAAAAAAAAAAHD6/4wAAAAAAAAAAAOL///HXx4BAh9jzf//jgIAAAAAAAAAAAAAUOb////9/v///9xUAAAAAAAAAAAAAAAAAAhgr+H489qkVQUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "check-circle-outline": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARUpdjv7tajUQMAAAAAAAAAAAAAAAAARt7//////////9tBAAAAAAAAAAAAAAKA/f/PaCcICShs1P/8eQEAAAAAAAAAAIT/+nABAAAAAAAAAXn8/3kAAAAAAAAASv76QQAAAAAAAAAAAABJ/PxBAAAAAAAH5P9wAAAAAAAAAAAAACcAef/bAwAAAABc/80AAAAAAAAAAAAAVvt3AdT/UQAAAACt/2MAAAAAAAAAAABX+/9/AGz/owAAAADg/x8AAAAAAAAAAFn8/4AAACj/1gAAAAD3/gIAACkAAAAAWvz/gAAAAAn/7gAAAAD4/QEAg/pQAABb/P+AAAAAAAj/7wAAAADh/x4Ahf/6UF39/4AAAAAAACf/2AAAAACv/18AAIj/+v3/gAAAAAAAAGj/pQAAAABg/8cAAACL//+AAAAAAAAAAc//VAAAAAAI5v9nAAAAjoAAAAAAAAAAcP/eBAAAAAAAUP/4OgAAAAAAAAAAAABB+v1GAAAAAAAAAIv/+GcAAAAAAAAAAHD6/4AAAAAAAAAAAAOL///HXx4BAh9jzf/+hAIAAAAAAAAAAAAAUOb////9/v///+RKAAAAAAAAAAAAAAAAAAhgr+H49+CtXAcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "alert-circle-outline": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARUpdjv6tGaTQIAAAAAAAAAAAAAAAAARt7//////////9ZMAAAAAAAAAAAAAAKA/f/PaCcICShs1P//hQEAAAAAAAAAAIT/+nABAAAAAAAAAXn8/4UAAAAAAAAASv76QQAAAAAAAAAAAABJ/P9MAAAAAAAH5P9wAAAAAAD/+AAAAAAAef/WAgAAAABc/80AAAAAAAD/+AAAAAAAAdT/TQAAAACt/2MAAAAAAAD/+AAAAAAAAGz/mgAAAADg/x8AAAAAAAD/+AAAAAAAACj/0QAAAAD3/gIAAAAAAAD/+AAAAAAAAAn/6gAAAAD0/QEAAAAAAAD89AAAAAAAAAj/6wAAAADb/x4AAAAAAAAAAAAAAAAAACf/0gAAAACm/18AAAAAAAAAAAAAAAAAAGj/nQAAAABZ/8cAAAAAAAD/+AAAAAAAAc//UQAAAAAG4f9nAAAAAAD/+AAAAAAAcP/aBAAAAAAAWv/4OgAAAAAIBwAAAABB+v9RAAAAAAAAAJT/+GcAAAAAAAAAAHD6/4sAAAAAAAAAAASU///HXx4BAh9jzf//jgIAAAAAAAAAAAAAWuH////9/v///9xUAAAAAAAAAAAAAAAAAAZZptv089qkVQUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "cube-outline": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAELHyUQAAAAAAAAAAAAAAAAAAAAAAAAps/////+2KwAAAAAAAAAAAAAAAAAAFpf8//F4d/H//JkXAAAAAAAAAAAAAAl68v/7lhUAABWV+//zfAkAAAAAAAAAUuL//7QpAAAAAAAAKLL//+RUAAAAAAAA9///fgAAAAAAAAAAAAB7///5AgAAAAAA/////6siAAAAAAAAIqr/////BAAAAAAA//998//5jBAAABGN+f/zfP//BAAAAAAA//8EF5v9/+xtce7//JoXAP//BAAAAAAA//8EAAAuu/////+5LAAAAP//BAAAAAAA//8EAAAAAEz//EgAAAAAAP//BAAAAAAA//8EAAAAAAD/+AAAAAAAAP//BAAAAAAA//8EAAAAAAD/+AAAAAAAAP//BAAAAAAA//8FAAAAAAD/+AAAAAAAAf//BAAAAAAA+P/OPgAAAAD/+AAAAAA+zf/6AgAAAAAAWef//6whAAD/+AAAIqz//+lcAAAAAAAAAAyD9f/4hw3/+A6K+f/2hQ0AAAAAAAAAAAAAG6D9/+f//er//qIcAAAAAAAAAAAAAAAAAAAwvP////++MgAAAAAAAAAAAAAAAAAAAAAAAEvP0U0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "printer-3d-nozzle-heat-outline": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB/j4+Pj4+Pj4+PgAAAAAAAAAAAAAAAAACP////////////8AAAAAAAAAAAAAAAAACP/8AAAAAAAE//8AAAAAAAAAAAAAAAAACP/8AAAAAAAE//8AAAAAAAAAAAAAAAAACP/8AAAAAAAE//8AAAAAAAAAAAAAAAD////8AAAAAAAE////+AAAAAAAAAAAAAD////8AAAAAAAE////+AAAAAAAAAAAAAD/+AQDAAAAAAAABAT/+AAAAAAAAAAAAAD/+AAAAAAAAAAAAAD/+AAAAAAAAAAAAAD///jODgAAAAAS0/j/+AAAAAAAAAAAAAD/////vQUAAAjD////+AAAAAAAAAAAAAAAACft/6MBAqv/6SIAABUdAAABMwAAAAAAAAA8+P+Hj//2NgAAAK35XwBl/6kAAAAAAAAAV/7///1QAAAAU//rFhjv/1wAAAAAAAAAAHf//24AAAAE5v9iAJz/xwAAAAAAAAAAAAAIBwAAAAAAmv+5AEL+9iMAAAAAAAAAAAAAAAAAAAAAEOf/ZwCU/7sAAAAAAAAAAAAAAAAAAAAAIPT/TQCz/5wAAAAAAAAAAAAAAAAAAAAAt/+lAGL/5RAAAAAAAAAAAAAAAAAAAAACa84UAD7CTwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "radiator": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAXsj0AAAAjylEAAAAhylYAAAAAAAAAAACt/6MAAAG+/48AAAC5/5sAAAAAAAAAAFb/6BIAAGb/3AoAAF3/4w8AAAAAAAAAAJT/vAAAAIr/wgEAAH7/zAMAAAAAAAAAABDn/14AAAre/2oAAAbW/3YAAAAAAAAAAACO/8wAAACS/8QAAACG/9AAAAAAAAAAACH1/kEAACv6+zIAACP2/jsAAAAAAAAAAIf/mAAAAH3+hgAAAHL9kgAAAAAAAAAAAABFDQAAAAAuBwAAAAAqDAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABJ5P/////////////////////iQQAAAADk////////////////////////2gAAAAD///87P///O0D//zc///87Q///9wAAAAD///8ABP//AAD/+AAE//8ACP//+AAAAAD///8ABP//AAD/+AAE//8ACP//+AAAAAD///83O///Nzz//zM7//83P///+AAAAAD/////////////////////////+AAAAAD/////////////////////////+AAAAAD/+AQEBAQEBAQEBAQEBAQEBAT/+AAAAAD89AAAAAAAAAAAAAAAAAAAAAD89AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "close": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAouRQAAAAAAAAAABW5JwAAAAAAAAAAAAC6/9IUAAAAAAAAFdL/uQAAAAAAAAAAAAAV0//SFAAAAAAV0v/SFQAAAAAAAAAAAAAAFdP/0hQAABXS/9IVAAAAAAAAAAAAAAAAABXT/9IUFdL/0hUAAAAAAAAAAAAAAAAAAAAV0//S0//SFQAAAAAAAAAAAAAAAAAAAAAAFdP//9MVAAAAAAAAAAAAAAAAAAAAAAAAFdL//9IUAAAAAAAAAAAAAAAAAAAAAAAV0v/S0//SFAAAAAAAAAAAAAAAAAAAABXS/9IVFdP/0hQAAAAAAAAAAAAAAAAAFdL/0hUAABXT/9IUAAAAAAAAAAAAAAAV0v/SFQAAAAAV0//SFAAAAAAAAAAAAAC6/9IVAAAAAAAAFdP/uQAAAAAAAAAAAAApuhUAAAAAAAAAABW6KAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "fullscreen": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD4+Pj48AAAAAD4+Pj48AAAAAAAAAAAAAD/////+AAAAAD/////+AAAAAAAAAAAAAD/+AAAAAAAAAAAAAD/+AAAAAAAAAAAAAD/+AAAAAAAAAAAAAD/+AAAAAAAAAAAAAD/+AAAAAAAAAAAAAD/+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD48AAAAAAAAAAAAAD48AAAAAAAAAAAAAD/+AAAAAAAAAAAAAD/+AAAAAAAAAAAAAD/+AAAAAAAAAAAAAD/+AAAAAAAAAAAAAD///j48AAAAAD4+Pj/+AAAAAAAAAAAAAD/////+AAAAAD/////+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "printer-3d-nozzle-alert-outline": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB/j4+Pj4+Pj4+PgAAAAAAAAAAAAAAAAACP////////////8AAAAAAAAAAAAAAAAACP/8AAAAAAAE//8AAAAAAAAAAAAAAAAACP/8AAAAAAAE//8AAAAAAAAAAAAAAAAACP/8AAAAAAAE//8AAAAAAAAAAAAAAAD////8AAAAAAAE////+AAE//8AAAAAAAD////8AAAAAAAE////+AAE//8AAAAAAAD/+AQDAAAAAAAABAT/+AAE//8AAAAAAAD/+AAAAAAAAAAAAAD/+AAE//8AAAAAAAD///jPDwAAAAAS0/j/+AAE//8AAAAAAAD/////vgYAAAjE////+AAE//8AAAAAAAAAACft/6YBAq3/6SIAAAAAAAAAAAAAAAAAAAA8+P+Kkv/1NgAAAAAAAAAAAAAAAAAAAAAAVf7///1OAAAAAAAE//8AAAAAAAAAAAAAAHT//2sAAAAAAAAE//8AAAAAAAAAAAAAAAAEAwAAAAAAAAAABAQAAAAAAAAAAAAAAAD89AAAAAAAAAAAAAAAAAAAAAAAAAAAADT/4AAAAAAAAAAAAAAAAAD4+Pj4+Pj4+P//jAAAAAAAAAAAAAAAAAD//////////+iQCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "sleep": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEBAQEBAQAAAAAAAAAAAAAAAAAAAAAAAD///////8AAAAAAAAAAAAAAAAAAAAAAAD///////8AAAAAAAAAAAAAAAAAAAAAAAAAACHq/5MAAAAAAAAAAAAAAAAAAAAAAAAAD9X/twMAAAAAAAAAAAAA/Pz8/Pz8AAAEuf/TDgAAAAAAAAAAAAAA/Pz8/v//AACX/+ojBAQAAAAAAAAAAAAAAAAi6/+RAAD///////8AAAAAAAAAAAAAAA7V/7gDAAD///////8AAP///////wAAArb/1w8AAAAAAAAAAAAAAP///////wAAj//tJAAAAAAAAAAAAAAAAAgIIeX/mgAA///9+Pj4AAAAAAAAAAAAAAALzP+7BAAA////////AAAAAAAAAAAAAAKx/9YQAAAAAAAAAAAAAAAAAAAAAAAAAJL/6yIAAAAAAAAAAAAAAAAAAAAAAAAAAP///////wAAAAAAAAAAAAAAAAAAAAAAAP///////wAAAAAAAAAAAAAAAAAAAAAAAAQEBAQEBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "timer-sand": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+Pj4+Pj4+Pj4+Pj4AAAAAAAAAAAAAAAA////////////////AAAAAAAAAAAAAAAA//8EAAAAAAAABP//AAAAAAAAAAAAAAAA//8EAAAAAAAABP//AAAAAAAAAAAAAAAA//8EA/b8/PUDBP//AAAAAAAAAAAAAAAA//8hAE76+U4AIv//AAAAAAAAAAAAAAAAiP/fHwBOTQAf4P+HAAAAAAAAAAAAAAAAAIj/3x8AAB/g/4cAAAAAAAAAAAAAAAAAAACI/98fH+D/hwAAAAAAAAAAAAAAAAAAAAAAiP/f4P+HAAAAAAAAAAAAAAAAAAAAAAAAgP/j5P+AAAAAAAAAAAAAAAAAAAAAAAB//+MkJOT/gAAAAAAAAAAAAAAAAAAAAH//4yQAACTk/4AAAAAAAAAAAAAAAAAAf//jJAAAAAAk5P+AAAAAAAAAAAAAAAAA//8lAAAAAAAAJv//AAAAAAAAAAAAAAAA//8EAAAAAAAABP//AAAAAAAAAAAAAAAA//8EAAAAAAAABP//AAAAAAAAAAAAAAAA//8EAAAAAAAABP//AAAAAAAAAAAAAAAA///4+Pj4+Pj4+P//AAAAAAAAAAAAAAAA////////////////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "video-off-outline": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAA/2SUAAAAAAAAAAAAAAAAAAAAAAAAAAACw/+UlAAAAAAAAAAAAAAAAAAAAAAAAAAAJu//lJQAAAAAAAAAAAAAAAAAAAAAAAAAACbv/5SUAAAAAAAAAAAAAAAAAAAAAAAAAyP///+UlAC7s/////8cAAAAeAAAAAAAA///////lJQAx7/////8DAB7dAAAAAAAA//8HDLv/5SUAAgMD//8DHt3/AAAAAAAA//8DAAm7/+UlAAAA//8i3f//AAAAAAAA//8DAAAJu//lJQAA6//g////AAAAAAAA//8DAAAACbv/5SUALev/////AAAAAAAA//8DAAAAAAm7/+UlAC3r////AAAAAAAA//8DAAAAAAAJu//lJQAt6///AAAAAAAA//8DAAAAAAAACbv/5SUALev/AAAAAAAA//8HAwMDAwMDAw2+/+UlAC3rAAAAAAAA///////////////////lJQAtAAAAAAAAyP///////////////+7/5SUAAAAAAAAAAAAAAAAAAAAAAAAAAAm7/+UlAAAAAAAAAAAAAAAAAAAAAAAAAAAJu//cBQAAAAAAAAAAAAAAAAAAAAAAAAAACbJFAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "printer-3d-off": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD2tCQav9/f39/f39/f39/f399+HBgAAALn/uwkHtv//////////////////hwAAAAz0/7wJB7X/////////////Nzj/3wAAAAD7//+9CQaz////////////ODj/9wAAAAD7////vQoGsv//////////////9wAAAAD7/////74KAAAAAAAAAAAD////9wAAAAD7////w/+/CgAAAAAAAAAD////9wAAAAD7////DML/wAsAEQIAAAAD////9wAAAAD7////AAvB/8ALBIVdAwAD////9wAAAAADAwMDBWLc///BCwSs3GIFAwMDAwAAAAAAAAAAyf//y8n/wgwErP/JAAAAAAAAAAAAAAAA////v0LC/8IMBKz/AAAAAAAAAAAAAAAA///t//+6+v/DDASsAAAAAAAAAAAAAAAA//8Sg/T/////xAwEAAAAAAAAAAAAAAAA//8DABf/+iXE/8QNAAAAAAAAAAAAAAAA//8UAAD/9wAMxv/FDQAAAAAAAAAAAAAA4//veAn/9wt78f//xg0AAAAAAAAAAAAAHaT+/+X//ej//6q0/8YOAAAAAAAAAAAAAAA1wf/////EOAAGs//HDgAAAAAAAAAAAAAAAFHT01IAAAAABrT/wgAAAAAAAAAAAAAAAAAAAAAAAAAAAAaxUwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"};
+const T = { bg: "#101317", surface: "#20242a", raised: "#2c3037", outline: "#3a3f47", text: "#f3f0e9", muted: "#b3b5b9", subtle: "#818792", unavailable: "#92979e", error: "#ff9991", ok: "#9bcba8", ink: "#17191d" };
+const ACCENTS = [["Песок", "#dfb98a"], ["Небо", "#82bdf5"], ["Коралл", "#e6a18d"], ["Бирюза", "#75cfc7"], ["Фиалка", "#b5a0e8"], ["Мята", "#9bcba8"]];
+const FILAMENTS = [["Оранжевый PLA", "#f08a3c"], ["Белый PLA", "#e9e6df"], ["Серый PLA", "#8a8f97"], ["Красный PETG", "#d9483b"], ["Мятный PLA", "#7fd1b0"], ["Синий PLA", "#3f7fe0"]];
+const SIZES = [[2,2],[2,4],[4,2],[4,4],[4,6],[8,2],[8,4],[8,6],[8,8]];
+const FONT = '"Noto Sans", system-ui, sans-serif', P = 12, GAP = 8, HOLD_MS = 900, ACK_MS = 700, TOTAL_MIN = 184, LAYERS = 240;
+const DEV = "a1_03900d622126120";
+
+const state = { status: "running", progress: 46, run: true, task: "Органайзер для отвёрток", filament: "#f08a3c", camera: true, cover: true, accent: "#dfb98a", screen: "8x6", offline: false, reduced: false };
+if (matchMedia("(prefers-reduced-motion: reduce)").matches) state.reduced = true;
+try { Object.assign(state, JSON.parse(localStorage.getItem("printer-stand") || "{}")); } catch (e) {}
+if (!SIZES.some(([w, h]) => `${w}x${h}` === state.screen)) state.screen = "8x6";
+const save = () => { try { localStorage.setItem("printer-stand", JSON.stringify(state)); } catch (e) {} };
+let pending = null;                                   // { status, at } — the panel shows the intent until HA confirms
+const shownStatus = () => pending ? pending.status : state.status;
+
+/* ---------- printer model: what the entities say ---------- */
+const PREP = ["Нагрев стола", "Калибровка стола", "Очистка сопла", "Нагрев сопла"];
+const PREP_HA = ["heatbed_preheating", "auto_bed_leveling", "cleaning_nozzle_tip", "heating_hotend"];
+function prepIndex() { return Math.floor(performance.now() / 4000) % PREP.length; }
+function remainingMin() { return Math.round(TOTAL_MIN * (100 - state.progress) / 100); }
+function layer() { return state.status === "idle" ? 0 : state.status === "finish" ? LAYERS : Math.max(1, Math.round(LAYERS * state.progress / 100)); }
+const fmtDur = (m) => m >= 60 ? `${Math.floor(m / 60)} ч ${String(m % 60).padStart(2, "0")} мин` : `${m} мин`;
+const fmtShort = (m) => `${Math.floor(m / 60)}:${String(m % 60).padStart(2, "0")}`;
+function endClock() { const d = new Date(Date.now() + remainingMin() * 60000); return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`; }
+function temps() {
+  const s = shownStatus();
+  if (s === "running" || s === "pause") return { noz: 220, nozT: 220, bed: 65, bedT: 65 };
+  if (s === "prepare") { const k = (performance.now() / 20000) % 1; return { noz: Math.round(140 + 80 * k), nozT: 220, bed: Math.round(40 + 25 * k), bedT: 65 }; }
+  return { noz: 31, nozT: 0, bed: 29, bedT: 0 };
+}
+// What the card says the printer is doing: label, colour, icon, and the short time line.
+function doing() {
+  const s = shownStatus(), th = theme();
+  if (state.offline) return { text: "Нет связи", c: T.unavailable, icon: "printer-3d-off", time: "" };
+  if (s === "prepare") return { text: PREP[prepIndex()], c: th.accent, icon: "printer-3d-nozzle-heat-outline", time: "", short: "" };
+  if (s === "running") return { text: pending ? "Продолжаем…" : "Печать", c: th.accent, icon: "printer-3d-nozzle", time: `ещё ${fmtDur(remainingMin())}`, short: fmtShort(remainingMin()) };
+  if (s === "pause") return { text: pending ? "Ставим на паузу…" : "Пауза", c: T.muted, icon: "pause", time: `осталось ${fmtDur(remainingMin())}`, short: fmtShort(remainingMin()) };
+  if (s === "finish") return { text: "Готово", c: T.ok, icon: "check-circle-outline", time: `за ${fmtDur(TOTAL_MIN)}`, short: fmtShort(TOTAL_MIN) };
+  if (s === "failed") return { text: pending ? "Останавливаем…" : "Ошибка печати", c: T.error, icon: "alert-circle-outline", time: "засор сопла", short: "" };
+  return { text: "Ожидание", c: T.muted, icon: "sleep", time: "нет задачи", short: "" };
+}
+const hasJob = () => !["idle"].includes(shownStatus()) && !state.offline;
+const taskName = () => hasJob() ? (state.task.trim() || "Без названия") : "Нет задачи";
+const canPause = () => !state.offline && ["running", "prepare"].includes(shownStatus()) && !pending;
+const canResume = () => !state.offline && shownStatus() === "pause" && !pending;
+const canStop = () => !state.offline && ["running", "prepare", "pause"].includes(shownStatus()) && !pending;
+
+/* ---------- colour / icons ---------- */
+const hex = (c) => [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16));
+const rgb = (a, al = 1) => `rgba(${a.map((v) => Math.round(Math.max(0, Math.min(255, v)))).join(",")},${al})`;
+const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
+function theme() { const a = hex(state.accent), s = hex(T.surface); return { accent: state.accent, a, fill: rgb(mix(s, a, 0.5)), surface: rgb(mix(s, a, 0.14)) }; }
+const maskCache = new Map();
+function icon(ctx, name, x, y, size, color) {
+  const key = name + color;
+  if (!maskCache.has(key)) {
+    const bytes = Uint8Array.from(atob(ICONS[name]), (c) => c.charCodeAt(0)), c = document.createElement("canvas"); c.width = c.height = 24;
+    const g = c.getContext("2d"), img = g.createImageData(24, 24), col = color.startsWith("#") ? hex(color) : color.match(/[\d.]+/g).slice(0, 3).map(Number);
+    for (let i = 0; i < 576; i++) img.data.set([col[0], col[1], col[2], bytes[i]], i * 4);
+    g.putImageData(img, 0, 0); maskCache.set(key, c);
+  }
+  ctx.drawImage(maskCache.get(key), x, y, size, size);
+}
+function rr(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.roundRect(x, y, w, h, typeof r === "number" ? Math.min(r, w / 2, h / 2) : r); }
+function ellipsis(ctx, text, w) { if (ctx.measureText(text).width <= w) return text; while (text.length > 1 && ctx.measureText(text + "…").width > w) text = text.slice(0, -1); return text + "…"; }
+function wrap2(ctx, text, w) {                                   // up to two lines, the second ellipsised
+  const words = text.split(" "); let a = "";
+  for (let i = 0; i < words.length; i++) {
+    const t = a ? a + " " + words[i] : words[i];
+    if (ctx.measureText(t).width > w && a) return [a, ellipsis(ctx, words.slice(i).join(" "), w)];
+    a = t;
+  }
+  return [ellipsis(ctx, a, w)];
+}
+
+/* ---------- the model being printed: a twisted six-lobed vase ---------- */
+// Stacked slices drawn bottom → top read as a solid with visible layer lines, like a real print.
+function vaseRadius(u, a) {                                      // u: 0 bottom → 1 top, a: angle
+  const prof = 0.62 + 0.28 * Math.sin(u * Math.PI * 0.95 + 0.25) - 0.1 * u;
+  return prof * (1 + 0.11 * Math.cos(6 * (a + u * 1.6)));
+}
+function drawVase(ctx, cx, base, R, Hh, upTo, col, light = 1, lines = true) {
+  const c = hex(col), N = Math.max(12, Math.round(Hh / 2.2)), M = 48, squash = 0.34, top = Math.max(0, Math.min(1, upTo));
+  const n = Math.round(N * top);
+  for (let i = 0; i <= n; i++) {
+    const u = i / N, y = base - u * Hh;
+    const g = ctx.createLinearGradient(cx - R, 0, cx + R, 0);
+    const shade = (lines && i % 2 ? 0.9 : 1) * light;
+    g.addColorStop(0, rgb(mix(c, [0, 0, 0], 0.55).map((v) => v * shade)));
+    g.addColorStop(0.62, rgb(c.map((v) => v * shade)));
+    g.addColorStop(1, rgb(mix(c, [255, 255, 255], 0.25).map((v) => v * shade)));
+    ctx.fillStyle = g; ctx.beginPath();
+    for (let k = 0; k <= M; k++) { const a = k / M * Math.PI * 2, r = vaseRadius(u, a) * R; const x = cx + Math.cos(a) * r, yy = y + Math.sin(a) * r * squash; k ? ctx.lineTo(x, yy) : ctx.moveTo(x, yy); }
+    ctx.fill();
+  }
+  if (n === N || top < 1) {                                       // the top face: rim of the shell, darker inside (vase mode)
+    const u = n / N, y = base - u * Hh;
+    ctx.beginPath();
+    for (let k = 0; k <= M; k++) { const a = k / M * Math.PI * 2, r = vaseRadius(u, a) * R; const x = cx + Math.cos(a) * r, yy = y + Math.sin(a) * r * squash; k ? ctx.lineTo(x, yy) : ctx.moveTo(x, yy); }
+    ctx.fillStyle = rgb(mix(c, [255, 255, 255], 0.18).map((v) => v * light)); ctx.fill();
+    ctx.beginPath();
+    for (let k = 0; k <= M; k++) { const a = k / M * Math.PI * 2, r = vaseRadius(u, a) * R * 0.9; const x = cx + Math.cos(a) * r, yy = y + Math.sin(a) * r * squash; k ? ctx.lineTo(x, yy) : ctx.moveTo(x, yy); }
+    ctx.fillStyle = rgb(mix(c, [0, 0, 0], 0.45).map((v) => v * light)); ctx.fill();
+  }
+  return base - (n / N) * Hh;
+}
+// Cover image: the slicer's render of the plate (image.<printer>_cover_image), drawn once per colour.
+const coverCache = new Map();
+function coverImage(size) {
+  const key = state.filament + size;
+  if (coverCache.has(key)) return coverCache.get(key);
+  const c = document.createElement("canvas"), k = 2; c.width = c.height = size * k;
+  const g = c.getContext("2d"); g.scale(k, k);
+  g.fillStyle = "rgba(0,0,0,.28)"; g.beginPath(); g.ellipse(size / 2, size * 0.86, size * 0.3, size * 0.07, 0, 0, Math.PI * 2); g.fill();
+  drawVase(g, size / 2, size * 0.84, size * 0.33, size * 0.66, 1, state.filament, 1, false);
+  coverCache.set(key, c); return c;
+}
+
+/* ---------- camera frame (camera.<printer>_camera), procedural ---------- */
+// A1 is a bed slinger: the bed moves along Y, the toolhead along the X gantry. Frames at ~15 fps like the real stream.
+function drawCamera(ctx, r, now, big) {
+  ctx.save(); ctx.beginPath(); ctx.rect(r.x, r.y, r.w, r.h); ctx.clip();
+  if (!state.camera || state.offline) {
+    ctx.fillStyle = "#15181d"; ctx.fillRect(r.x, r.y, r.w, r.h);
+    const s = r.h >= 90 ? 24 : 20;
+    icon(ctx, "video-off-outline", r.x + r.w / 2 - s / 2, r.y + r.h / 2 - s / 2 - (r.h >= 90 ? 10 : 0), s, T.subtle);
+    if (r.h >= 90) { ctx.font = `14px ${FONT}`; ctx.fillStyle = T.subtle; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(ellipsis(ctx, state.offline ? "Нет связи" : "Камера недоступна", r.w - 16), r.x + r.w / 2, r.y + r.h / 2 + 16); }
+    ctx.restore(); return;
+  }
+  const s = shownStatus(), t = state.reduced ? 0 : Math.floor(now / 66) * 66 / 1000;
+  const W = r.w, H = r.h, S = Math.max(W / 16, H / 9);           // cover crop of a 16:9 frame
+  const fw = S * 16, fh = S * 9, ox = r.x + (W - fw) / 2, oy = r.y + (H - fh) / 2;
+  const X = (u) => ox + u * fw, Y = (v) => oy + v * fh;
+  const lit = s === "idle" || s === "finish" ? 0.75 : 1;
+  const bg = ctx.createLinearGradient(0, oy, 0, oy + fh);
+  bg.addColorStop(0, "#2a2724"); bg.addColorStop(0.55, "#191816"); bg.addColorStop(1, "#0d0d0c");
+  ctx.fillStyle = bg; ctx.fillRect(r.x, r.y, r.w, r.h);
+  ctx.fillStyle = "rgba(255,240,215,.05)"; ctx.fillRect(X(0.06), Y(0), fw * 0.05, fh); ctx.fillRect(X(0.89), Y(0), fw * 0.05, fh);   // frame posts
+  // bed: textured PEI plate in perspective; it slides front/back while printing
+  const moving = (s === "running") && !state.reduced;
+  const slide = moving ? Math.sin(t * 2.3) * 0.025 + Math.sin(t * 5.1) * 0.01 : 0;
+  const bt = 0.6 + slide, bb = 0.93 + slide;
+  ctx.beginPath(); ctx.moveTo(X(0.2), Y(bt)); ctx.lineTo(X(0.8), Y(bt)); ctx.lineTo(X(0.93), Y(bb)); ctx.lineTo(X(0.07), Y(bb)); ctx.closePath();
+  const bed = ctx.createLinearGradient(0, Y(bt), 0, Y(bb)); bed.addColorStop(0, "#5b4a35"); bed.addColorStop(1, "#7c6343");
+  ctx.fillStyle = bed; ctx.fill();
+  ctx.strokeStyle = "rgba(0,0,0,.35)"; ctx.lineWidth = Math.max(1, S * 0.08); ctx.stroke();
+  ctx.fillStyle = "#2b2b2b"; ctx.fillRect(X(0.07), Y(bb), X(0.93) - X(0.07), fh * 0.025);
+  // the part on the bed, built up to the current layer
+  const prog = s === "idle" ? 0 : s === "finish" ? 1 : s === "prepare" ? 0 : state.progress / 100;
+  const cx = X(0.5), base = Y((bt + bb) / 2 + 0.03), R = fh * 0.13, Hh = fh * 0.42;
+  ctx.fillStyle = "rgba(0,0,0,.35)"; ctx.beginPath(); ctx.ellipse(cx, base + R * 0.15, R * 0.95, R * 0.3, 0, 0, Math.PI * 2); ctx.fill();
+  let topY = base;
+  if (prog > 0) topY = drawVase(ctx, cx, base, R, Hh, prog, state.filament, lit, true);
+  // gantry and toolhead
+  const parked = s === "finish" || s === "idle" || s === "pause" || s === "failed";
+  const gy = parked ? Y(0.16) : Math.min(topY - fh * 0.11, Y(0.5));
+  ctx.fillStyle = "#3b3d42"; ctx.fillRect(X(0), gy - fh * 0.02, fw, fh * 0.04);
+  ctx.fillStyle = "rgba(255,255,255,.08)"; ctx.fillRect(X(0), gy - fh * 0.02, fw, fh * 0.008);
+  const hx = parked ? X(s === "pause" ? 0.82 : 0.9) : cx + Math.sin(t * 3.7) * R * 0.9 + Math.sin(t * 9.3) * R * 0.15;
+  const hw = fw * 0.075, hh = fh * 0.14;
+  rr(ctx, hx - hw / 2, gy - hh * 0.55, hw, hh, S * 0.3); ctx.fillStyle = "#d6d7d9"; ctx.fill();
+  ctx.fillStyle = "#9a9da3"; ctx.fillRect(hx - hw / 2, gy + hh * 0.2, hw, hh * 0.12);
+  ctx.beginPath(); ctx.moveTo(hx - hw * 0.14, gy + hh * 0.45); ctx.lineTo(hx + hw * 0.14, gy + hh * 0.45); ctx.lineTo(hx, gy + hh * 0.62); ctx.closePath(); ctx.fillStyle = "#c9a14a"; ctx.fill();
+  if (s === "running" || s === "prepare") {                         // hot nozzle glow
+    const k = s === "prepare" ? 0.5 + 0.5 * Math.sin(now / 300) : 1;
+    const glow = ctx.createRadialGradient(hx, gy + hh * 0.62, 0, hx, gy + hh * 0.62, R * 0.5);
+    glow.addColorStop(0, `rgba(255,170,90,${0.55 * k})`); glow.addColorStop(1, "rgba(255,170,90,0)"); ctx.fillStyle = glow; ctx.fillRect(hx - R, gy, R * 2, R);
+  }
+  if (s === "failed") { ctx.strokeStyle = state.filament; ctx.lineWidth = Math.max(1, S * 0.06); ctx.beginPath(); for (let i = 0; i < 9; i++) { const a = i * 1.7; ctx.lineTo(cx + Math.cos(a) * R * (0.6 + 0.2 * Math.sin(i)), topY - fh * 0.04 - Math.abs(Math.sin(a)) * fh * 0.05); } ctx.stroke(); }
+  // chamber light and sensor grain
+  const led = ctx.createRadialGradient(X(0.5), Y(0), 0, X(0.5), Y(0), fw * 0.7); led.addColorStop(0, "rgba(255,244,225,.10)"); led.addColorStop(1, "rgba(255,244,225,0)");
+  ctx.fillStyle = led; ctx.fillRect(r.x, r.y, r.w, r.h);
+  const vig = ctx.createRadialGradient(X(0.5), Y(0.5), fh * 0.3, X(0.5), Y(0.5), fw * 0.62); vig.addColorStop(0, "rgba(0,0,0,0)"); vig.addColorStop(1, "rgba(0,0,0,.45)");
+  ctx.fillStyle = vig; ctx.fillRect(r.x, r.y, r.w, r.h);
+  if (big) {                                                         // the stream's own timestamp
+    ctx.font = `14px ${FONT}`; ctx.textAlign = "right"; ctx.textBaseline = "alphabetic"; ctx.fillStyle = "rgba(255,255,255,.55)";
+    const d = new Date(); ctx.fillText(d.toLocaleTimeString("ru-RU"), r.x + r.w - 10, r.y + r.h - 10);
+  }
+  ctx.restore();
+}
+
+/* ---------- layouts ---------- */
+// Every item has a rect; "hit" items (camera, pause, stop) are ≥ 44×44 touch targets.
+function layout(W, H) {
+  const L = { W, H, items: [] }, add = (o) => (L.items.push(o), o);
+  if (W < 150 && H < 150) {                                         // 2×2: progress ring round the glyph
+    add({ t: "ring", r: { x: P, y: P, w: 44, h: 44 } });
+    add({ t: "pct", r: { x: P, y: H - P - 24, w: 56, h: 24 }, size: 18 });
+    add({ t: "time1", r: { x: P + 56, y: H - P - 24, w: W - 2 * P - 56, h: 24 }, right: true, fit: true });
+    return L;
+  }
+  if (W < 150) {                                                    // 2×4: model picture, %, bar, state
+    const s = W - 2 * P;
+    add({ t: "model", r: { x: P, y: P, w: s, h: Math.min(s, H - 132) }, hit: "camera" });
+    add({ t: "pct", r: { x: P, y: H - P - 92, w: s, h: 34 }, size: 28, center: true });
+    add({ t: "bar", r: { x: P, y: H - P - 52, w: s, h: 6 } });
+    add({ t: "state1", r: { x: P, y: H - P - 40, w: s, h: 20 }, center: true });
+    add({ t: "time1", r: { x: P, y: H - P - 20, w: s, h: 20 }, center: true });
+    return L;
+  }
+  if (H < 150 && W < 400) {                                         // 4×2: glyph, task / state, then % · bar · time
+    add({ t: "chip", r: { x: P, y: P, w: 44, h: 44 } });
+    add({ t: "head", r: { x: P + 56, y: P, w: W - 2 * P - 56, h: 44 } });
+    add({ t: "barrow", r: { x: P, y: H - P - 28, w: W - 2 * P, h: 28 } });
+    return L;
+  }
+  if (H < 150) {                                                    // 8×2: camera thumb, task, big %, bar
+    const cw = Math.round((H - 2 * P) * 16 / 9);
+    add({ t: "camera", r: { x: P, y: P, w: cw, h: H - 2 * P }, round: 12, hit: "camera" });
+    const x = P + cw + 14;
+    add({ t: "pct", r: { x: W - P - 96, y: P, w: 96, h: 40 }, size: 28, right: true });
+    add({ t: "head", r: { x, y: P, w: W - P - 96 - 8 - x, h: 44 } });
+    add({ t: "barrow", r: { x, y: H - P - 28, w: W - P - x, h: 28 } });
+    return L;
+  }
+  if (W < 400 && H < 260) {                                         // 4×4: camera on top, task and bar below
+    const ch = Math.round(W * 9 / 16);
+    add({ t: "camera", r: { x: 0, y: 0, w: W, h: ch }, top: true, hit: "camera", pill: true });
+    add({ t: "task", r: { x: P, y: ch + 8, w: W - 2 * P - 56, h: 20 } });
+    add({ t: "pct", r: { x: W - P - 56, y: ch + 4, w: 56, h: 28 }, size: 18, right: true });
+    add({ t: "time1", r: { x: P, y: ch + 30, w: W - 2 * P, h: 20 }, layer: true });
+    add({ t: "bar", r: { x: P, y: H - P - 6, w: W - 2 * P, h: 6 } });
+    return L;
+  }
+  if (W < 400) {                                                    // 4×6: camera, task, big %, bar, buttons
+    const ch = Math.round(W * 9 / 16);
+    add({ t: "camera", r: { x: 0, y: 0, w: W, h: ch }, top: true, hit: "camera", pill: true });
+    add({ t: "task", r: { x: P, y: ch + 10, w: W - 2 * P, h: 20 } });
+    add({ t: "state1", r: { x: P, y: ch + 30, w: W - 2 * P, h: 20 } });
+    add({ t: "pct", r: { x: P, y: ch + 54, w: 100, h: 36 }, size: 28 });
+    add({ t: "time2", r: { x: P + 100, y: ch + 54, w: W - 2 * P - 100, h: 36 } });
+    add({ t: "bar", r: { x: P, y: ch + 96, w: W - 2 * P, h: 6 } });
+    const by = H - P - 44, bw = (W - 2 * P - GAP) / 2;
+    add({ t: "pause", r: { x: P, y: by, w: bw, h: 44 }, hit: "pause", label: true });
+    add({ t: "stop", r: { x: P + bw + GAP, y: by, w: bw, h: 44 }, hit: "stop", label: true });
+    return L;
+  }
+  if (H < 260) {                                                    // 8×4: camera left, everything else right
+    const cw = 264;
+    add({ t: "camera", r: { x: 0, y: 0, w: cw, h: H }, left: true, hit: "camera", pill: true });
+    const x = cw + 14, w = W - P - x;
+    add({ t: "task2", r: { x, y: P, w, h: 40 } });
+    add({ t: "state1", r: { x, y: P + 42, w, h: 20 } });
+    add({ t: "pct", r: { x, y: P + 70, w, h: 36 }, size: 28 });
+    add({ t: "time1", r: { x, y: P + 108, w, h: 20 } });
+    add({ t: "info", r: { x, y: P + 128, w, h: 20 }, short: true });
+    add({ t: "bar", r: { x, y: H - P - 6, w, h: 6 } });
+    return L;
+  }
+  if (H < 380) {                                                    // 8×6: camera + model picture, then the job
+    const ch = 176, cw = Math.round(ch * 16 / 9) - 13;
+    add({ t: "camera", r: { x: 0, y: 0, w: cw, h: ch }, topleft: true, hit: "camera", pill: true });
+    add({ t: "model", r: { x: cw + GAP, y: P, w: W - P - cw - GAP, h: ch - P }, caption: true, hit: "camera" });
+    const y = ch + 12;
+    add({ t: "task", r: { x: P, y, w: W - 2 * P - 120, h: 20 } });
+    add({ t: "state1", r: { x: P, y: y + 20, w: W - 2 * P - 120, h: 20 } });
+    add({ t: "pct", r: { x: W - P - 120, y: y - 2, w: 120, h: 40 }, size: 28, right: true });
+    add({ t: "bar", r: { x: P, y: y + 50, w: W - 2 * P, h: 6 } });
+    const by = H - P - 44;
+    add({ t: "info", r: { x: P, y: by, w: W - 2 * P - 2 * 104 - 2 * GAP, h: 44 }, two: true });
+    add({ t: "pause", r: { x: W - P - 2 * 104 - GAP, y: by, w: 104, h: 44 }, hit: "pause", label: true });
+    add({ t: "stop", r: { x: W - P - 104, y: by, w: 104, h: 44 }, hit: "stop", label: true });
+    return L;
+  }
+  // 8×8: big camera, model picture below left, the job beside it
+  const ch = 232;
+  add({ t: "camera", r: { x: 0, y: 0, w: W, h: ch }, top: true, hit: "camera", pill: true, big: true });
+  const ms = H - P - ch - 12;
+  add({ t: "model", r: { x: P, y: ch + 12, w: ms, h: ms }, caption: true, hit: "camera" });
+  const x = P + ms + 14, w = W - P - x;
+  add({ t: "task", r: { x, y: ch + 12, w, h: 20 } });
+  add({ t: "state1", r: { x, y: ch + 32, w, h: 20 } });
+  add({ t: "pct", r: { x, y: ch + 56, w: 100, h: 36 }, size: 28 });
+  add({ t: "time2", r: { x: x + 100, y: ch + 56, w: w - 100, h: 36 } });
+  add({ t: "bar", r: { x, y: ch + 98, w, h: 6 } });
+  add({ t: "info", r: { x, y: ch + 110, w, h: 20 } });
+  const by = H - P - 44, bw = (w - GAP) / 2;
+  add({ t: "pause", r: { x, y: by, w: bw, h: 44 }, hit: "pause", label: true });
+  add({ t: "stop", r: { x: x + bw + GAP, y: by, w: bw, h: 44 }, hit: "stop", label: true });
+  return L;
+}
+
+/* ---------- drawing ---------- */
+function barColor() { const s = shownStatus(), th = theme(); return state.offline ? T.subtle : s === "failed" ? T.error : s === "finish" ? T.ok : s === "pause" ? T.muted : th.accent; }
+function shownPct() { const s = shownStatus(); return state.offline || s === "idle" ? null : s === "finish" ? 100 : s === "prepare" ? 0 : state.progress; }
+function drawBar(ctx, r, now) {
+  rr(ctx, r.x, r.y, r.w, r.h, r.h / 2); ctx.fillStyle = T.raised; ctx.fill();
+  const p = shownPct(); if (p === null) return;
+  if (shownStatus() === "prepare") {                                 // indeterminate: a short sweep while it heats and levels
+    const k = state.reduced ? 0.35 : (now / 1400) % 1, w = r.w * 0.28, x = r.x - w + k * (r.w + w);
+    ctx.save(); rr(ctx, r.x, r.y, r.w, r.h, r.h / 2); ctx.clip(); rr(ctx, x, r.y, w, r.h, r.h / 2); ctx.fillStyle = barColor(); ctx.fill(); ctx.restore(); return;
+  }
+  if (p > 0) { rr(ctx, r.x, r.y, Math.max(r.h, r.w * p / 100), r.h, r.h / 2); ctx.fillStyle = barColor(); ctx.fill(); }
+}
+function pctText() { const p = shownPct(); return p === null || shownStatus() === "prepare" ? "—" : `${p} %`; }
+function stateLine(maxW, ctx) {
+  const d = doing(), s = shownStatus();
+  if (s === "running" || s === "pause") return d.text;
+  return d.text;
+}
+function layerText() { const s = shownStatus(); return s === "idle" || s === "prepare" || state.offline ? "" : `слой ${layer()} / ${LAYERS}`; }
+function drawPill(ctx, x, y, d) {
+  ctx.font = `500 14px ${FONT}`; const tw = Math.min(ctx.measureText(d.text).width, 150), w = tw + 30;
+  rr(ctx, x, y, w, 26, 13); ctx.fillStyle = "rgba(16,19,23,.78)"; ctx.fill();
+  ctx.beginPath(); ctx.arc(x + 13, y + 13, 4, 0, Math.PI * 2); ctx.fillStyle = d.c; ctx.fill();
+  ctx.fillStyle = T.text; ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(ellipsis(ctx, d.text, 150), x + 22, y + 14);
+}
+function drawButton(ctx, it, view, now) {
+  const r = it.r, off = state.offline, th = theme();
+  const isStop = it.t === "stop", resume = !isStop && shownStatus() === "pause";
+  const enabled = isStop ? canStop() : (resume ? canResume() : canPause());
+  const pressed = view.press && view.press.hit === it.hit;
+  rr(ctx, r.x, r.y, r.w, r.h, 14); ctx.fillStyle = !enabled ? T.surface : pressed ? T.outline : T.raised; ctx.fill();
+  if (!enabled) { ctx.strokeStyle = T.raised; ctx.lineWidth = 1; rr(ctx, r.x + .5, r.y + .5, r.w - 1, r.h - 1, 14); ctx.stroke(); }
+  if (isStop && view.press && view.press.hit === "stop" && enabled) {          // hold to stop: the button fills
+    const k = Math.min(1, (now - view.press.t0) / HOLD_MS);
+    ctx.save(); rr(ctx, r.x, r.y, r.w, r.h, 14); ctx.clip(); ctx.fillStyle = rgb(hex(T.error), 0.35); ctx.fillRect(r.x, r.y, r.w * k, r.h); ctx.restore();
+  }
+  const name = isStop ? "stop" : resume ? "play" : "pause", color = !enabled ? T.subtle : isStop ? T.error : th.accent;
+  const label = isStop ? (view.press && view.press.hit === "stop" ? "Держите…" : "Стоп") : resume ? "Продолжить" : "Пауза";
+  ctx.font = `14px ${FONT}`; const tw = ctx.measureText(label).width;
+  const showLabel = it.label && r.w >= tw + 24 + 8 + 20;
+  const gx = showLabel ? r.x + (r.w - (24 + 8 + tw)) / 2 : r.x + (r.w - 24) / 2;
+  icon(ctx, name, gx, r.y + 10, 24, color);
+  if (showLabel) { ctx.fillStyle = enabled ? T.text : T.subtle; ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(label, gx + 32, r.y + 23); }
+}
+function drawCard(ctx, view, now) {
+  const L = view.L, th = theme(), off = state.offline, d = doing();
+  ctx.save(); ctx.translate(view.ox, view.oy);
+  rr(ctx, 0, 0, L.W, L.H, 20); ctx.fillStyle = T.surface; ctx.fill();
+  ctx.save(); rr(ctx, 0, 0, L.W, L.H, 20); ctx.clip();
+  ctx.textBaseline = "middle";
+  for (const it of L.items) {
+    const r = it.r;
+    ctx.textAlign = it.center ? "center" : it.right ? "right" : "left";
+    const tx = it.center ? r.x + r.w / 2 : it.right ? r.x + r.w : r.x;
+    if (it.t === "camera") {
+      ctx.save();
+      if (it.round) { rr(ctx, r.x, r.y, r.w, r.h, it.round); ctx.clip(); }
+      drawCamera(ctx, r, now, it.big);
+      ctx.restore();
+      if (it.pill && !off) drawPill(ctx, r.x + 10, r.y + 10, d);
+    } else if (it.t === "model") {
+      rr(ctx, r.x, r.y, r.w, r.h, 14); ctx.fillStyle = T.raised; ctx.fill();
+      const cap = it.caption && r.h >= 120, ih = cap ? r.h - 26 : r.h, s = Math.min(r.w, ih);
+      if (state.cover && hasJob()) ctx.drawImage(coverImage(Math.round(s)), r.x + (r.w - s) / 2, r.y + (ih - s) / 2 + (cap ? 4 : 0), s, s);
+      else icon(ctx, hasJob() ? "cube-outline" : d.icon, r.x + r.w / 2 - 16, r.y + ih / 2 - 16, 32, T.subtle);
+      if (cap) { ctx.font = `14px ${FONT}`; ctx.fillStyle = T.muted; ctx.textAlign = "center"; ctx.fillText(ellipsis(ctx, hasJob() ? "Модель" : "Нет задачи", r.w - 16), r.x + r.w / 2, r.y + r.h - 16); }
+    } else if (it.t === "ring") {
+      const cx = r.x + 22, cy = r.y + 22, p = shownPct();
+      ctx.lineWidth = 3; ctx.lineCap = "round";
+      ctx.beginPath(); ctx.arc(cx, cy, 20.5, 0, Math.PI * 2); ctx.strokeStyle = T.raised; ctx.stroke();
+      if (p !== null && p > 0) { ctx.beginPath(); ctx.arc(cx, cy, 20.5, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * p / 100); ctx.strokeStyle = barColor(); ctx.stroke(); }
+      icon(ctx, d.icon, cx - 12, cy - 12, 24, off ? T.subtle : d.c);
+    } else if (it.t === "chip") {
+      rr(ctx, r.x, r.y, r.w, r.h, 12); ctx.fillStyle = off ? T.raised : th.surface; ctx.fill(); icon(ctx, d.icon, r.x + 10, r.y + 10, 24, off ? T.subtle : d.c);
+    } else if (it.t === "pct") {
+      ctx.font = `500 ${it.size}px ${FONT}`; ctx.fillStyle = off ? T.unavailable : T.text; ctx.fillText(ellipsis(ctx, pctText(), r.w), tx, r.y + r.h / 2 + 1);
+    } else if (it.t === "head") {                                     // task on top, what it does below
+      ctx.textAlign = "left";
+      ctx.font = `500 14px ${FONT}`; ctx.fillStyle = off ? T.unavailable : T.text; ctx.fillText(ellipsis(ctx, taskName(), r.w), r.x, r.y + 12);
+      ctx.font = `14px ${FONT}`; ctx.fillStyle = d.c; ctx.fillText(ellipsis(ctx, d.text, r.w), r.x, r.y + 33);
+    } else if (it.t === "task") {
+      ctx.font = `500 14px ${FONT}`; ctx.fillStyle = off ? T.unavailable : T.text; ctx.fillText(ellipsis(ctx, taskName(), r.w), tx, r.y + r.h / 2);
+    } else if (it.t === "task2") {
+      ctx.font = `500 14px ${FONT}`; ctx.fillStyle = off ? T.unavailable : T.text;
+      wrap2(ctx, taskName(), r.w).forEach((l, i) => ctx.fillText(l, r.x, r.y + 10 + i * 20));
+    } else if (it.t === "state1") {
+      ctx.font = `14px ${FONT}`; ctx.fillStyle = d.c; ctx.fillText(ellipsis(ctx, d.text, r.w), tx, r.y + r.h / 2);
+    } else if (it.t === "time1") {
+      ctx.font = `14px ${FONT}`; ctx.fillStyle = T.muted;
+      let s = it.layer ? [d.time, layerText()].filter(Boolean).join(" · ") : d.time;
+      const has = d.short !== undefined;
+      if (ctx.measureText(s).width > r.w && has && d.short) s = it.layer ? `${d.short} · ${layerText()}` : d.short;
+      if (ctx.measureText(s).width > r.w && has) s = d.short;
+      if (it.fit && ctx.measureText(s).width > r.w) s = "";
+      ctx.fillText(ellipsis(ctx, s || " ", r.w), tx, r.y + r.h / 2);
+    } else if (it.t === "time2") {                                    // beside the big %: time left and when it ends
+      ctx.textAlign = "right"; ctx.font = `14px ${FONT}`; ctx.fillStyle = T.muted;
+      const s = shownStatus(), run = s === "running";
+      ctx.fillText(ellipsis(ctx, d.time, r.w), r.x + r.w, r.y + 9);
+      if (run) ctx.fillText(ellipsis(ctx, `готово в ${endClock()}`, r.w), r.x + r.w, r.y + 28);
+    } else if (it.t === "barrow") {                                   // 62 % ▬▬▬▬ 1:24
+      ctx.font = `500 14px ${FONT}`; ctx.fillStyle = off ? T.unavailable : T.text; ctx.textAlign = "left";
+      const pw = ctx.measureText("100 %").width + 10; ctx.fillText(pctText(), r.x, r.y + r.h / 2);
+      ctx.font = `14px ${FONT}`; ctx.fillStyle = T.muted; ctx.textAlign = "right";
+      const tt = d.short || (shownStatus() === "finish" ? fmtShort(TOTAL_MIN) : ""), tw = tt ? ctx.measureText("00:00").width + 10 : 0;
+      if (tt) ctx.fillText(tt, r.x + r.w, r.y + r.h / 2);
+      drawBar(ctx, { x: r.x + pw, y: r.y + r.h / 2 - 3, w: r.w - pw - tw, h: 6 }, now);
+    } else if (it.t === "bar") drawBar(ctx, r, now);
+    else if (it.t === "info") {                                       // layer and temperatures (+ plastic on the wide one)
+      const tp = temps(), s = shownStatus();
+      ctx.font = `14px ${FONT}`; ctx.fillStyle = T.muted; ctx.textAlign = "left";
+      const lt = layerText(), noz = `сопло ${tp.noz}°${tp.nozT && tp.nozT !== tp.noz ? ` → ${tp.nozT}°` : ""}`, bed = `стол ${tp.bed}°${tp.bedT && tp.bedT !== tp.bed ? ` → ${tp.bedT}°` : ""}`;
+      if (off) { ctx.fillText("—", r.x, r.y + r.h / 2); continue; }
+      if (it.two) {
+        ctx.fillText(ellipsis(ctx, [lt, hasJob() ? "PLA · 38 г" : ""].filter(Boolean).join(" · ") || " ", r.w), r.x, r.y + 11);
+        ctx.fillText(ellipsis(ctx, `${noz} · ${bed}`, r.w), r.x, r.y + 33);
+      } else if (it.short) ctx.fillText(ellipsis(ctx, lt || `${noz}`, r.w), r.x, r.y + r.h / 2);
+      else ctx.fillText(ellipsis(ctx, [lt, `${noz}`, `${bed}`].filter(Boolean).join(" · "), r.w), r.x, r.y + r.h / 2);
+    } else if (it.t === "pause" || it.t === "stop") drawButton(ctx, it, view, now);
+  }
+  ctx.restore();
+  if (off) { ctx.strokeStyle = T.unavailable; ctx.lineWidth = 1; rr(ctx, .5, .5, L.W - 1, L.H - 1, 20); ctx.stroke(); }
+  ctx.restore();
+}
+// Full-screen camera, opened by a tap on the picture; a tap anywhere closes it.
+function drawFull(ctx, now) {
+  ctx.fillStyle = "#000"; ctx.fillRect(0, 0, 480, 480);
+  const d = doing(); drawCamera(ctx, { x: 0, y: 105, w: 480, h: 270 }, now, true);
+  drawPill(ctx, 16, 16, d);
+  rr(ctx, 480 - 16 - 44, 16, 44, 44, 22); ctx.fillStyle = T.raised; ctx.fill(); icon(ctx, "close", 480 - 16 - 34, 26, 24, T.text);
+  ctx.textBaseline = "middle"; ctx.textAlign = "left"; ctx.font = `500 18px ${FONT}`; ctx.fillStyle = T.text;
+  ctx.fillText(ellipsis(ctx, taskName(), 300), 16, 410);
+  ctx.font = `14px ${FONT}`; ctx.fillStyle = T.muted; ctx.fillText(ellipsis(ctx, [d.time, layerText()].filter(Boolean).join(" · "), 300), 16, 436);
+  ctx.textAlign = "right"; ctx.font = `500 28px ${FONT}`; ctx.fillStyle = T.text; ctx.fillText(pctText(), 464, 420);
+  drawBar(ctx, { x: 16, y: 456, w: 448, h: 6 }, now);
+}
+
+/* ---------- commands → HA (simulated) ---------- */
+function log(s) { document.getElementById("log").textContent = s; }
+function press(button, next) {
+  if (state.offline) return;
+  log(`button.press → button.${DEV}_${button}`);
+  pending = { status: next, at: performance.now() + ACK_MS };
+}
+
+/* ---------- surfaces ---------- */
+const views = [];
+let full = false;
+const cellPx = (n, axis = "x") => axis === "x" ? n * 59 - 8 : Math.floor(n * 53.5) - 8;
+function makeCanvas(cv, cssW, cssH) {
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  cv.width = Math.round(cssW * dpr); cv.height = Math.round(cssH * dpr);
+  if (cv.id !== "screen") cv.style.width = cssW + "px";
+  const ctx = cv.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); return ctx;
+}
+const io = new IntersectionObserver((es) => { for (const e of es) if (e.target._view) e.target._view.visible = e.isIntersecting; });
+function rebuild() {
+  views.length = 0; full = false;
+  const scr = document.getElementById("screen"), [sw, sh] = state.screen.split("x").map(Number);
+  const sv = { canvas: scr, ctx: makeCanvas(scr, 480, 480), L: layout(cellPx(sw), cellPx(sh, "y")), size: [sw, sh], ox: 8, oy: 8, screen: true, visible: true };
+  views.push(sv); attach(sv);
+  document.getElementById("screenCaption").textContent = `карточка ${sw}×${sh} · ${cellPx(sw)}×${cellPx(sh, "y")} px`;
+  const tray = document.getElementById("tray"); tray.replaceChildren();
+  for (const [w, h] of SIZES) {
+    const L = layout(cellPx(w), cellPx(h, "y"));
+    const fig = document.createElement("figure"), cap = document.createElement("figcaption"), cv = document.createElement("canvas");
+    cap.innerHTML = `<b>${w}×${h}</b>`; cv.setAttribute("aria-label", `Карточка 3D-принтера ${w}×${h}`);
+    fig.append(cap, cv); tray.append(fig);
+    const v = { canvas: cv, ctx: makeCanvas(cv, L.W, L.H), L, size: [w, h], ox: 0, oy: 0, visible: true }; views.push(v); io.observe(cv); attach(v);
+  }
+  save();
+}
+const inside = (p, r) => r && p.x >= r.x && p.x < r.x + r.w && p.y >= r.y && p.y < r.y + r.h;
+function local(v, e) { const b = v.canvas.getBoundingClientRect(), cw = v.screen ? 480 : v.L.W, ch = v.screen ? 480 : v.L.H; return { x: (e.clientX - b.left) * cw / b.width - v.ox, y: (e.clientY - b.top) * ch / b.height - v.oy }; }
+function hitAt(L, p) { for (const it of L.items) if (it.hit && inside(p, it.r) && it.r.w >= 44 && it.r.h >= 44) return it; return null; }
+function attach(view) {
+  const cv = view.canvas; cv._view = view; if (cv._attached) return; cv._attached = true;
+  cv.addEventListener("pointerdown", (e) => {
+    const v = cv._view;
+    if (v.screen && full) { full = false; return; }
+    const it = hitAt(v.L, local(v, e)); if (!it) return;
+    cv.setPointerCapture(e.pointerId);
+    v.press = { hit: it.hit, it, t0: performance.now() };
+  });
+  const end = (e, cancel) => {
+    const v = cv._view, pr = v.press; v.press = null; if (!pr || cancel) return;
+    const inHit = inside(local(v, e), pr.it.r);
+    if (!inHit) return;
+    if (pr.hit === "camera") { full = true; log(state.camera ? `камера на весь экран: camera.${DEV}_camera` : "камера недоступна"); return; }
+    if (pr.hit === "pause") { if (canResume()) press("resume", "running"); else if (canPause()) press("pause", "pause"); return; }
+    if (pr.hit === "stop" && canStop()) log("Удерживайте «Стоп», чтобы прервать печать");
+  };
+  cv.addEventListener("pointerup", (e) => end(e, false));
+  cv.addEventListener("pointercancel", (e) => end(e, true));
+  cv.addEventListener("pointerleave", () => { if (cv._view.press && cv._view.press.hit !== "stop") cv._view.press = null; });
+}
+
+/* ---------- loop ---------- */
+let prev = performance.now(), simAcc = 0, haLast = 0;
+function frame(now) {
+  const dt = Math.min(0.1, (now - prev) / 1000); prev = now;
+  for (const v of views) if (v.press && v.press.hit === "stop" && canStop() && now - v.press.t0 >= HOLD_MS) { v.press = null; press("stop", "failed"); pendingStop = true; }
+  if (pending && now >= pending.at) {
+    state.status = pending.status; pending = null; log(`HA подтвердил: print_status = ${haStatus()}`);
+    if (pendingStop) { pendingStop = false; state.status = "idle"; log("HA подтвердил: печать прервана, принтер свободен"); }
+    syncControls();
+  }
+  if (state.run && !state.offline && !pending) {                    // one printing minute per real second
+    simAcc += dt;
+    if (state.status === "prepare" && simAcc > 12) { simAcc = 0; state.status = "running"; syncControls(); }
+    if (state.status === "running" && simAcc > TOTAL_MIN / 100 * 1.0) { simAcc = 0; state.progress = Math.min(100, state.progress + 1); if (state.progress >= 100) state.status = "finish"; syncControls(); }
+  }
+  for (const v of views) {
+    if (!v.visible) continue;
+    if (v.screen) {
+      if (full) { drawFull(v.ctx, now); continue; }
+      v.ctx.fillStyle = T.bg; v.ctx.fillRect(0, 0, 480, 480);
+    } else v.ctx.clearRect(0, 0, v.L.W, v.L.H);
+    drawCard(v.ctx, v, now);
+  }
+  if (now - haLast > 500) { haLast = now; haReadout(); }
+  requestAnimationFrame(frame);
+}
+let pendingStop = false;
+function haStatus() { return state.offline ? "unavailable" : state.status; }
+function entities() {
+  const s = state.status, off = state.offline, tp = temps(), job = s !== "idle";
+  const stage = s === "prepare" ? PREP_HA[prepIndex()] : s === "running" ? "printing" : s === "pause" ? "paused_user" : s === "failed" ? "paused_nozzle_clog" : "idle";
+  const u = (v) => off ? "unavailable" : v;
+  return [
+    [`sensor.${DEV}_print_status`, u(s), "что делает принтер: idle, prepare, running, pause, finish, failed"],
+    [`sensor.${DEV}_current_stage`, u(stage), "этап: нагрев стола, калибровка, печать…"],
+    [`sensor.${DEV}_task_name`, u(job ? state.task.trim() || "unknown" : "unknown"), "название модели (Task name)"],
+    [`sensor.${DEV}_print_progress`, u(String(s === "finish" ? 100 : state.progress)), "прогресс, %"],
+    [`sensor.${DEV}_remaining_time`, u(String(s === "finish" || !job ? 0 : remainingMin())), "осталось, мин"],
+    [`sensor.${DEV}_end_time`, u(job && s !== "finish" ? new Date(Date.now() + remainingMin() * 60000).toISOString().slice(0, 16) : "unknown"), "когда закончится"],
+    [`sensor.${DEV}_current_layer`, u(String(layer())), "текущий слой"],
+    [`sensor.${DEV}_total_layer_count`, u(String(job ? LAYERS : 0)), "всего слоёв"],
+    [`sensor.${DEV}_nozzle_temperature`, u(String(tp.noz)), "сопло, °C (и nozzle_target_temperature)"],
+    [`sensor.${DEV}_bed_temperature`, u(String(tp.bed)), "стол, °C (и bed_target_temperature)"],
+    [`sensor.${DEV}_print_weight`, u(job ? "38" : "0"), "вес модели, г"],
+    [`camera.${DEV}_camera`, u(state.camera ? "streaming" : "unavailable"), "изображение с камеры"],
+    [`image.${DEV}_cover_image`, u(state.cover && job ? "2026-10-31T17:40:00" : "unknown"), "картинка модели из слайсера"],
+    [`button.${DEV}_pause`, u("unknown"), "пауза"],
+    [`button.${DEV}_resume`, u("unknown"), "продолжить"],
+    [`button.${DEV}_stop`, u("unknown"), "стоп (на карточке — удержанием)"],
+  ];
+}
+function haReadout() {
+  const e = entities();
+  document.getElementById("haOut").innerHTML = e.slice(0, 5).map(([id, v]) => `<b>${id.split(".")[1].replace(DEV + "_", "")}</b> ${v}`).join(" &nbsp;· ");
+  const tb = document.getElementById("ents");
+  if (tb.closest("details").open || !tb.rows.length) tb.innerHTML = e.map(([id, v, n]) => `<tr><td>${id}</td><td>${v}</td><td>${n}</td></tr>`).join("");
+}
+
+/* ---------- controls ---------- */
+function pressed(box, value) { for (const b of box.querySelectorAll("[data-v]")) b.setAttribute("aria-pressed", String(b.dataset.v === value)); }
+function syncControls() {
+  pressed(document.getElementById("status"), state.status);
+  const p = document.getElementById("progress"); if (document.activeElement !== p) p.value = state.progress;
+  document.getElementById("progressOut").textContent = `${state.progress} %`;
+  save();
+}
+function controls() {
+  const st = document.getElementById("status");
+  st.addEventListener("click", (e) => { const v = e.target.dataset?.v; if (!v) return; state.status = v; pending = null; if (v === "finish") state.progress = 100; if (v !== "finish" && state.progress >= 100) state.progress = 46; syncControls(); });
+  const p = document.getElementById("progress");
+  p.addEventListener("input", () => { state.progress = Number(p.value); if (state.status === "finish" && state.progress < 100) state.status = "running"; syncControls(); });
+  const task = document.getElementById("task"); task.value = state.task; task.addEventListener("input", () => { state.task = task.value; save(); });
+  const fl = document.getElementById("filaments");
+  for (const [name, c] of FILAMENTS) { const b = document.createElement("button"); b.type = "button"; b.className = "swatch"; b.style.background = c; b.dataset.v = c; b.title = name; b.setAttribute("aria-label", name); b.onclick = () => { state.filament = c; pressed(fl, c); save(); }; fl.append(b); }
+  pressed(fl, state.filament);
+  const sw = document.getElementById("swatches");
+  for (const [name, c] of ACCENTS) { const b = document.createElement("button"); b.type = "button"; b.className = "swatch"; b.style.background = c; b.dataset.v = c; b.title = name; b.setAttribute("aria-label", name); b.onclick = () => setAccent(c); sw.append(b); }
+  setAccent(state.accent);
+  const sizes = document.getElementById("sizes");
+  for (const [w, h] of SIZES) { const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.dataset.v = `${w}x${h}`; b.textContent = `${w}×${h}`; b.onclick = () => { state.screen = b.dataset.v; pressed(sizes, state.screen); rebuild(); }; sizes.append(b); }
+  pressed(sizes, state.screen);
+  for (const id of ["run", "camera", "cover", "offline", "reduced"]) { const el = document.getElementById(id); el.checked = state[id]; el.addEventListener("change", () => { state[id] = el.checked; if (id === "offline") pending = null; save(); }); }
+  syncControls();
+}
+function setAccent(c) { state.accent = c; document.documentElement.style.setProperty("--accent", c); pressed(document.getElementById("swatches"), c); save(); }
+controls();
+(document.fonts ? Promise.all([document.fonts.load(`14px "Noto Sans"`), document.fonts.load(`500 14px "Noto Sans"`), document.fonts.load(`500 28px "Noto Sans"`), document.fonts.load(`500 18px "Noto Sans"`)]).catch(() => {}) : Promise.resolve()).finally(() => { rebuild(); requestAnimationFrame(frame); });
+</script>

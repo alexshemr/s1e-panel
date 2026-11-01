@@ -1,0 +1,922 @@
+<meta charset="utf-8">
+<title>Стенд рулонной шторы S1E</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&family=Noto+Sans+Display:wght@500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: workbench like the weather stand — sticky controls, the 480×480 panel screen beside a tray of every card size. */
+:root {
+  --page: #0b0e12;
+  --tray: #101317;          /* panel screen colour (token color.background) */
+  --raised: #171b21;
+  --line: #2a3039;
+  --text: #f3f0e9;
+  --muted: #9da2aa;
+  --accent: #dfb98a;
+  --display: "Noto Sans Display", "Noto Sans", system-ui, sans-serif;
+  --body: "Noto Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  color-scheme: dark;
+}
+html, body { background: var(--page); color: var(--text); }
+body { font-family: var(--body); font-size: 14px; line-height: 1.5; }
+.wrap { max-width: 1480px; margin: 0 auto; padding-block: 20px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 18px; }
+header { display: grid; gap: 4px; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+h1 { font-family: var(--display); font-weight: 600; font-size: clamp(24px, 3vw, 32px); line-height: 1.15; margin: 0; text-wrap: balance; }
+.lede { color: var(--muted); max-width: 76ch; margin: 0; }
+.controls { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px); padding-block: 10px; border-bottom: 1px solid var(--line); display: grid; gap: 10px; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--page); }
+.row { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+.group { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.label { font-size: 12px; color: var(--muted); margin-right: 2px; }
+.seg { display: inline-flex; background: var(--raised); border: 1px solid var(--line); border-radius: 10px; padding: 2px; }
+.seg button { font: inherit; font-size: 13px; color: var(--muted); background: none; border: 0; border-radius: 8px; padding: 4px 12px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: #2c3037; color: var(--text); }
+.chip { font: inherit; font-size: 13px; color: var(--text); background: var(--raised); border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; cursor: pointer; font-variant-numeric: tabular-nums; }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #17130e; font-weight: 600; }
+.swatch { width: 26px; height: 26px; border-radius: 50%; border: 2px solid transparent; outline: 1px solid var(--line); cursor: pointer; padding: 0; }
+.swatch[aria-pressed="true"] { border-color: var(--text); }
+.custom { position: relative; width: 26px; height: 26px; border-radius: 50%; overflow: hidden; outline: 1px dashed var(--muted); }
+.custom input { position: absolute; inset: -6px; width: 40px; height: 40px; border: 0; padding: 0; cursor: pointer; background: none; }
+.switch { display: inline-flex; gap: 8px; align-items: center; font-size: 13px; cursor: pointer; }
+.switch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.switch span { width: 34px; height: 20px; border-radius: 999px; background: var(--line); position: relative; transition: background .15s; }
+.switch span::after { content: ""; position: absolute; left: 3px; top: 3px; width: 14px; height: 14px; border-radius: 50%; background: var(--text); transition: transform .15s; }
+.switch input:checked + span { background: var(--accent); }
+.switch input:checked + span::after { transform: translateX(14px); background: #17130e; }
+input[type=range] { accent-color: var(--accent); }
+.hour, .pitch { display: inline-flex; gap: 8px; align-items: center; font-size: 13px; font-variant-numeric: tabular-nums; }
+.hour input { width: 150px; } .pitch input { width: 110px; }
+.ha { font-family: var(--mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.ha b { color: var(--text); font-weight: 500; }
+input[type=date] { font: inherit; font-size: 13px; color: var(--text); background: var(--raised); border: 1px solid var(--line); border-radius: 10px; padding: 3px 8px; }
+.readout { font-family: var(--mono); font-size: 12px; color: var(--muted); min-width: 4ch; }
+.chip:focus-visible, .seg button:focus-visible, .swatch:focus-visible, .switch input:focus-visible + span, .kbd button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.bench { display: grid; grid-template-columns: minmax(0, 520px) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 1100px) { .bench { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 700px) { .controls { position: static; backdrop-filter: none; } }
+.device { background: #05070a; border: 1px solid var(--line); border-radius: 22px; padding: 20px; display: grid; gap: 10px; justify-items: center; }
+.device canvas { width: 100%; max-width: 480px; aspect-ratio: 1; display: block; touch-action: none; }
+.caption { font-family: var(--mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; text-align: center; }
+.kbd { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; justify-content: center; }
+.kbd button { font: inherit; font-size: 13px; color: var(--text); background: #2c3037; border: 0; border-radius: 12px; min-height: 36px; padding: 0 14px; cursor: pointer; }
+.kbd input { width: 140px; }
+.tray { background: var(--tray); border: 1px solid var(--line); border-radius: 18px; padding: 18px; display: flex; flex-wrap: wrap; gap: 22px 16px; align-items: flex-start; min-width: 0; }
+figure { margin: 0; display: grid; gap: 6px; min-width: 0; max-width: 100%; }
+figure canvas { display: block; max-width: 100%; height: auto; touch-action: none; }
+figcaption { font-family: var(--mono); font-size: 12px; color: var(--muted); display: flex; gap: 8px; font-variant-numeric: tabular-nums; }
+figcaption b { color: var(--text); font-weight: 500; }
+.note { color: var(--muted); font-size: 13px; max-width: 92ch; margin: 0; }
+.note strong { color: var(--text); font-weight: 500; }
+@media (prefers-reduced-motion: reduce) { .switch span, .switch span::after { transition: none; } }
+[hidden] { display: none !important; }
+</style>
+
+<div class="wrap">
+  <header>
+    <a class="eyebrow" href="index.html" style="color:inherit;text-decoration:none">← Все стенды</a>
+    <div class="eyebrow">Aqara S1E · рулонная штора</div>
+    <h1>Рулонная штора</h1>
+    <p class="lede">Рулонная штора: открыть, стоп, закрыть и положение в процентах, движение со скоростью мотора. Ткань сматывается в короб над окном и опускается сверху вниз ровно на столько, на сколько штора закрыта. Пока ткань едет, вал в коробе вращается, а рулон становится толще или тоньше. Тяните ткань прямо на окне или нажимайте кнопки; небо за окном следует за солнцем и луной.</p>
+  </header>
+
+  <section class="controls" aria-label="Параметры">
+    <div class="row">
+      <div class="group"><span class="label">Время</span>
+        <div class="seg" id="time"><button type="button" data-v="ha" aria-pressed="true">Home Assistant</button><button type="button" data-v="day" aria-pressed="false">День</button><button type="button" data-v="night" aria-pressed="false">Ночь</button></div>
+      </div>
+      <span class="group" id="haBox">
+        <span class="group" id="seasons"></span>
+        <input type="date" id="date" aria-label="Дата">
+        <label class="hour"><input type="range" id="hour" min="0" max="23.75" step="0.25" aria-label="Время по Москве"><span class="readout" id="hourOut"></span></label>
+        <label class="switch" hidden><input type="checkbox" id="noSun"><span></span>Нет sun.sun</label>
+      </span>
+      <div class="group" role="group" aria-label="Цвет шторы"><span class="label">Акцент</span><span class="group" id="swatches"></span>
+        <label class="custom" title="Свой цвет"><input type="color" id="customColor" value="#c48fb8" aria-label="Свой цвет акцента"></label>
+      </div>
+    </div>
+    <span class="ha" id="haOut" hidden></span>
+    <div class="row">
+      <div class="group"><span class="label">На экране</span><span class="group" id="sizes"></span></div>
+      <div class="group" hidden><span class="label">Сетка</span><div class="seg" id="grid"><button type="button" data-v="59">Стенд 59 × 59</button><button type="button" data-v="55.5">План 59 × 55,5</button><button type="button" data-v="53.5">Прошивка 59 × 53,5</button></div><span class="readout" id="pitchOut"></span></div>
+      <label class="switch"><input type="checkbox" id="offline"><span></span>Нет связи</label>
+      <label class="switch"><input type="checkbox" id="reduced"><span></span>Меньше движения</label>
+      <label class="switch" hidden><input type="checkbox" id="zoom"><span></span>Увеличить ×2</label>
+    </div>
+  </section>
+
+  <main class="bench">
+    <div class="device">
+      <canvas id="screen" width="480" height="480" aria-label="Экран панели с карточкой рулонной шторы"></canvas>
+      <div class="caption" id="screenCaption"></div>
+      <div class="kbd" hidden aria-label="Управление с клавиатуры">
+        <button type="button" data-cmd="close">Закрыть</button>
+        <button type="button" data-cmd="stop">Стоп</button>
+        <button type="button" data-cmd="open">Открыть</button>
+        <input type="range" id="kbdPos" min="0" max="100" step="1" aria-label="Положение рулонной шторы, % открытия">
+      </div>
+    </div>
+    <div class="tray" id="tray"></div>
+  </main>
+</div>
+
+<!-- embed-bridge -->
+<script>
+/* ---------- constructor bridge (tools/stand_bridge): lets home-stand.html host this stand as a widget ----------
+   Does nothing unless the page is opened as home-stand.html?embed=<id>&size=<WxH>&lang=<ru|en>.
+   Card mode shows only the card cut from the panel screen; settings mode shows the stand's own controls.
+   Settings are stored per widget (localStorage keys get "@<id>"), panel text is translated on the canvas.
+   A stand opened on its own with ?lang=en (the public demo) gets only the translation. */
+(() => {
+  const q = new URLSearchParams(location.search), id = q.get("embed"), solo = !id && q.get("lang") === "en";
+  if (!id && !solo) return;
+  const E = window.EMBED = { id, size: q.get("size") || "", lang: q.get("lang") === "en" ? "en" : "ru", mode: "card", solo };
+  const root = document.documentElement;
+  if (id) root.classList.add("embed", "embed-card");
+
+  /* each widget keeps its own settings */
+  if (id) try {
+    const S = Storage.prototype, gi = S.getItem, si = S.setItem;
+    S.getItem = function (k) { return gi.call(this, `${k}@${id}`); };
+    S.setItem = function (k, v) { return si.call(this, `${k}@${id}`, v); };
+  } catch (e) {}
+
+  /* panel language: Russian strings are translated where they are drawn */
+  const DICT = {"% · цвет":"% · color","(локально, без HA)":"(local, without HA)","(режим дома) и":"(home mode) and","(уставка бойлера, громкость),":"(water heater setpoint, volume),","+ температура":"+ temperature","+ цвет":"+ color",", фаза луны из":", moon phase from",", шаг":", step","1 вне нормы":"1 out of range","3 ступени":"3 steps","3D-принтер":"3D printer","4 ступени":"4 steps",": ошибка отрисовки":": render error",": текст «":": text «","CO₂ высокий":"CO₂ high","CO₂ повышен":"CO₂ elevated","HA подтвердил:":"HA confirmed:","HA подтвердил: print_status =":"HA confirmed: print_status =","HA подтвердил: печать прервана, принтер свободен":"HA confirmed: print cancelled, printer idle","HA подтвердил: цель":"HA confirmed: target","HA: время изменено извне →":"HA: time changed externally →","HA: дата изменена извне →":"HA: date changed externally →","PLA · 38 г":"PLA · 38 g","PM1 высокий":"PM1 high","PM1 превышен":"PM1 exceeded","PM2.5 высокий":"PM2.5 high","PM2.5 превышен":"PM2.5 exceeded","TVOC высокий":"TVOC high","TVOC повышен":"TVOC elevated","box: − и +":"box: − and +","sun.sun недоступен → запасной режим: день с 07:00 до 19:00 по часам панели.":"sun.sun unavailable → fallback: day from 07:00 to 19:00 by the panel clock.","«Время»":"«Time»","°   ·   Влажность 81 %":"°   ·   Humidity 81 %","° · азимут":"° · azimuth","° · восход":"° · sunrise","·  ещё":"·  more","· без HA":"· without HA","· высота":"· elevation","· ещё":"· more","· закат":"· sunset","· обогрев":"· heating","· по нажатию":"· on tap","· по расписанию":"· on schedule","· реле":"· relay","· сейчас":"· now","· сумерки":"· twilight","» выходит за":"» goes beyond","» выходит за карточку":"» goes beyond the card","Абажур":"Shade lamp","Авто":"Auto","Акцент":"Accent","Акцент интерфейса":"Interface accent","Без датчика":"No sensor","Без заголовка":"No title","Без названия":"Untitled","Без фото":"No photo","Белый PLA":"White PLA","Бирюза":"Teal","Бойлер":"Water heater","Бойлер 40…75 °C":"Water heater 40…75 °C","Бра":"Sconce","Бриз":"Breeze","Бризер":"Breezer","Бризер выключен":"Breezer off","Будильник":"Alarm","В комнате":"In the room","Вариантов":"Options","Вентилятор":"Fan","Вентилятор выключен":"Fan off","Весна":"Spring","Ветер и облака":"Wind and clouds","Ветрено":"Windy","Вечер":"Evening","Вид":"View","Вкл":"On","Вкл / выкл":"On / off","Включается…":"Turning on…","Включить":"Turn on","Включён":"On","Включён ·":"On ·","Включён · обогрев":"On · heating","Вкл…":"On…","Влажн.":"Hum.","Влажно":"Humid","Влажность":"Humidity","Влажность в комнате":"Room humidity","Влажность: влажно":"Humidity: humid","Влажность: очень сухо":"Humidity: very dry","Влажность: сухо":"Humidity: dry","Влажность: сыро":"Humidity: damp","Вода":"Water","Вода есть":"Water OK","Вода!":"Water!","Воздух":"Air","Воздух в комнате":"Room air","Волны":"Waves","Время":"Time","Время в HA":"Time in HA","Время по Москве":"Moscow time","Время суток":"Time of day","Все блоки скрыты: остались лампа и питание":"All blocks hidden: lamp and power remain","Все погоды":"All weathers","Все размеры":"All sizes","Всё в норме":"All normal","Вт":"W","Выберите датчики в веб-интерфейсе":"Select sensors in the web interface","Выбор":"Select","Выкл":"Off","Выкл · Обогрев":"Off · Heat","Выкл · Обогрев · Авто":"Off · Heat · Auto","Выкл.":"Off","Выключается…":"Turning off…","Выключатель":"Switch","Выключен":"Off","Выключить":"Turn off","Выкл…":"Off…","Выполняется…":"Running…","Высокий":"High","Гости":"Guests","Гости дома":"Guests home","Гостиная":"Living room","Готово":"Done","Град":"Hail","Греет":"Heating","Греет до":"Heating to","Гроза":"Thunderstorm","Гроза с дождём":"Thunderstorm, rain","Громкость":"Volume","Громкость 0…100 %, шаг 5":"Volume 0…100 %, step 5","Громкость оповещений":"Notification volume","Грязно":"Polluted","Дата":"Date","Дата в HA":"Date in HA","Дату и время":"Date and time","Датчик":"Sensor","Датчики":"Sensors","Датчики «Дома», до 4":"«Home» sensors, up to 4","Датчики на карточке":"Sensors on card","Датчики не выбраны":"No sensors selected","Датчики пульса, до 6":"Pulse sensors, up to 6","Дверь":"Door","Дверь открыта":"Door open","Действие":"Action","День":"Day","Держит":"Holding","Держите…":"Hold…","Дождь":"Rain","Долить воду":"Refill water","Дом":"Home","Дома":"Home","Дома всё в норме":"All normal at home","Душно":"Stuffy","Ед.":"Unit","Есть обогрев":"Has heater","Есть режимы":"Has effects","Жарко":"Hot","Ждёт":"Waiting","Ждёт · держит":"Waiting · holding","Живая погода":"Live weather","Заголовок":"Title","Задача":"Job","Зажмите и ведите":"Press and drag","Закрываются":"Closing","Закрыта":"Closed","Закрыто":"Closed","Закрыть":"Close","Замер мощности":"Power reading","Запуск":"Start","Запустить":"Run","Заставка":"Screensaver","Заставка:":"Screensaver:","Заставки":"Screensavers","Защита: удерживать":"Protection: hold","Зима":"Winter","Значение в Home Assistant":"Value in Home Assistant","Значения датчиков":"Sensor values","Зоны":"Zones","Идёт…":"Running…","Избранное":"Favorite","Иконка":"Icon","Иконка обогрева":"Heater icon","Какие сущности читает карточка":"Entities the card reads","Калибровка стола":"Bed leveling","Камера":"Camera","Камера недоступна":"Camera unavailable","Камин":"Fireplace","Картинка модели":"Model image","Карточка":"Card","Карточка света":"Light card","Карточка штор":"Curtain card","Качание":"Oscillation","Кельвины":"Kelvin","Кнопка":"Button","Кнопка HA":"HA button","Комфорт":"Comfort","Коралл":"Coral","Коснитесь, чтобы открыть дом":"Tap to open home","Котёл":"Boiler","Красный PETG":"Red PETG","Курьер приедет после 18:00 — позвоните в домофон 24, код подъезда 4512":"Courier arrives after 18:00 — ring intercom 24, entrance code 4512","Лампа":"Lamp","Лампа выключена":"Lamp off","Лампа умеет":"Lamp supports","Лампочка":"Bulb","Лето":"Summer","Ливень":"Pouring","Лист":"Leaf","Любимый момент":"Favorite moment","Люстра":"Chandelier","МСК":"MSK","Меньше движения":"Reduce motion","Микроклимат":"Climate","Модель":"Model","Мокрый снег":"Sleet","Мята":"Mint","Мятный PLA":"Mint PLA","На карточке":"On card","На экране":"On screen","Нагрев бойлера":"Water heater heating","Нагрев сопла":"Heating nozzle","Нагрев стола":"Heating bed","Название":"Name","Напольный вентилятор в кабинете":"Floor fan in the study","Направление":"Direction","Настольная":"Desk","Настольная лампа":"Desk lamp","Не греет":"Not heating","Не греет · держит":"Not heating · holding","Не дома":"Away","Не удалось запустить движок:":"Failed to start the engine:","Небо":"Sky","Нейтральный белый":"Neutral white","Нет":"No","Нет sun.sun":"No sun.sun","Нет воды":"No water","Нет воды — долейте":"No water — refill","Нет данных":"No data","Нет датчиков":"No sensors","Нет задачи":"No job","Нет связи":"Offline","Нет связи с HA":"No connection to HA","Норма":"Normal","Норма 20–24 °C":"Normal 20–24 °C","Норма 40–60 %":"Normal 40–60 %","Норма до 10 мкг/м³":"Normal up to 10 µg/m³","Норма до 15 мкг/м³":"Normal up to 15 µg/m³","Норма до 15 мкг/м³ (ВОЗ, за сутки)":"Normal up to 15 µg/m³ (WHO, daily)","Норма до 220 ppb":"Normal up to 220 ppb","Норма до 800 ppm":"Normal up to 800 ppm","Норма до 800 ppm, выше 1200 — проветрить":"Normal up to 800 ppm, above 1200 — ventilate","Норма ≤ 10":"Normal ≤ 10","Норма ≤ 15":"Normal ≤ 15","Норма ≤ 220":"Normal ≤ 220","Норма ≤ 800":"Normal ≤ 800","Нормы датчиков":"Sensor norms","Ночник":"Night light","Ночь":"Night","Облачно":"Cloudy","Обогрев":"Heating","Обратно":"Reverse","Обычный":"Normal","Огонь":"Fire","Одна карточка для всего, что включается одним касанием:":"One card for anything that switches with one tap:","Ожидание":"Idle","Оранжевый PLA":"Orange PLA","Органайзер для отвёрток":"Screwdriver organizer","Особые условия":"Exceptional","Останавливаем…":"Stopping…","Открываются":"Opening","Открыта":"Open","Открыто":"Open","Открыто на":"Open","Открыть":"Open","Отмена":"Cancel","Отменено":"Cancelled","Отопление":"Heating","Отопление, сухо":"Heating, dry","Отправка…":"Sending…","Отпуск":"Vacation","Оттенок":"Hue","Очень длинное название кнопки":"A very long button name","Очень длинное название комнаты":"A very long room name","Очень сухо":"Very dry","Оченьдлинноесловобезпробеловкотороенепомещаетсявстроку и ещё немного текста после него":"Averyverylongwordwithoutspacesthatdoesnotfitintheline and a bit more text after it","Очистка сопла":"Cleaning nozzle","Ошибка":"Error","Ошибка печати":"Print error","Ощущается как":"Feels like","Параметры":"Settings","Пауза":"Pause","Переменная облачность":"Partly cloudy","Песок":"Sand","Печать":"Printing","Печать идёт (×60)":"Printing (×60)","Плавно, %":"Smooth, %","План 59 × 55,5":"Plan 59 × 55.5","Пластик":"Filament","Плоское бра":"Flat sconce","Повышен":"Elevated","Погода":"Weather","Подача":"Airflow","Подача · авто":"Airflow · auto","Подача воздуха ·":"Airflow ·","Подготовка":"Preparing","Показывает значение":"Shows the value","Положение рулонной шторы, % открытия":"Roller blind position, % open","Положение шторы, % открытия":"Curtain position, % open","Потолочный":"Ceiling","Потолочный (контур)":"Ceiling (outline)","Потолочный свет":"Ceiling light","Правка времени: ведите вверх или вниз":"Edit time: drag up or down","Правка даты: ведите вверх или вниз":"Edit date: drag up or down","Превышен":"Exceeded","Пресет":"Preset","Пресеты (Комфорт, Эко, Не дома)":"Presets (Comfort, Eco, Away)","Пример":"Example","Принтер":"Printer","Приоткрыто":"Ajar","Прогресс":"Progress","Продолжаем…":"Resuming…","Продолжить":"Resume","Протечка":"Leak","Протечка!":"Leak!","Прохладно":"Cool","Прошивка 59 × 53,5":"Firmware 59 × 53.5","Прямо":"Forward","Пульс дома":"Home pulse","Пусто":"Empty","Радиатор":"Radiator","Радуга":"Rainbow","Размер":"Size","Рассвет":"Sunrise","Режим":"Mode","Режим «":"Mode «","Режим дома":"Home mode","Режимы":"Modes","Режимы (Авто, Сон, Турбо)":"Modes (Auto, Sleep, Turbo)","Режимы Бриз и Сон":"Breeze and Sleep modes","Реле":"Relay","Реле панели":"Panel relay","Рулонная штора":"Roller blind","Русский":"Russian","Ручной":"Manual","Ручной режим: небо не зависит от Home Assistant.":"Manual mode: the sky ignores Home Assistant.","Свежо":"Fresh","Свет":"Light","Свеча":"Candle","Свой цвет":"Custom color","Свой цвет акцента":"Custom accent color","Сейчас":"Now","Сейчас в комнате":"Now in the room","Серый PLA":"Grey PLA","Сетка":"Grid","Синий PLA":"Blue PLA","Скорости":"Speeds","Скорость":"Speed","Скорость, %":"Speed, %","Скрипт":"Script","Служебная карточка":"Helper card","Смог":"Smog","Смог за окном":"Smog outside","Снег":"Snow","Сон":"Sleep","Сообщение":"Message","Сохраняется…":"Saving…","Ставим на паузу…":"Pausing…","Стенд 59 × 59":"Stand 59 × 59","Стоп":"Stop","Суббота, 31 октября, ☁ 9°":"Saturday, 31 October, ☁ 9°","Сухо":"Dry","Сущность":"Entity","Сущность содержит":"Entity contains","Сцена":"Scene","Сыро":"Damp","Текст":"Text","Текст в HA":"Text in HA","Темп.":"Temp.","Температура":"Temperature","Температура: жарко":"Temperature: hot","Температура: прохладно":"Temperature: cool","Температура: тепло":"Temperature: warm","Температура: холодно":"Temperature: cold","Тепло":"Warm","Термостат":"Thermostat","Тип":"Type","Только «нет воды»":"Only «no water»","Только время":"Time only","Только дату":"Date only","Только чтение":"Read only","Торшер":"Floor lamp","Туман":"Fog","Турбо":"Turbo","Тёплый белый":"Warm white","Тёплый пол":"Floor heating","Увеличить ×2":"Zoom ×2","Увлажнитель":"Humidifier","Увлажнитель в детской спальне":"Humidifier in the nursery","Увлажняет":"Humidifying","Увлажняет до":"Humidifying to","Удерживайте":"Hold","Удерживайте «Стоп», чтобы прервать печать":"Hold «Stop» to cancel the print","Удерживайте, чтобы":"Hold to","Удерживайте, чтобы изменить":"Hold to change","Умеренно":"Moderate","Управление с клавиатуры":"Keyboard control","Уровень, %":"Level, %","Ушёл":"Away","Фиалка":"Violet","Флажок HA":"HA toggle","Фон":"Background","Фото":"Photo","Холодно":"Cold","Холодный белый":"Cool white","Цвет":"Color","Цвет пластика":"Filament color","Цвет шторы":"Curtain color","Цветной свет":"Colored light","Цель":"Target","Чайник":"Kettle","Чем греет":"Heat source","Число":"Number","Число, выбор, текст":"Number, select, text","Чисто":"Clean","Чтение":"Reading","Шаг":"Step","Штора":"Curtain","Шторы":"Curtains","Эко":"Eco","Язык панели":"Panel language","Яркость":"Brightness","Яркость лампы":"Lamp brightness","Ясная ночь":"Clear night","Ясно":"Clear","авг":"Aug","августа":"August","апр":"Apr","апреля":"April","бак долит":"tank refilled","в баке нет воды — увлажнитель остановился":"tank is empty — humidifier stopped","вес модели, г":"model weight, g","вне нормы":"out of range","воскресенье":"Sunday","вс":"Sun","всего слоёв":"total layers","всё в норме":"all normal","вт":"Tue","вторник":"Tuesday","вчера":"yesterday","выкл":"off","выключен":"off","выше цели на":"above target by","готово в":"done at","греет":"heating","датчики не выбраны":"no sensors selected","движок неба не запустился:":"sky engine failed to start:","дек":"Dec","декабря":"December","дн.":"d","до":"to","до цели":"to target","другие размеры недоступны":"other sizes unavailable","ещё":"more","ещё N":"N more","за":"in","за пределами карточки":"outside the card","завтра":"tomorrow","запустить":"run","засор сопла":"nozzle clog","заставка":"screensaver","и":"and","из":"of","изменено":"changed","изображение с камеры":"camera image","июл":"Jul","июля":"July","июн":"Jun","июня":"June","кВт":"kW","как задано":"as set","камера на весь экран: camera.":"camera full screen: camera.","камера недоступна":"camera unavailable","картинка модели из слайсера":"model image from the slicer","карточка":"card","качание":"oscillation","когда закончится":"when it ends","лампа не умеет:":"lamp can't do:","мар":"Mar","марта":"March","мая":"May","меньше 44 × 44 (":"smaller than 44 × 44 (","мин":"min","мин назад":"min ago","мин назад ·":"min ago ·","мкг/м³":"µg/m³","мс/кадр ·":"ms/frame ·","название модели (Task name)":"model name (Task name)","не больше":"at most","не греет":"not heating","нет воды":"no water","нет задачи":"no job","нет ответа от HA — состояние возвращено":"no reply from HA — state reverted","нет связи — цель не отправлена":"offline — target not sent","новый":"new","ноя":"Nov","ноября":"November","обратно":"reverse","окт":"Oct","октября":"October","осталось":"left","осталось, мин":"left, min","панели":"panel","пауза":"paused","переключить":"toggle","перекрываются":"overlap","плитку":"tile","плитку «Дома»":"the «Home» tile","пн":"Mon","подтвердил:":"confirmed:","понедельник":"Monday","прогресс, %":"progress, %","продолжить":"resume","пт":"Fri","пульс":"pulse","пятница":"Friday","реле":"relay","сб":"Sat","сб, 31 окт":"Sat, 31 Oct","сегодня":"today","сейчас":"now","сен":"Sep","сентября":"September","скрипт завершён":"script finished","слой":"layer","служебные карточки":"helper cards","сопло":"nozzle","сопло, °C (и nozzle_target_temperature)":"nozzle, °C (and nozzle_target_temperature)","ср":"Wed","среда":"Wednesday","стол":"bed","стол, °C (и bed_target_temperature)":"bed, °C (and bed_target_temperature)","стоп (на карточке — удержанием)":"stop (on the card — by holding)","суббота":"Saturday","суббота, 31 октября":"Saturday, 31 October","суббота, 31 октября 2026":"Saturday, 31 October 2026","сцен":"scenes","текущий слой":"current layer","у этого типа только эти размеры":"this type has only these sizes","фев":"Feb","февраля":"February","фон в браузере:":"background in browser:","цель":"target","ч":"h","через":"in","четверг":"Thursday","чт":"Thu","что делает принтер: idle, prepare, running, pause, finish, failed":"what the printer is doing: idle, prepare, running, pause, finish, failed","экран":"screen","этап: нагрев стола, калибровка, печать…":"stage: heating bed, leveling, printing…","янв":"Jan","января":"January","— ваше фото с часами, датой и погодой.":"— your photo with clock, date and weather.","← Все стенды":"← All stands"};
+  const CYR = /[А-Яа-яЁё]/, keys = Object.keys(DICT).sort((a, b) => b.length - a.length);
+  const lower = new Map(keys.map((k) => [k.toLowerCase(), DICT[k]]));
+  const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const RE = keys.length ? new RegExp(`(?<![А-Яа-яЁё])(?:${keys.map(esc).join("|")})(?![А-Яа-яЁё])`, "giu") : null;
+  const cap = (src, out) => {
+    if (!out) return src;
+    const up = src[0] !== src[0].toLowerCase(), outUp = out[0] !== out[0].toLowerCase();
+    return up && !outUp ? out[0].toUpperCase() + out.slice(1) : !up && outUp && src[0] !== src[0].toUpperCase() ? out[0].toLowerCase() + out.slice(1) : out;
+  };
+  const cache = new Map();
+  const tr = E.tr = (s) => {
+    if (E.lang !== "en" || typeof s !== "string" || !s) return s;
+    let v = cache.get(s);
+    if (v !== undefined) return v;
+    v = s;
+    if (CYR.test(v)) v = DICT[v] ?? (RE ? v.replace(RE, (m) => DICT[m] ?? cap(m, lower.get(m.toLowerCase()))) : v);
+    v = v.replace(/«/g, "“").replace(/»/g, "”").replace(/(\d),(\d)/g, "$1.$2");
+    if (cache.size > 5000) cache.clear();
+    cache.set(s, v);
+    return v;
+  };
+  for (const P of [window.CanvasRenderingContext2D, window.OffscreenCanvasRenderingContext2D]) {
+    if (!P) continue;
+    for (const m of ["fillText", "strokeText", "measureText"]) {
+      const o = P.prototype[m];
+      P.prototype[m] = function (t, ...a) { return o.call(this, tr(t), ...a); };
+    }
+  }
+
+  /* the stand's own controls (settings mode) in the panel language: text nodes and titles, originals kept */
+  const seen = new WeakMap();                                  // node → { o: original, w: what we wrote }
+  const ATTRS = ["title", "aria-label", "placeholder"];
+  const trText = (s) => { const m = /^(\s*)([\s\S]*?)(\s*)$/.exec(s); return m[1] + tr(m[2]) + m[3]; };
+  const SKIP = /^(SCRIPT|STYLE|TEXTAREA|NOSCRIPT)$/;
+  function domText(n) {
+    if (!n.parentNode || SKIP.test(n.parentNode.nodeName)) return;
+    let r = seen.get(n);
+    if (!r || n.nodeValue !== r.w) { if (!CYR.test(n.nodeValue)) { seen.delete(n); return; } r = { o: n.nodeValue }; seen.set(n, r); }
+    const v = E.lang === "en" ? trText(r.o) : r.o;
+    r.w = v;
+    if (n.nodeValue !== v) n.nodeValue = v;
+  }
+  function domAttrs(el) {
+    for (const a of ATTRS) {
+      if (!el.hasAttribute(a)) continue;
+      const k = "__tr_" + a, cur = el.getAttribute(a);
+      let r = el[k];
+      if (!r || cur !== r.w) { if (!CYR.test(cur)) continue; r = el[k] = { o: cur }; }
+      r.w = E.lang === "en" ? trText(r.o) : r.o;
+      if (cur !== r.w) el.setAttribute(a, r.w);
+    }
+  }
+  function domWalk(root0) {
+    if (!root0) return;
+    if (root0.nodeType === 3) return domText(root0);
+    if (root0.nodeType !== 1 || SKIP.test(root0.tagName)) return;
+    domAttrs(root0);
+    const it = document.createTreeWalker(root0, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT, { acceptNode: (n) => n.nodeType === 1 && SKIP.test(n.tagName) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT });
+    for (let n = it.nextNode(); n; n = it.nextNode()) n.nodeType === 3 ? domText(n) : domAttrs(n);
+  }
+  const domAll = () => { domWalk(document.body); if (document.documentElement.lang) document.documentElement.lang = E.lang; };
+  new MutationObserver((list) => {
+    for (const m of list) {
+      if (m.type === "characterData") domText(m.target);
+      else if (m.type === "attributes") domAttrs(m.target);
+      else for (const n of m.addedNodes) domWalk(n);
+    }
+  }).observe(root, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ATTRS });
+
+  /* layout of the iframe */
+  const css = document.createElement("style");
+  css.textContent = `
+html.embed, html.embed body { background: transparent !important; margin: 0; }
+html.embed body::before { display: none !important; }
+html.embed .embed-hide, html.embed .tray, html.embed .kbd, html.embed .kbd2, html.embed .caption { display: none !important; }
+html.embed .device canvas { border-radius: 0 !important; }
+html.embed-card, html.embed-card body { overflow: hidden !important; width: 100%; height: 100%; }
+html.embed-card .wrap { display: block !important; padding: 0 !important; margin: 0 !important; max-width: none !important; }
+html.embed-card .wrap > :not(.bench) { display: none !important; }
+html.embed-card .bench { display: block !important; }
+html.embed-card .device { display: block !important; padding: 0 !important; border: 0 !important; border-radius: 0 !important; background: none !important; }
+html.embed-card .device > :not(canvas) { display: none !important; }
+html.embed-card .device canvas { position: fixed !important; left: var(--ex, 0px); top: var(--ey, 0px); width: var(--ew, 480px) !important; max-width: none !important; height: auto !important; aspect-ratio: auto !important; }
+html.embed-settings body { overflow: auto; }
+html.embed-settings .wrap { max-width: none !important; padding: 14px 18px 24px !important; gap: 14px !important; }
+html.embed-settings .wrap > :not(.controls):not(.bench) { display: none !important; }
+html.embed-settings .controls { position: static !important; backdrop-filter: none !important; background: none !important; padding-top: 0 !important; }
+html.embed-settings .bench { display: flex !important; justify-content: center; }
+html.embed-settings .device { width: fit-content; max-width: 100%; box-sizing: border-box; }
+html.embed-settings .device canvas { width: var(--sw, 480px) !important; max-width: 100% !important; height: auto !important; aspect-ratio: auto !important; }
+`;
+  (document.head || root).append(css);
+
+  const $ = (s) => document.querySelector(s);
+  const sizeBox = () => document.getElementById("sizes");
+  const canvas = () => $(".device canvas");
+  const fullScreen = (s) => s === "screen" || s === "saver";
+  function sizes() {
+    const box = sizeBox();
+    if (!box) return ["screen"];                               // the screensaver stand: whole panel
+    return [...box.querySelectorAll("[data-v]")].map((b) => b.dataset.v).filter((v) => /^\d+x\d+$/.test(v) || v === "saver");
+  }
+  function current() {
+    try { if (typeof state === "object" && state) return state.screen || state.size || "screen"; } catch (e) {}
+    return E.size;
+  }
+  function applySize(s) {
+    if (!s || s === current()) return;
+    const b = sizeBox() && [...sizeBox().querySelectorAll("[data-v]")].find((x) => x.dataset.v === s);
+    if (b) b.click();
+  }
+  function geometry() {
+    const cv = canvas(), s = current();
+    if (!cv) return;
+    const screenCanvas = cv.id === "screen";                   // card stands draw the card at (8, 8) on the 480 × 480 screen
+    root.style.setProperty("--ex", screenCanvas && !fullScreen(s) ? "-8px" : "0px");
+    root.style.setProperty("--ey", screenCanvas && !fullScreen(s) ? "-8px" : "0px");
+    const w = screenCanvas ? 480 : cv.width;
+    root.style.setProperty("--ew", w + "px");
+    root.style.setProperty("--sw", w + "px");
+  }
+  function applyLang() {
+    cache.clear();
+    domAll();
+    const box = document.getElementById("lang");                // weather stand: the text layers come in both languages
+    const b = box && box.querySelector(`[data-v="${E.lang}"]`);
+    if (b) { if (b.getAttribute("aria-pressed") !== "true") b.click(); return; }
+    try { if (typeof window.rebuild === "function") window.rebuild(); } catch (e) {}
+  }
+  function hideStandOnly() {
+    for (const id of ["sizes", "lang", "view", "zoom", "grid"]) {
+      const el = document.getElementById(id);
+      if (!el) continue;
+      const g = (el.classList.contains("group") ? el.parentElement : el).closest(".group, .switch");
+      (g || el).classList.add("embed-hide");
+    }
+  }
+  let sent = "";
+  function report(force) {
+    geometry();
+    const msg = { source: "s1e-embed", id, type: "info", sizes: sizes(), size: current() };
+    const sig = JSON.stringify(msg);
+    if (!force && sig === sent) return;
+    sent = sig;
+    parent.postMessage(msg, "*");
+  }
+  function setMode(m) {
+    E.mode = m;
+    root.classList.toggle("embed-card", m === "card");
+    root.classList.toggle("embed-settings", m === "settings");
+    if (m === "settings") scrollTo(0, 0);
+    geometry();
+  }
+
+  addEventListener("message", (e) => {
+    const d = e.data;
+    if (!d || d.target !== "s1e-embed") return;
+    if (d.type === "mode") setMode(d.mode);
+    if (d.type === "size") { E.size = d.size; applySize(d.size); }
+    if (d.type === "lang" && d.lang !== E.lang) { E.lang = d.lang === "en" ? "en" : "ru"; applyLang(); }
+    report(true);
+  });
+
+  let tries = 0;
+  function init() {
+    if (sizeBox() && !sizeBox().querySelector("[data-v]") && tries++ < 150) return void setTimeout(init, 100);   // controls built after an async boot
+    if (typeof window.ellipsis === "function") { const o = window.ellipsis; window.ellipsis = (ctx, t, w) => o(ctx, tr(t), w); }
+    if (solo) {
+      applyLang();
+      for (const p of document.querySelectorAll("p")) if (CYR.test(p.textContent)) p.hidden = true;   // prose without an English text yet
+      const h = document.querySelector("h1");
+      if (h) document.title = `${h.textContent.trim()} · S1E Panel demo`;
+      return;
+    }
+    hideStandOnly();
+    domAll();
+    if (E.lang === "en") applyLang();
+    applySize(E.size);
+    report(true);
+    setInterval(() => report(false), 400);
+  }
+  if (document.readyState === "loading") addEventListener("DOMContentLoaded", () => setTimeout(init, 0)); else setTimeout(init, 0);
+})();
+</script>
+<!-- /embed-bridge -->
+<script>
+const ICONS = {"roller-shade": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB/////////////////////8AAAAAAAAAB/////////////////////8AAAAAAAAAB/////////////////////8AAAAAAAAAB/////////////////////8AAAAAAAAAB/////////////////////8AAAAAAAAAB/////////////////////8AAAAAAAAAB/////////////////////8AAAAAAAAAB/////////////////////8AAAAAAAAAB/////////////////////8AAAAAAAAAB///+/v7+/v///v7+/v8//8AAAAAAAAAB//7AAAAAAD/9wAAAAAD//8AAAAAAAAAB//7AAAAAAT/+QMAAAAD//8AAAAAAAAAB//7AAAAAIn//4cAAAAD//8AAAAAAAAAB//7AAAAALv//7MAAAAD//8AAAAAAAAAB//7AAAAAD3j4TgAAAAD//8AAAAAAAADC//8AwMDAwMDAwMDAwMH//8DAwAAAAD/////////////////////////9wAAAAD/////////////////////////9wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "roller-shade-closed": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB/////////////////////8AAAAAAAAAB/////////////////////8AAAAAAAAAB/////////////////////8AAAAAAAAAB/////////////////////8AAAAAAAAAB/////////////////////8AAAAAAAAAB/////////////////////8AAAAAAAAAB/////////////////////8AAAAAAAAAB/////////////////////8AAAAAAAAAB/////////////////////8AAAAAAAAAB/////////////////////8AAAAAAAAAB/////////////////////8AAAAAAAAAB/////////////////////8AAAAAAAAAB/////////////////////8AAAAAAAAAB/////////////////////8AAAAAAAAAB//8AwMDAwP/+AMDAwMH//8AAAAAAAADC//8AwMDAwP/+AMDAwMH//8DAwAAAAD/////////////////////////9wAAAAD/////////////////////////9wAAAAAAAAAAAAAAAKT//5oAAAAAAAAAAAAAAAAAAAAAAAAAABygnhcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "arrow-collapse-up": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD39/f39/f39/f39/f39/f39/f38AAAAAD/////////////////////////9wAAAAAAAAAAAAAAAACDewAAAAAAAAAAAAAAAAAAAAAAAAAAAIP//3sAAAAAAAAAAAAAAAAAAAAAAAAAg/////97AAAAAAAAAAAAAAAAAAAAAACD//z//v7/ewAAAAAAAAAAAAAAAAAAAIP//Fn/+GH9/3sAAAAAAAAAAAAAAAAAg//8WAD/+ABf/f97AAAAAAAAAAAAAACD//tWAAD/+AAAXf3/ewAAAAAAAAAAAIL/+1QAAAD/+AAAAFv8/3kAAAAAAAAAAF/4UgAAAAD/+AAAAABZ+FcAAAAAAAAAAAAbAAAAAAD/+AAAAAAAGwAAAAAAAAAAAAAAAAAAAAD/+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "arrow-expand-down": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD39/f39/f39/f39/f39/f39/f38AAAAAD/////////////////////////9wAAAAAAAAAAAAAAAAD/9wAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/9wAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/9wAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/9wAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/9wAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/9wAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/9wAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/9wAAAAAAAAAAAAAAAAAAAAAbAAAAAAD/9wAAAAAAGwAAAAAAAAAAAF73UAAAAAD/9wAAAABX+FYAAAAAAAAAAIL/+lAAAAD/9wAAAFf8/3oAAAAAAAAAAACE//pQAAD/9wAAV/z/fAAAAAAAAAAAAAAAhP/6UAD/9wBX/P98AAAAAAAAAAAAAAAAAIT/+lD/91f8/3wAAAAAAAAAAAAAAAAAAACE//r//vz/fAAAAAAAAAAAAAAAAAAAAAAAhP////98AAAAAAAAAAAAAAAAAAAAAAAAAIT//3wAAAAAAAAAAAAAAAAAAAAAAAAAAACEfAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", "stop": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA////////////////AAAAAAAAAAAAAAAA////////////////AAAAAAAAAAAAAAAA////////////////AAAAAAAAAAAAAAAA////////////////AAAAAAAAAAAAAAAA////////////////AAAAAAAAAAAAAAAA////////////////AAAAAAAAAAAAAAAA////////////////AAAAAAAAAAAAAAAA////////////////AAAAAAAAAAAAAAAA////////////////AAAAAAAAAAAAAAAA////////////////AAAAAAAAAAAAAAAA////////////////AAAAAAAAAAAAAAAA////////////////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"};
+const T = { bg: "#101317", surface: "#20242a", raised: "#2c3037", outline: "#3a3f47", text: "#f3f0e9", muted: "#b3b5b9", subtle: "#818792", unavailable: "#92979e", error: "#ff9991" };
+const ACCENTS = [["Песок", "#dfb98a"], ["Небо", "#82bdf5"], ["Коралл", "#e6a18d"], ["Бирюза", "#75cfc7"], ["Фиалка", "#b5a0e8"], ["Мята", "#9bcba8"]];
+const SIZES = [[2,2],[2,4],[2,6],[2,8],[4,2],[4,4],[4,6],[8,2],[8,4],[8,6],[8,8]];
+const DELAY = 700, TRAVEL_MS = 10000, FPS = 20;
+const TITLE = "Рулонная штора";
+const FONT = '"Noto Sans", system-ui, sans-serif';
+
+const state = { time: "clock", hour: null, accent: "#dfb98a", screen: "8x8", gridY: 59, offline: false, reduced: false, zoom: false };
+if (matchMedia("(prefers-reduced-motion: reduce)").matches) state.reduced = true;
+try { Object.assign(state, JSON.parse(localStorage.getItem("roller-stand") || "{}")); } catch (e) {}
+state.gridY = 53.5; state.zoom = false;
+const save = () => { try { const { hour, ...rest } = state; localStorage.setItem("roller-stand", JSON.stringify(rest)); } catch (e) {} };
+
+/* ---------- entity: simulated HA cover ---------- */
+const cover = { pos: 65, target: 65, dir: 0, pending: null, drag: null };
+function command(target) {
+  if (state.offline) return;
+  target = Math.max(0, Math.min(100, Math.round(target)));
+  cover.target = target;
+  cover.pending = { target, at: performance.now() + DELAY };
+}
+function stop() {
+  if (state.offline) return;
+  cover.pending = { stop: true, at: performance.now() + 250 };
+}
+function pump(now, dt) {
+  if (cover.pending && now >= cover.pending.at) {
+    if (cover.pending.stop) { cover.target = Math.round(cover.pos); cover.pos = cover.target; cover.dir = 0; }
+    else cover.target = cover.pending.target;
+    cover.pending = null;
+  }
+  if (!cover.pending && Math.abs(cover.target - cover.pos) > 0.01) {
+    const step = dt * 100 / TRAVEL_MS, d = cover.target - cover.pos;
+    cover.dir = Math.sign(d);
+    cover.pos = Math.abs(d) <= step ? cover.target : cover.pos + Math.sign(d) * step;
+  } else if (!cover.pending) cover.dir = 0;
+}
+const shown = () => Math.round(cover.pos);
+const heading = () => cover.pending && !cover.pending.stop ? Math.sign(cover.pending.target - cover.pos) : cover.dir;
+function statusText(long = true) {
+  if (state.offline) return "Нет связи";
+  const h = heading();
+  if (h > 0) return "Открываются";
+  if (h < 0) return "Закрываются";
+  const p = shown();
+  if (p >= 100) return "Открыто";
+  if (p <= 0) return "Закрыто";
+  return long ? `Открыто на ${p} %` : "Приоткрыто";
+}
+
+/* ---------- colour ---------- */
+const hex = (c) => [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16));
+const rgb = (a) => `rgb(${a.map((v) => Math.round(Math.max(0, Math.min(255, v)))).join(",")})`;
+const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
+const mixHex = (a, b, t) => rgb(mix(hex(a), hex(b), t));
+function theme() {
+  const a = state.accent;
+  return { accent: a, fill: mixHex(T.surface, a, 0.5), surface: mixHex(T.surface, a, 0.13), a: hex(a) };
+}
+
+/* ---------- icons (MDI alpha masks from the firmware set) ---------- */
+const maskCache = new Map();
+function icon(ctx, name, x, y, size, color) {
+  const key = name + color;
+  if (!maskCache.has(key)) {
+    const bytes = Uint8Array.from(atob(ICONS[name]), (c) => c.charCodeAt(0));
+    const c = document.createElement("canvas"); c.width = c.height = 24;
+    const g = c.getContext("2d"), img = g.createImageData(24, 24), [r, gg, b] = hex(color);
+    for (let i = 0; i < 576; i++) { img.data[i * 4] = r; img.data[i * 4 + 1] = gg; img.data[i * 4 + 2] = b; img.data[i * 4 + 3] = bytes[i]; }
+    g.putImageData(img, 0, 0); maskCache.set(key, c);
+  }
+  ctx.imageSmoothingEnabled = true;
+  ctx.drawImage(maskCache.get(key), x, y, size, size);
+}
+
+/* ---------- sky from Home Assistant ----------
+   The illustration reads only what HA publishes:
+   sun.sun → state, attributes.elevation, azimuth, next_rising, next_setting;
+   sensor.moon_phase (Moon integration) → new_moon … waning_crescent.
+   On the stand these entities are computed for Moscow so seasons can be compared. */
+const HOME = { lat: 55.7558, lon: 37.6173, tz: 3 };          // fixture only; the panel gets values from HA
+const RAD = Math.PI / 180;
+function solar(ms) {
+  const d = ms / 864e5 - 10957.5;                              // days since J2000.0
+  const g = (357.529 + 0.98560028 * d) * RAD, q = 280.459 + 0.98564736 * d;
+  const L = (q + 1.915 * Math.sin(g) + 0.020 * Math.sin(2 * g)) * RAD, e = (23.439 - 0.00000036 * d) * RAD;
+  const ra = Math.atan2(Math.cos(e) * Math.sin(L), Math.cos(L)), dec = Math.asin(Math.sin(e) * Math.sin(L));
+  const gmst = ((18.697374558 + 24.06570982441908 * d) % 24 + 24) % 24;
+  const ha = (gmst * 15 + HOME.lon) * RAD - ra, lat = HOME.lat * RAD;
+  const elev = Math.asin(Math.sin(lat) * Math.sin(dec) + Math.cos(lat) * Math.cos(dec) * Math.cos(ha));
+  const az = Math.atan2(-Math.sin(ha), Math.tan(dec) * Math.cos(lat) - Math.sin(lat) * Math.cos(ha));
+  return { elevation: elev / RAD, azimuth: ((az / RAD) % 360 + 360) % 360 };
+}
+function nextCross(ms, level, up) {
+  const f = (m) => solar(m).elevation - level;
+  let a = ms, fa = f(a);
+  for (let i = 0; i < 600; i++) {
+    const b = a + 5 * 6e4, fb = f(b);
+    if (up ? fa < 0 && fb >= 0 : fa >= 0 && fb < 0) {
+      let lo = a, hi = b; for (let k = 0; k < 18; k++) { const mid = (lo + hi) / 2; if ((f(mid) >= 0) === up) hi = mid; else lo = mid; }
+      return hi;
+    }
+    a = b; fa = fb;
+  }
+  return null;
+}
+const iso = (ms) => ms == null ? null : new Date(ms).toISOString().replace(".000Z", "+00:00").replace(/\.\d+Z$/, "+00:00");
+const PHASES = ["new_moon", "waxing_crescent", "first_quarter", "waxing_gibbous", "full_moon", "waning_gibbous", "last_quarter", "waning_crescent"];
+let haCache = { key: null };
+function haEntities(ms) {
+  const key = Math.floor(ms / 6e4);
+  if (haCache.key === key) return haCache;
+  const p = solar(ms), age = (((ms - Date.UTC(2000, 0, 6, 18, 14)) / 864e5 / 29.530588853) % 1 + 1) % 1;
+  const sun = { entity_id: "sun.sun", state: p.elevation > -0.833 ? "above_horizon" : "below_horizon",
+    attributes: { elevation: +p.elevation.toFixed(2), azimuth: +p.azimuth.toFixed(2), rising: solar(ms + 6e4).elevation > p.elevation,
+      next_rising: iso(nextCross(ms, -0.833, true)), next_setting: iso(nextCross(ms, -0.833, false)),
+      next_dawn: iso(nextCross(ms, -6, true)), next_dusk: iso(nextCross(ms, -6, false)) } };
+  const moon = { entity_id: "sensor.moon_phase", state: PHASES[Math.round(age * 8) % 8] };
+  haCache = { key, sun, moon, age };
+  return haCache;
+}
+const PHASE_AGE = Object.fromEntries(PHASES.map((p, i) => [p, i / 8]));
+const smooth = (e0, e1, x) => { const t = Math.max(0, Math.min(1, (x - e0) / (e1 - e0))); return t * t * (3 - 2 * t); };
+const clamp01 = (v) => Math.max(0, Math.min(1, v));
+// What the native renderer needs: everything below is derived from the two HA entities and "now".
+function skyFromHA(sun, moon, now) {
+  const e = sun.attributes.elevation;
+  const day = smooth(-6, 3, e);                              // civil twilight → full day
+  const dusk = clamp01(1 - Math.abs(e - 1) / 7);             // warm horizon near sunrise/sunset
+  const rise = Date.parse(sun.attributes.next_rising), set = Date.parse(sun.attributes.next_setting);
+  let sunP = -1, nightP = -1;
+  if (sun.state === "above_horizon") sunP = clamp01((now - (rise - 864e5)) / (set - (rise - 864e5)));
+  else nightP = clamp01((now - (set - 864e5)) / (rise - (set - 864e5)));
+  return { day, dusk, sunP, nightP, sunHeight: clamp01(e / 55), sunUp: e > -1.5, moonAge: moon ? PHASE_AGE[moon.state] ?? 0.5 : 0.5 };
+}
+function fallbackSky(hour) {                                  // sun.sun missing: fixed 07:00–19:00
+  const day = smooth(6.4, 7.6, hour) * (1 - smooth(18.4, 19.6, hour)), sunP = (hour - 7) / 12;
+  return { day, dusk: 1 - Math.abs(2 * day - 1), sunP: sunP >= 0 && sunP <= 1 ? sunP : -1,
+    nightP: sunP < 0 || sunP > 1 ? ((hour - 19 + 24) % 24) / 12 : -1, sunHeight: Math.sin(Math.PI * clamp01(sunP)) * 0.7, sunUp: day > 0.2, moonAge: 0.5 };
+}
+const sim = { live: true, day: null, hour: 12 };
+function simNow() {
+  if (sim.live) return Date.now();
+  const [y, m, d] = sim.day.split("-").map(Number);
+  return Date.UTC(y, m - 1, d) + (sim.hour - HOME.tz) * 36e5;
+}
+function sky() {
+  if (state.time === "day") return { day: 1, dusk: 0, sunP: 0.42, nightP: -1, sunHeight: 0.6, sunUp: true, moonAge: 0.5 };
+  if (state.time === "night") return { day: 0, dusk: 0, sunP: -1, nightP: 0.55, sunHeight: 0, sunUp: false, moonAge: 0.38 };
+  const now = simNow();
+  if (state.noSun) { const h = ((now / 36e5 + HOME.tz) % 24 + 24) % 24; return fallbackSky(h); }
+  const { sun, moon } = haEntities(now);
+  return skyFromHA(sun, moon, now);
+}
+
+/* ---------- scene: window, city, curtain ---------- */
+function rand(seed) { let s = seed >>> 0 || 1; return () => (s = (s * 1664525 + 1013904223) >>> 0) / 4294967296; }
+const cityCache = new Map();
+function city(w, h) {
+  const key = w + "x" + h;
+  if (cityCache.has(key)) return cityCache.get(key);
+  const R = rand(w * 7919 + h * 104729), small = w < 60;
+  const far = [], near = [], trees = [], clouds = [];
+  let x = -R() * 10;
+  while (x < w) { const bw = w * (0.09 + R() * 0.1) + 4, bh = h * (0.2 + R() * 0.26); far.push({ x, w: bw, h: bh, roof: R() < .25 }); x += bw + w * 0.01; }
+  x = -R() * 8;
+  while (x < w) {
+    const bw = w * (0.11 + R() * 0.12) + 5, bh = h * (0.12 + R() * 0.22), cols = Math.max(1, Math.floor(bw / 7)), rows = Math.max(1, Math.floor(bh / 8));
+    const lit = []; for (let i = 0; i < cols * rows; i++) lit.push(R());
+    near.push({ x, w: bw, h: bh, cols, rows, lit, antenna: R() < .3 }); x += bw + w * (0.02 + R() * 0.05);
+  }
+  const nt = small ? 2 : Math.max(3, Math.round(w / 45));
+  for (let i = 0; i < nt; i++) trees.push({ x: (i + 0.3 + R() * 0.4) / nt * w, r: h * (0.055 + R() * 0.035) + 2, k: R() });
+  const nc = small ? 1 : Math.max(2, Math.round(w / 110));
+  for (let i = 0; i < nc; i++) clouds.push({ x: R(), y: 0.1 + R() * 0.25, s: 0.7 + R() * 0.6, v: 0.6 + R() * 0.8 });
+  const stars = []; for (let i = 0; i < (small ? 6 : Math.round(w * h / 500)); i++) stars.push({ x: R(), y: R() * 0.5, p: R() * 6.28, r: R() < .15 ? 1.4 : 0.9 });
+  const o = { far, near, trees, clouds, stars }; cityCache.set(key, o); return o;
+}
+function rr(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.roundRect(x, y, w, h, Math.min(r, w / 2, h / 2)); }
+
+function drawSky(ctx, g, s, t, lod) {
+  const { x, y, w, h } = g, day = s.day, dusk = s.dusk;
+  const top = mix(mix([12, 20, 40], [76, 128, 190], day), [96, 84, 128], dusk * 0.35);
+  const bot = mix(mix([30, 46, 78], [168, 202, 230], day), [231, 156, 116], dusk * 0.75);
+  const grad = ctx.createLinearGradient(0, y, 0, y + h); grad.addColorStop(0, rgb(top)); grad.addColorStop(1, rgb(bot));
+  ctx.fillStyle = grad; ctx.fillRect(x, y, w, h);
+  const C = city(Math.round(w), Math.round(h));
+  // stars
+  if (day < 0.6) for (const st of C.stars) {
+    const tw = state.reduced ? 0.8 : 0.55 + 0.45 * Math.sin(t / 700 + st.p);
+    ctx.fillStyle = `rgba(255,248,225,${(1 - day / 0.6) * tw})`; ctx.fillRect(x + st.x * w, y + st.y * h, st.r, st.r);
+  }
+  const R = Math.max(2.5, Math.min(w, h) * 0.075);
+  if (s.sunP >= 0 && s.sunUp) {                   // sun: x from day progress, height from real elevation
+    const ox = x + w * (0.12 + 0.76 * s.sunP), oy = y + h * (0.64 - 0.5 * s.sunHeight);
+    if (lod) { const glow = ctx.createRadialGradient(ox, oy, R * .6, ox, oy, R * 3.2); glow.addColorStop(0, "rgba(255,226,150,.55)"); glow.addColorStop(1, "rgba(255,226,150,0)"); ctx.fillStyle = glow; ctx.fillRect(ox - R * 4, oy - R * 4, R * 8, R * 8); }
+    ctx.fillStyle = rgb(mix([255, 222, 120], [255, 170, 110], dusk)); ctx.beginPath(); ctx.arc(ox, oy, R, 0, 7); ctx.fill();
+  }
+  if (s.nightP >= 0) {                              // moon: arc across the night, shape from sensor.moon_phase
+    const ox = x + w * (0.14 + 0.72 * s.nightP), oy = y + h * (0.6 - 0.42 * Math.sin(Math.PI * s.nightP));
+    const lit = (1 - Math.cos(s.moonAge * 2 * Math.PI)) / 2, MR = R * 0.95;
+    if (lod && lit > 0.1) { const glow = ctx.createRadialGradient(ox, oy, R * .5, ox, oy, R * 2.8); glow.addColorStop(0, `rgba(240,234,210,${0.25 * lit})`); glow.addColorStop(1, "rgba(240,234,210,0)"); ctx.fillStyle = glow; ctx.fillRect(ox - R * 3, oy - R * 3, R * 6, R * 6); }
+    ctx.fillStyle = "rgba(200,206,225,.13)"; ctx.beginPath(); ctx.arc(ox, oy, MR, 0, 7); ctx.fill();
+    if (lit > 0.02) {
+      const right = s.moonAge < 0.5, rx = MR * Math.abs(1 - 2 * lit), bulgeRight = right === (lit < 0.5);
+      ctx.fillStyle = "#efe8cf"; ctx.beginPath();
+      ctx.arc(ox, oy, MR, -Math.PI / 2, Math.PI / 2, !right);
+      if (bulgeRight) ctx.ellipse(ox, oy, Math.max(0.01, rx), MR, 0, Math.PI / 2, -Math.PI / 2, true);
+      else ctx.ellipse(ox, oy, Math.max(0.01, rx), MR, 0, Math.PI / 2, Math.PI * 1.5, false);
+      ctx.fill();
+    }
+  }
+  // clouds
+  if (lod) for (const c of C.clouds) {
+    const span = w + 60, drift = state.reduced ? 0 : t * 0.004 * c.v;
+    const cx = x - 30 + ((c.x * span + drift) % span), cy = y + c.y * h, k = c.s * Math.max(6, h * 0.06);
+    ctx.fillStyle = day > 0.4 ? `rgba(255,255,255,${0.55 + 0.3 * day})` : `rgba(120,135,170,${0.25 + 0.2 * (1 - day)})`;
+    ctx.beginPath(); ctx.moveTo(cx + k, cy); ctx.arc(cx, cy, k, 0, 7); ctx.moveTo(cx + k * 2.3, cy - k * .45); ctx.arc(cx + k * 1.1, cy - k * .45, k * 1.2, 0, 7); ctx.moveTo(cx + k * 3.2, cy); ctx.arc(cx + k * 2.3, cy, k * .9, 0, 7); ctx.rect(cx, cy, k * 2.3, k * .9); ctx.fill("nonzero");
+  }
+}
+function drawCity(ctx, g, s, lod) {
+  const { x, y, w, h } = g, day = s.day, C = city(Math.round(w), Math.round(h));
+  const ground = y + h * 0.88;
+  ctx.fillStyle = rgb(mix([40, 56, 86], [128, 150, 180], day));
+  for (const b of C.far) { ctx.fillRect(x + b.x, ground - b.h, b.w, b.h); if (b.roof && lod) { ctx.beginPath(); ctx.moveTo(x + b.x, ground - b.h); ctx.lineTo(x + b.x + b.w / 2, ground - b.h - b.w * .35); ctx.lineTo(x + b.x + b.w, ground - b.h); ctx.fill(); } }
+  for (const b of C.near) {
+    ctx.fillStyle = rgb(mix([22, 32, 54], [86, 106, 136], day)); ctx.fillRect(x + b.x, ground - b.h, b.w, b.h);
+    if (b.antenna && lod) ctx.fillRect(x + b.x + b.w * .3, ground - b.h - 5, 1.2, 5);
+    if (lod && b.w > 9) {
+      const cw = (b.w - 4) / b.cols, ch = (b.h - 4) / b.rows;
+      for (let r = 0; r < b.rows; r++) for (let c = 0; c < b.cols; c++) {
+        const lit = b.lit[r * b.cols + c];
+        if (day > 0.5) { if (lit < .5) continue; ctx.fillStyle = "rgba(205,222,240,.45)"; }
+        else ctx.fillStyle = lit < 0.38 * (1 - day) + 0.05 ? "#f6cd6e" : "rgba(60,76,110,.6)";
+        ctx.fillRect(x + b.x + 2 + c * cw + cw * .2, ground - b.h + 2 + r * ch + ch * .22, cw * .55, ch * .5);
+      }
+    }
+  }
+  ctx.fillStyle = rgb(mix([14, 26, 30], [92, 128, 96], day)); ctx.fillRect(x, ground, w, y + h - ground);
+  for (const tr of C.trees) {
+    const tx = x + tr.x, r = tr.r;
+    ctx.fillStyle = rgb(mix([18, 22, 20], [96, 76, 58], day)); ctx.fillRect(tx - Math.max(1, r * .14), ground - r * .9, Math.max(2, r * .28), r * .9 + 1);
+    ctx.fillStyle = rgb(mix([14, 38, 32], tr.k < .5 ? [70, 128, 86] : [92, 146, 98], day));
+    ctx.beginPath(); ctx.arc(tx, ground - r * 1.5, r, 0, 7); if (lod) ctx.arc(tx - r * .55, ground - r * 1.05, r * .7, 0, 7), ctx.arc(tx + r * .55, ground - r * 1.1, r * .72, 0, 7); ctx.fill();
+  }
+}
+// Draws the whole window composition into rect r. closed: 0..1 share of glass hidden. ghost: target share or null.
+/* ---------- scene: window with a roller shade lowered from a cassette above it ---------- */
+function sceneGeom(r, lod) {
+  const side = Math.max(lod ? 10 : 3, Math.min(36, r.w * 0.09));
+  const top = Math.max(lod ? 18 : 4, Math.min(30, r.h * 0.11)), bottom = Math.max(lod ? 8 : 2, r.h * 0.06);
+  const win = { x: r.x + side, y: r.y + top, w: r.w - 2 * side, h: r.h - top - bottom };
+  const over = lod ? Math.min(8, side * 0.6) : 1;               // cassette and fabric overhang the frame
+  const casH = lod ? Math.max(9, Math.min(18, top * 0.72)) : Math.max(2, top * 0.7);
+  const cas = { x: win.x - over, y: win.y - casH + (lod ? 2 : 1), w: win.w + 2 * over, h: casH };
+  const fab = { x: win.x - over * 0.55, w: win.w + over * 1.1, y: cas.y + cas.h, run: win.y + win.h - (cas.y + cas.h) };
+  return { win, cas, fab, over };
+}
+function drawScene(ctx, r, closed, ghost, t, lod) {
+  const s = sky(), th = theme(), { win, cas, fab, over } = sceneGeom(r, lod);
+  const frameW = lod ? Math.max(3, Math.min(6, win.w * 0.02)) : 1.5;
+  // glass
+  ctx.save(); rr(ctx, win.x, win.y, win.w, win.h, lod ? 8 : 2); ctx.clip();
+  drawSky(ctx, win, s, t, lod); drawCity(ctx, win, s, lod);
+  if (lod) { const gl = ctx.createLinearGradient(win.x, win.y, win.x + win.w, win.y + win.h); gl.addColorStop(0, "rgba(255,255,255,.10)"); gl.addColorStop(.35, "rgba(255,255,255,0)"); ctx.fillStyle = gl; ctx.fillRect(win.x, win.y, win.w, win.h); }
+  ctx.restore();
+  // frame + mullions + sill
+  const frameCol = mixHex(T.outline, "#c9ccd2", 0.25);
+  ctx.strokeStyle = frameCol; ctx.lineWidth = frameW; rr(ctx, win.x, win.y, win.w, win.h, lod ? 8 : 2); ctx.stroke();
+  if (lod) { ctx.fillStyle = frameCol; ctx.fillRect(win.x + win.w / 2 - frameW / 2, win.y, frameW, win.h); ctx.fillRect(win.x, win.y + win.h * 0.36, win.w, frameW * .8); }
+  if (lod) { ctx.fillStyle = mixHex(T.outline, "#ffffff", 0.12); rr(ctx, win.x - 6, win.y + win.h - 1, win.w + 12, Math.max(4, frameW + 2), 2); ctx.fill(); }
+  // fabric: hangs from the cassette, its lower edge at the closed share of the window
+  const drop = closed * fab.run, railH = lod ? Math.max(4, Math.min(7, r.h * 0.022)) : Math.max(1.2, r.h * 0.05);
+  const bottomY = fab.y + drop;
+  if (drop > 0.5) {
+    if (lod) {                                                 // soft shadow the shade casts on the glass
+      const sh = ctx.createLinearGradient(0, bottomY, 0, bottomY + 10);
+      sh.addColorStop(0, "rgba(0,0,0,.28)"); sh.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.save(); rr(ctx, win.x, win.y, win.w, win.h, 8); ctx.clip(); ctx.fillStyle = sh; ctx.fillRect(win.x, bottomY, win.w, 10); ctx.restore();
+    }
+    const gr = ctx.createLinearGradient(0, fab.y, 0, bottomY);
+    gr.addColorStop(0, rgb(mix(th.a, [0, 0, 0], 0.30)));
+    gr.addColorStop(Math.min(1, 14 / Math.max(14, drop)), rgb(th.a));
+    gr.addColorStop(1, rgb(mix(th.a, [255, 255, 255], 0.06)));
+    ctx.fillStyle = lod ? gr : rgb(th.a);
+    ctx.fillRect(fab.x, fab.y, fab.w, drop);
+    if (lod) {
+      // weave: faint horizontal threads that travel with the fabric, so the motion reads as rolling
+      ctx.save(); ctx.beginPath(); ctx.rect(fab.x, fab.y, fab.w, drop); ctx.clip();
+      ctx.fillStyle = "rgba(0,0,0,.07)";
+      for (let y = bottomY - 3; y > fab.y; y -= 6) ctx.fillRect(fab.x, y, fab.w, 1);
+      ctx.fillStyle = "rgba(255,255,255,.05)";
+      for (let y = bottomY - 6; y > fab.y; y -= 6) ctx.fillRect(fab.x, y, fab.w, 1);
+      ctx.restore();
+      ctx.fillStyle = rgb(mix(th.a, [0, 0, 0], 0.22));      // side hems
+      ctx.fillRect(fab.x, fab.y, 1.5, drop); ctx.fillRect(fab.x + fab.w - 1.5, fab.y, 1.5, drop);
+    }
+  }
+  // bottom rail with a pull tab; when open it tucks under the cassette
+  ctx.fillStyle = rgb(mix(th.a, [0, 0, 0], 0.42));
+  rr(ctx, fab.x - (lod ? 1 : 0), bottomY - railH * 0.5, fab.w + (lod ? 2 : 0), railH, lod ? railH / 2 : 0.5); ctx.fill();
+  if (lod) {
+    const tabW = Math.max(12, Math.min(22, win.w * 0.06)), tabH = Math.max(5, railH + 1), cx = win.x + win.w / 2;
+    ctx.fillStyle = rgb(mix(th.a, [0, 0, 0], 0.5));
+    rr(ctx, cx - tabW / 2, bottomY + railH * 0.5 - 1, tabW, tabH, tabH / 2); ctx.fill();
+  }
+  // cassette (covers the roll); end caps show the shaft turning while the shade moves
+  ctx.fillStyle = mixHex(T.outline, "#c9ccd2", 0.32); rr(ctx, cas.x, cas.y, cas.w, cas.h, lod ? Math.min(6, cas.h / 2) : 1); ctx.fill();
+  if (lod) {
+    ctx.fillStyle = "rgba(255,255,255,.18)"; ctx.fillRect(cas.x + 4, cas.y + 2, cas.w - 8, 1.5);
+    ctx.fillStyle = "rgba(0,0,0,.25)"; ctx.fillRect(cas.x + 2, cas.y + cas.h - 2, cas.w - 4, 2);
+    // roll inside, seen through the end caps: thicker when more fabric is wound up
+    const R = cas.h * (0.26 + 0.16 * (1 - closed)), cy = cas.y + cas.h / 2;
+    const turn = closed * fab.run / Math.max(4, R) ;       // radians: fabric length / roll radius
+    for (const cx of [cas.x + cas.h / 2 + 1, cas.x + cas.w - cas.h / 2 - 1]) {
+      ctx.fillStyle = mixHex(T.outline, "#000000", 0.25); ctx.beginPath(); ctx.arc(cx, cy, cas.h * 0.42, 0, 7); ctx.fill();
+      ctx.fillStyle = rgb(mix(th.a, [0, 0, 0], 0.25)); ctx.beginPath(); ctx.arc(cx, cy, R, 0, 7); ctx.fill();
+      ctx.strokeStyle = T.muted; ctx.lineWidth = 1.2; ctx.beginPath();
+      ctx.moveTo(cx, cy); ctx.lineTo(cx + Math.cos(turn) * R * 0.9, cy + Math.sin(turn) * R * 0.9); ctx.stroke();
+      ctx.fillStyle = T.muted; ctx.beginPath(); ctx.arc(cx, cy, 1.4, 0, 7); ctx.fill();
+    }
+  }
+  if (ghost != null && lod) {                                   // where the shade is heading
+    const gy = fab.y + ghost * fab.run;
+    ctx.save(); ctx.setLineDash([4, 4]); ctx.strokeStyle = T.text; ctx.globalAlpha = 0.8; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(win.x + 2, gy); ctx.lineTo(win.x + win.w - 2, gy); ctx.stroke(); ctx.restore();
+  }
+  return win;
+}
+
+/* ---------- card layout (relative to card size, so a new grid pitch only rescales) ---------- */
+function layout(W, H) {
+  const L = { W, H, items: [] }, P = 12, add = (o) => L.items.push(o);
+  const narrow = W < 150;
+  if (narrow) {
+    if (H < 150) {                                           // 2×2
+      const s = Math.min(32, H - 2 * P - 44 - 8);          // 32 at 110 px, 23 at 99 px
+      add({ t: "icon", r: { x: P, y: P, w: s, h: s } });
+      add({ t: "value", r: { x: 52, y: P + s / 2 - 15, w: W - 52 - 8, h: 30 }, size: 21, align: "right" });
+      add({ t: "btn", r: { x: P, y: H - P - 44, w: W - 2 * P, h: 44 }, cmd: "toggle" });
+      return L;
+    }
+    const stack = H >= 400 ? ["open", "stop", "close"] : ["toggle"];
+    let y = H - P;
+    for (const c of stack.slice().reverse()) { y -= 44; add({ t: "btn", r: { x: P, y, w: W - 2 * P, h: 44 }, cmd: c }); y -= 8; }
+    add({ t: "value", r: { x: P, y: y - 28, w: W - 2 * P, h: 28 }, size: 21, align: "center" });
+    add({ t: "scene", r: { x: P, y: P, w: W - 2 * P, h: y - 28 - 8 - P } });
+    return L;
+  }
+  const short = H < 150;
+  add({ t: short ? "mini" : "icon", r: short ? { x: 12, y: 8, w: 28, h: 28 } : { x: 14, y: 10, w: 24, h: 24 } });
+  add({ t: "title", r: { x: 48, y: 12, w: W - 48 - P, h: 24 } });
+  if (short) {
+    const three = W >= 300, nb = three ? 3 : 1, bw = 44;
+    const sw = W - 2 * P - nb * (bw + 8);
+    add({ t: "slider", r: { x: P, y: H - P - 44, w: sw, h: 44 } });
+    (three ? ["close", "stop", "open"] : ["toggle"]).forEach((c, i) => add({ t: "btn", r: { x: P + sw + 8 + i * (bw + 8), y: H - P - 44, w: bw, h: 44 }, cmd: c }));
+    return L;
+  }
+  let y = H - P - 44;
+  if (W >= 400 && H < 300) {                                 // wide medium 8×4: slider and icon buttons share the bottom row
+    const sw = W - 2 * P - 3 * 52;
+    add({ t: "slider", r: { x: P, y, w: sw, h: 44 } });
+    ["close", "stop", "open"].forEach((c, i) => add({ t: "btn", r: { x: P + sw + 8 + i * 52, y, w: 44, h: 44 }, cmd: c }));
+    add({ t: "scene", r: { x: P, y: 48, w: W - 2 * P, h: y - 8 - 48 } });
+    L.statusLong = true;
+    return L;
+  }
+  const bw = (W - 2 * P - 16) / 3;
+  ["close", "stop", "open"].forEach((c, i) => add({ t: "btn", r: { x: P + i * (bw + 8), y, w: bw, h: 44 }, cmd: c, labeled: bw >= 110 }));
+  const slider = H >= 300;
+  if (slider) { y -= 52; add({ t: "slider", r: { x: P, y, w: W - 2 * P, h: 44 } }); }
+  L.statusLong = !slider;
+  add({ t: "scene", r: { x: P, y: 48, w: W - 2 * P, h: y - 8 - 48 } });
+  return L;
+}
+
+/* ---------- card renderer ---------- */
+const BTN = { open: ["arrow-collapse-up", "Открыть"], close: ["arrow-expand-down", "Закрыть"], stop: ["stop", "Стоп"] };
+function resolve(cmd) { if (cmd !== "toggle") return cmd; if (heading()) return "stop"; return shown() >= 50 ? "close" : "open"; }
+function fitFont(ctx, text, w, sizes) { for (const s of sizes) { ctx.font = `${s}px ${FONT}`; if (ctx.measureText(text).width <= w) return s; } return sizes[sizes.length - 1]; }
+function drawCard(ctx, L, t, ox = 0, oy = 0) {
+  const th = theme(), off = state.offline, closed = 1 - cover.pos / 100;
+  ctx.save(); ctx.translate(ox, oy);
+  rr(ctx, 0, 0, L.W, L.H, 20); ctx.fillStyle = T.surface; ctx.fill();
+  if (off) { ctx.strokeStyle = T.unavailable; ctx.lineWidth = 1; rr(ctx, .5, .5, L.W - 1, L.H - 1, 20); ctx.stroke(); }
+  const drag = cover.drag && cover.drag.L === L ? cover.drag : null;
+  const ghostVal = drag ? drag.value : (Math.abs(cover.target - cover.pos) > 0.5 || cover.pending) ? (cover.pending && !cover.pending.stop ? cover.pending.target : cover.target) : null;
+  ctx.textBaseline = "middle";
+  for (const it of L.items) {
+    const r = it.r;
+    if (it.t === "scene") {
+      ctx.save(); rr(ctx, r.x, r.y, r.w, r.h, 12); ctx.clip();
+      drawScene(ctx, r, closed, ghostVal == null ? null : 1 - ghostVal / 100, t, true);
+      ctx.restore();
+      if (off) { ctx.fillStyle = "rgba(16,19,23,.55)"; ctx.fillRect(r.x, r.y, r.w, r.h); }
+      it.win = r;
+    } else if (it.t === "mini") {
+      ctx.save(); rr(ctx, r.x, r.y, r.w, r.h, 6); ctx.clip(); ctx.fillStyle = T.raised; ctx.fillRect(r.x, r.y, r.w, r.h);
+      drawScene(ctx, r, closed, null, t, false); ctx.restore();
+    } else if (it.t === "icon") {
+      icon(ctx, shown() > 0 ? "roller-shade" : "roller-shade-closed", r.x, r.y, r.w, off ? T.subtle : th.accent);
+    } else if (it.t === "title") {
+      const status = statusText(L.statusLong);
+      ctx.font = `14px ${FONT}`; const sw = ctx.measureText(status).width;
+      ctx.fillStyle = off ? T.error : heading() ? T.text : T.muted; ctx.textAlign = "right";
+      // Narrow cards: the full name and the status do not fit together, so the name shortens to «Штора».
+      let title = TITLE, shortStatus = statusText(false), text = status;
+      if (sw > r.w - ctx.measureText(title).width - 12) text = shortStatus;
+      if (ctx.measureText(text).width > r.w - ctx.measureText(title).width - 12) title = "Штора";
+      ctx.fillText(text, r.x + r.w, r.y + r.h / 2);
+      ctx.fillStyle = T.muted; ctx.textAlign = "left"; ctx.fillText(title, r.x, r.y + r.h / 2);
+    } else if (it.t === "value") {
+      const txt = off ? "—" : `${drag ? drag.value : shown()} %`;
+      ctx.font = `${it.size}px ${FONT}`; ctx.fillStyle = off ? T.subtle : T.text; ctx.textAlign = it.align;
+      ctx.fillText(txt, it.align === "right" ? r.x + r.w : it.align === "center" ? r.x + r.w / 2 : r.x, r.y + r.h / 2);
+    } else if (it.t === "slider") {
+      rr(ctx, r.x, r.y, r.w, r.h, r.h / 2); ctx.fillStyle = T.raised; ctx.fill();
+      if (!off) { const fw = Math.max(r.h, r.w * cover.pos / 100); rr(ctx, r.x, r.y, fw, r.h, r.h / 2); ctx.fillStyle = th.fill; ctx.fill(); }
+      if (ghostVal != null && !off) { const mx = r.x + 6 + (r.w - 16) * ghostVal / 100; ctx.fillStyle = T.text; rr(ctx, mx, r.y + 6, 4, r.h - 12, 2); ctx.fill(); }
+      const txt = off ? "—" : `${drag ? drag.value : shown()} %`;
+      ctx.textAlign = "center"; ctx.fillStyle = off ? T.subtle : T.text; ctx.font = `${fitFont(ctx, txt, r.w - 16, [21, 18, 14])}px ${FONT}`;
+      ctx.fillText(txt, r.x + r.w / 2, r.y + r.h / 2 + 1);
+    } else if (it.t === "btn") {
+      const cmd = resolve(it.cmd), h = heading();
+      const active = !off && ((cmd === "open" && h > 0) || (cmd === "close" && h < 0));
+      rr(ctx, r.x, r.y, r.w, r.h, 12); ctx.fillStyle = it.pressed ? T.outline : active ? th.surface : T.raised; ctx.globalAlpha = off ? 0.4 : 1; ctx.fill();
+      const [ic, label] = BTN[cmd], col = off ? T.subtle : active ? th.accent : T.text;
+      if (it.labeled) {
+        ctx.font = `14px ${FONT}`; const tw = ctx.measureText(label).width, gx = r.x + (r.w - (24 + 8 + tw)) / 2;
+        icon(ctx, ic, gx, r.y + 10, 24, col); ctx.fillStyle = off ? T.subtle : T.text; ctx.textAlign = "left"; ctx.fillText(label, gx + 32, r.y + r.h / 2 + 1);
+      } else icon(ctx, ic, r.x + (r.w - 24) / 2, r.y + 10, 24, col);
+      ctx.globalAlpha = 1;
+    }
+  }
+  ctx.restore();
+}
+
+/* ---------- surfaces ---------- */
+const views = [];   // {canvas, ctx, L, ox, oy, scale, kind}
+// Width step is 59 everywhere; height step differs: stand 59, planned 436 px grid 55.5, current firmware 53.5 (int(n*53.5) - 8).
+const cellPx = (n, axis = "x") => axis === "x" ? n * 59 - 8 : Math.floor(n * state.gridY) - 8;
+function makeCanvas(cv, cssW, cssH) {
+  const k = state.zoom && cv.id !== "screen" ? 2 : 1, dpr = Math.min(2, window.devicePixelRatio || 1) * k;
+  cv.width = Math.round(cssW * dpr); cv.height = Math.round(cssH * dpr);
+  if (cv.id !== "screen") cv.style.width = cssW * k + "px";
+  const ctx = cv.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); return ctx;
+}
+function rebuild() {
+  views.length = 0; cityCache.clear();
+  const scr = document.getElementById("screen");
+  const [sw, sh] = state.screen.split("x").map(Number);
+  const SL = layout(cellPx(sw), cellPx(sh, "y"));
+  views.push({ canvas: scr, ctx: makeCanvas(scr, 480, 480), L: SL, ox: 8, oy: 8, screen: true, visible: true });
+  document.getElementById("screenCaption").textContent = `карточка ${sw}×${sh}`;
+  const tray = document.getElementById("tray"); tray.replaceChildren();
+  for (const [w, h] of SIZES) {
+    const L = layout(cellPx(w), cellPx(h, "y"));
+    const fig = document.createElement("figure"), cap = document.createElement("figcaption"), cv = document.createElement("canvas");
+    cap.innerHTML = `<b>${w}×${h}</b>`;
+    cv.setAttribute("aria-label", `Карточка рулонной шторы ${w}×${h}`);
+    fig.append(cap, cv); tray.append(fig);
+    const v = { canvas: cv, ctx: makeCanvas(cv, L.W, L.H), L, ox: 0, oy: 0, visible: true };
+    views.push(v); io.observe(cv); cv._view = v; attach(v);
+  }
+  attach(views[0]);
+  document.getElementById("pitchOut").textContent = `8×8 = ${cellPx(8)} × ${cellPx(8, "y")} px`;
+  save();
+}
+const io = new IntersectionObserver((es) => { for (const e of es) if (e.target._view) e.target._view.visible = e.isIntersecting; });
+
+/* ---------- pointer ---------- */
+function local(v, e) {
+  const b = v.canvas.getBoundingClientRect(), cssW = v.screen ? 480 : v.L.W, cssH = v.screen ? 480 : v.L.H;
+  return { x: (e.clientX - b.left) * cssW / b.width - v.ox, y: (e.clientY - b.top) * cssH / b.height - v.oy };
+}
+const inside = (p, r) => p.x >= r.x && p.x < r.x + r.w && p.y >= r.y && p.y < r.y + r.h;
+function valueFor(it, p) {
+  const r = it.r;
+  if (it.t === "slider") return Math.round(Math.max(0, Math.min(100, (p.x - r.x - 6) / (r.w - 16) * 100)));
+  const { fab } = sceneGeom(r, true);                         // grab the shade and pull it down or up
+  const closed = Math.max(0, Math.min(1, (p.y - fab.y) / fab.run));
+  return Math.round(100 - closed * 100);
+}
+function attach(v) {
+  if (v.canvas._attached) { v.canvas._view = v; return; }
+  v.canvas._attached = true; v.canvas._view = v;
+  v.canvas.addEventListener("pointerdown", (e) => {
+    const view = v.canvas._view, p = local(view, e); if (state.offline) return;
+    const it = view.L.items.find((i) => (i.t === "btn" || i.t === "slider" || i.t === "scene") && inside(p, i.r));
+    if (!it) return;
+    v.canvas.setPointerCapture(e.pointerId);
+    if (it.t === "btn") { it.pressed = true; view.pressedItem = it; return; }
+    cover.drag = { L: view.L, it, value: valueFor(it, p) };
+  });
+  v.canvas.addEventListener("pointermove", (e) => {
+    const view = v.canvas._view; if (!cover.drag || cover.drag.L !== view.L) return;
+    cover.drag.value = valueFor(cover.drag.it, local(view, e));
+  });
+  const end = (e, cancel) => {
+    const view = v.canvas._view;
+    if (view.pressedItem) { const it = view.pressedItem; it.pressed = false; view.pressedItem = null; if (!cancel && inside(local(view, e), it.r)) run(resolve(it.cmd)); }
+    if (cover.drag && cover.drag.L === view.L) { const val = cover.drag.value; cover.drag = null; if (!cancel) command(val); }
+  };
+  v.canvas.addEventListener("pointerup", (e) => end(e, false));
+  v.canvas.addEventListener("pointercancel", (e) => end(e, true));
+}
+function run(cmd) { if (cmd === "open") command(100); else if (cmd === "close") command(0); else stop(); }
+
+/* ---------- loop ---------- */
+let last = performance.now(), acc = 0;
+function frame(now) {
+  const dt = now - last; last = now; pump(now, dt); acc += dt;
+  if (acc >= 1000 / FPS || cover.drag) {
+    acc = 0;
+    for (const v of views) {
+      if (!v.visible) continue;
+      const ctx = v.ctx;
+      if (v.screen) { ctx.fillStyle = T.bg; ctx.fillRect(0, 0, 480, 480); }
+      else ctx.clearRect(0, 0, v.L.W, v.L.H);
+      drawCard(ctx, v.L, now, v.ox, v.oy);
+    }
+    const kp = document.getElementById("kbdPos"); if (document.activeElement !== kp) kp.value = shown();
+    if (state.time === "ha" && sim.live) syncSim();
+    renderHA();
+  }
+  requestAnimationFrame(frame);
+}
+
+/* ---------- controls ---------- */
+const msk = (ms) => new Date(ms + HOME.tz * 36e5);
+const hhmm = (ms) => ms == null || isNaN(ms) ? "—" : msk(ms).toISOString().slice(11, 16);
+function syncSim() {                                          // live mode follows the real clock (Moscow time)
+  const m = msk(Date.now()); sim.day = m.toISOString().slice(0, 10); sim.hour = m.getUTCHours() + m.getUTCMinutes() / 60;
+  const di = document.getElementById("date"); if (document.activeElement !== di) di.value = sim.day;
+  document.getElementById("hour").value = sim.hour; document.getElementById("hourOut").textContent = hhmm(simNow()) + " МСК";
+}
+let haLast = "";
+function renderHA() {
+  const out = document.getElementById("haOut");
+  let html;
+  if (state.time !== "ha") html = "Ручной режим: небо не зависит от Home Assistant.";
+  else if (state.noSun) html = "sun.sun недоступен → запасной режим: день с 07:00 до 19:00 по часам панели.";
+  else {
+    const now = simNow(), { sun, moon } = haEntities(now), a = sun.attributes;
+    html = `<b>sun.sun</b> ${sun.state} · высота ${a.elevation.toFixed(1)}° · азимут ${a.azimuth.toFixed(0)}° · восход <b>${hhmm(Date.parse(a.next_rising))}</b> · закат <b>${hhmm(Date.parse(a.next_setting))}</b> · сумерки ${hhmm(Date.parse(a.next_dusk))} · <b>sensor.moon_phase</b> ${moon.state}`;
+  }
+  if (html !== haLast) { out.innerHTML = html; haLast = html; }
+}
+function syncHour() { document.getElementById("hourOut").textContent = hhmm(simNow()) + " МСК"; }
+function pressed(box, value) { for (const b of box.querySelectorAll("[data-v]")) b.setAttribute("aria-pressed", String(b.dataset.v === value)); }
+function controls() {
+  if (!["ha", "day", "night"].includes(state.time)) state.time = "ha";
+  syncSim();
+  const time = document.getElementById("time");
+  time.addEventListener("click", (e) => { const v = e.target.dataset?.v; if (!v) return; state.time = v; pressed(time, v); document.getElementById("haBox").hidden = v !== "ha"; save(); });
+  pressed(time, state.time); document.getElementById("haBox").hidden = state.time !== "ha";
+  document.getElementById("hour").addEventListener("input", (e) => { sim.live = false; sim.hour = Number(e.target.value); syncHour(); pressed(seasons, ""); });
+  document.getElementById("date").addEventListener("change", (e) => { if (!e.target.value) return; sim.live = false; sim.day = e.target.value; syncHour(); pressed(seasons, ""); });
+  const seasons = document.getElementById("seasons"), year = msk(Date.now()).getUTCFullYear();
+  for (const [label, day] of [["Сейчас", null], ["Зима", `${year}-12-22`], ["Весна", `${year}-03-20`], ["Лето", `${year}-06-21`]]) {
+    const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.textContent = label; b.dataset.v = label;
+    b.onclick = () => { if (!day) { sim.live = true; syncSim(); } else { sim.live = false; sim.day = day; document.getElementById("date").value = day; syncHour(); } pressed(seasons, label); };
+    seasons.append(b);
+  }
+  pressed(seasons, "Сейчас");
+  const noSun = document.getElementById("noSun"); noSun.checked = !!state.noSun; noSun.addEventListener("change", () => { state.noSun = noSun.checked; save(); });
+  const sw = document.getElementById("swatches");
+  for (const [name, c] of ACCENTS) { const b = document.createElement("button"); b.type = "button"; b.className = "swatch"; b.style.background = c; b.dataset.v = c; b.title = name; b.setAttribute("aria-label", name); b.onclick = () => setAccent(c); sw.append(b); }
+  document.getElementById("customColor").addEventListener("input", (e) => setAccent(e.target.value));
+  setAccent(state.accent);
+  const sizes = document.getElementById("sizes");
+  for (const [w, h] of SIZES) { const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.dataset.v = `${w}x${h}`; b.textContent = `${w}×${h}`; b.onclick = () => { state.screen = b.dataset.v; pressed(sizes, state.screen); rebuild(); }; sizes.append(b); }
+  pressed(sizes, state.screen);
+  const grid = document.getElementById("grid"); if (![59, 55.5, 53.5].includes(state.gridY)) state.gridY = 59;
+  grid.addEventListener("click", (e) => { const v = e.target.dataset?.v; if (!v) return; state.gridY = Number(v); pressed(grid, v); rebuild(); });
+  pressed(grid, String(state.gridY));
+  for (const id of ["offline", "reduced", "zoom"]) { const el = document.getElementById(id); el.checked = state[id]; el.addEventListener("change", () => { state[id] = el.checked; if (id === "zoom") rebuild(); save(); }); }
+  for (const b of document.querySelectorAll("[data-cmd]")) b.onclick = () => run(b.dataset.cmd);
+  document.getElementById("kbdPos").addEventListener("change", (e) => command(Number(e.target.value)));
+}
+function setAccent(c) {
+  state.accent = c; document.documentElement.style.setProperty("--accent", c);
+  pressed(document.getElementById("swatches"), c); maskCache.clear(); save();
+}
+controls();
+(document.fonts ? document.fonts.load(`14px "Noto Sans"`).then(() => document.fonts.load(`21px "Noto Sans"`)).catch(() => {}) : Promise.resolve()).finally(() => { rebuild(); requestAnimationFrame(frame); });
+</script>

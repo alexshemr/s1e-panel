@@ -1,0 +1,126 @@
+{
+  "format_version": 1,
+  "renderer_version": 1,
+  "id": "s1e.examples",
+  "version": 1,
+  "templates": [
+    {
+      "id": "breezer",
+      "type": "breezer",
+      "name": {
+        "ru": "Бризер",
+        "en": "breezer"
+      },
+      "blocks": [
+        "speed",
+        "modes",
+        "heater",
+        "metrics"
+      ],
+      "sizes": [
+        [
+          4,
+          6
+        ],
+        [
+          8,
+          6
+        ],
+        [
+          8,
+          8
+        ]
+      ],
+      "show_title": true
+    },
+    {
+      "id": "heater-first",
+      "type": "breezer",
+      "name": {
+        "ru": "Обогрев первым",
+        "en": "heater-first"
+      },
+      "blocks": [
+        "heater",
+        "speed",
+        "modes",
+        "metrics"
+      ],
+      "sizes": [
+        [
+          4,
+          6
+        ],
+        [
+          8,
+          6
+        ],
+        [
+          8,
+          8
+        ]
+      ],
+      "show_title": true
+    },
+    {
+      "id": "no-heater",
+      "type": "breezer",
+      "name": {
+        "ru": "Без обогрева",
+        "en": "no-heater"
+      },
+      "blocks": [
+        "speed",
+        "modes",
+        "metrics"
+      ],
+      "sizes": [
+        [
+          4,
+          6
+        ],
+        [
+          8,
+          6
+        ],
+        [
+          8,
+          8
+        ]
+      ],
+      "show_title": true
+    },
+    {
+      "id": "weather-title",
+      "type": "weather",
+      "name": {
+        "ru": "Погода с заголовком",
+        "en": "Weather with title"
+      },
+      "blocks": [
+        "current",
+        "details",
+        "forecast"
+      ],
+      "sizes": [
+        [
+          4,
+          4
+        ],
+        [
+          4,
+          6
+        ],
+        [
+          8,
+          6
+        ],
+        [
+          8,
+          8
+        ]
+      ],
+      "show_title": true
+    }
+  ]
+}

@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S1E Panel — Aqara S1E Home Assistant firmware and touch panel</title>
+<meta name="description" content="S1E Panel is custom firmware that turns the Aqara Magic Switch S1E into a fast Home Assistant touch panel: lights, curtains, climate, sensors, screensavers and notifications. Try the live demo.">
+<meta name="keywords" content="Aqara S1E Home Assistant, Aqara Magic Switch S1E, Aqara S1E custom firmware, Aqara S1E firmware, Home Assistant touch panel, Aqara S1E custom UI">
+<link rel="canonical" href="https://alexshemr.github.io/s1e-panel/">
+<link rel="alternate" hreflang="en" href="https://alexshemr.github.io/s1e-panel/">
+<link rel="alternate" hreflang="ru" href="https://alexshemr.github.io/s1e-panel/ru/">
+<meta property="og:type" content="website">
+<meta property="og:title" content="S1E Panel — Home Assistant firmware for the Aqara S1E">
+<meta property="og:description" content="Turn the Aqara Magic Switch S1E into a native Home Assistant touch panel. Try the interactive demo in your browser.">
+<meta property="og:url" content="https://alexshemr.github.io/s1e-panel/">
+<meta property="og:image" content="https://alexshemr.github.io/s1e-panel/assets/en/hero.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0b0f14">
+<link rel="icon" href="assets/icon.png">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"S1E Panel","applicationCategory":"HomeAutomation","operatingSystem":"Aqara S1E (NPD1121WSK01) Linux","description":"Custom firmware that turns the Aqara Magic Switch S1E into a native Home Assistant touch panel.","license":"https://opensource.org/licenses/MIT","url":"https://github.com/alexshemr/s1e-panel","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+</script>
+<style>
+:root{--bg:#0b0f14;--panel:#141a22;--line:#232c38;--text:#e9eef4;--muted:#9aa7b6;--accent:#ffd966;--accent2:#dfb98a;color-scheme:dark}
+:root[data-theme="light"]{--bg:#f6f4ef;--panel:#ffffff;--line:#e3ded3;--text:#1b2028;--muted:#5d6672;--accent:#b8860b;--accent2:#9b6b2f;color-scheme:light}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f6f4ef;--panel:#ffffff;--line:#e3ded3;--text:#1b2028;--muted:#5d6672;--accent:#b8860b;--accent2:#9b6b2f;color-scheme:light}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif}
+a{color:var(--accent)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+nav{display:flex;align-items:center;gap:16px;padding:16px 0;flex-wrap:wrap}
+nav .brand{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--text);text-decoration:none;margin-right:auto}
+nav .brand img{width:32px;height:32px;border-radius:8px}
+nav a{text-decoration:none;color:var(--muted);font-size:15px}
+nav a:hover{color:var(--text)}
+header{padding:40px 0 24px;text-align:center}
+h1{font-size:clamp(30px,5vw,52px);line-height:1.1;margin:0 0 16px;letter-spacing:-.02em}
+h1 span{color:var(--accent)}
+.lede{max-width:760px;margin:0 auto 28px;color:var(--muted);font-size:clamp(16px,2.2vw,19px)}
+.cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:36px}
+.btn{display:inline-block;padding:12px 22px;border-radius:999px;text-decoration:none;font-weight:600;border:1px solid var(--line);color:var(--text);background:var(--panel)}
+.btn.primary{background:var(--accent);color:#1b1608;border-color:var(--accent)}
+.hero img{width:100%;height:auto;display:block}
+h2{font-size:clamp(24px,3.4vw,34px);margin:64px 0 8px;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:0 0 24px}
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px;text-decoration:none;color:var(--text);display:flex;flex-direction:column;gap:8px}
+a.card:hover{border-color:var(--accent2)}
+.card h3{margin:0;font-size:19px}
+.card p{margin:0;color:var(--muted);font-size:15px}
+.card .go{margin-top:auto;color:var(--accent);font-weight:600;font-size:15px}
+.shots{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.shots figure{margin:0}
+.shots img{width:100%;height:auto;border-radius:20px;display:block}
+.shots figcaption{color:var(--muted);font-size:14px;margin-top:8px}
+.steps{counter-reset:s;list-style:none;padding:0;display:grid;gap:12px}
+.steps li{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px 14px 56px;position:relative}
+.steps li::before{counter-increment:s;content:counter(s);position:absolute;left:16px;top:14px;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#1b1608;font-weight:700;display:grid;place-items:center;font-size:14px}
+.note{border-left:3px solid var(--accent2);padding:12px 16px;background:var(--panel);border-radius:0 12px 12px 0;color:var(--muted);font-size:15px}
+footer{margin:72px 0 32px;color:var(--muted);font-size:14px;border-top:1px solid var(--line);padding-top:24px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips span{border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:14px;color:var(--muted);background:var(--panel)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav>
+  <a class="brand" href="./"><img src="assets/icon.png" alt="">S1E Panel</a>
+  <a href="#demo">Demo</a>
+  <a href="gallery.html">Cards</a>
+  <a href="https://github.com/alexshemr/s1e-panel/blob/main/docs/installation.md">Install</a>
+  <a href="https://github.com/alexshemr/s1e-panel">GitHub</a>
+  <a href="ru/" hreflang="ru" lang="ru">Русский</a>
+</nav>
+
+<header>
+  <h1>Your <span>Aqara S1E</span>,<br>a Home Assistant touch panel</h1>
+  <p class="lede">S1E Panel is custom firmware for the <b>Aqara Magic Switch S1E</b>. It replaces the factory interface with a fast, native dashboard for Home Assistant: your lights, curtains, climate devices and sensors — not only Aqara's — on a responsive 480 × 480 touch screen.</p>
+  <div class="cta">
+    <a class="btn primary" href="demo/stands/home-stand.html?lang=en&amp;mode=play">▶ Try the live demo</a>
+    <a class="btn" href="https://github.com/alexshemr/s1e-panel/blob/main/docs/installation.md">Install on your panel</a>
+    <a class="btn" href="https://github.com/alexshemr/s1e-panel">GitHub</a>
+  </div>
+  <div class="hero"><img src="assets/en/hero.png" width="1536" height="480" alt="Aqara S1E running S1E Panel: a Home Assistant dashboard with light, curtains, thermostat, room climate and weather; a second page with a breezer, a humidifier and a 3D printer; the animated weather screensaver"></div>
+</header>
+
+<section id="demo">
+  <h2>Try it in your browser</h2>
+  <p class="sub">No panel and no Home Assistant needed: the devices are simulated.</p>
+  <div class="grid">
+    <a class="card" href="demo/stands/home-stand.html?lang=en&amp;mode=play"><h3>Panel constructor</h3><p>A whole panel screen of live cards. Switch the light, drag the brightness, pick a colour, open the curtains, set the thermostat — then rearrange the screen your way.</p><span class="go">Open the constructor →</span></a>
+    <a class="card" href="gallery.html"><h3>Card gallery</h3><p>Every card type, interactive, in its real size on the panel, with the Home Assistant entities and options it supports.</p><span class="go">Browse the cards →</span></a>
+    <a class="card" href="demo/editor/?demo&amp;lang=en"><h3>Web editor</h3><p>The panel's real editor with demo data. Its preview is the firmware's own renderer compiled to WebAssembly — exactly what the panel draws.</p><span class="go">Open the editor →</span></a>
+  </div>
+</section>
+
+<section>
+  <h2>Why S1E Panel</h2>
+  <p class="sub">Built for Home Assistant, designed for a wall.</p>
+  <div class="grid">
+    <div class="card"><h3>A real Home Assistant panel</h3><p>Lights, curtains and roller blinds, thermostats, humidifiers, fans, breezers, room climate, switches, scenes and scripts, helpers, weather, media and a 3D printer card.</p></div>
+    <div class="card"><h3>Smooth and alive</h3><p>Native LVGL drawing and swipeable pages. The lamp glows in its colour, the curtain moves in a window with the real sky, the fan spins at its real speed.</p></div>
+    <div class="card"><h3>Arranged your way</h3><p>Several pages on an 8 × 8 grid, cards in up to 11 sizes, your colours, icons, captions and the device modes you use.</p></div>
+    <div class="card"><h3>Edit from any browser</h3><p>A web editor on the panel itself with a live preview, plus adding and moving cards right on the touch screen.</p></div>
+    <div class="card"><h3>Screensavers and messages</h3><p>Clock, live weather, home readings or your photos — or a shuffle. Home Assistant sends messages with forecasts or a doorbell camera photo.</p></div>
+    <div class="card"><h3>No tokens, safe updates</h3><p>A companion integration pairs with a tap on the panel. Updates come over Wi-Fi, signed, with automatic rollback.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>Screens from the firmware</h2>
+  <p class="sub">Rendered by S1E Panel's own renderer, at the panel's resolution.</p>
+  <div class="shots">
+    <figure><img src="assets/en/saver-rain.gif" width="480" height="480" loading="lazy" alt="Living weather screensaver with animated rain"><figcaption>Living weather screensaver</figcaption></figure>
+    <figure><img src="assets/en/screen-saver-pulse.png" width="480" height="480" loading="lazy" alt="Home essentials screensaver with six home readings"><figcaption>Home essentials</figcaption></figure>
+    <figure><img src="assets/en/screen-notification-photo.png" width="480" height="480" loading="lazy" alt="Doorbell notification with a camera photo"><figcaption>Doorbell photo from Home Assistant</figcaption></figure>
+    <figure><img src="assets/en/screen-notification-weather.png" width="480" height="480" loading="lazy" alt="Good night message with tomorrow's rainy weather"><figcaption>Weather message</figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <h2>Supported cards</h2>
+  <p class="sub">Each card adapts to its size; larger cards show more controls.</p>
+  <div class="chips">
+    <span>Light</span><span>Curtains</span><span>Roller blind</span><span>Thermostat</span><span>Humidifier</span><span>Fan</span><span>Breezer</span><span>Climate (CO₂, PM2.5, humidity…)</span><span>Switch</span><span>Relay</span><span>Scene / script</span><span>Time</span><span>Date and time</span><span>Number</span><span>Select</span><span>Text</span><span>Weather</span><span>3D printer</span><span>Media</span><span>Readings</span>
+  </div>
+  <p><a href="gallery.html">Open the card gallery →</a></p>
+</section>
+
+<section>
+  <h2>Install on your Aqara S1E</h2>
+  <p class="sub">Once through the service console, then every update over Wi-Fi.</p>
+  <ol class="steps">
+    <li><b>Check the model:</b> Aqara Magic Switch S1E, NPD1121WSK01.</li>
+    <li><b>Get console access</b> to the panel (UART) — the method by <a href="https://github.com/oopuuu/AqaraS1E-Custom-GUI">oopuuu</a> and <a href="https://github.com/niceboygithub/AqaraSmartSwitchS1E">niceboygithub</a>.</li>
+    <li><b>Run the installer</b> with the first-install bundle from the <a href="https://github.com/alexshemr/s1e-panel/releases/latest">latest release</a>. It test-starts S1E Panel before making it permanent.</li>
+    <li><b>Connect Home Assistant</b> with the <a href="https://github.com/alexshemr/ha-s1e-panel">S1E Panel integration</a> (HACS) and add your first card.</li>
+  </ol>
+  <p><a class="btn primary" href="https://github.com/alexshemr/s1e-panel/blob/main/docs/installation.md">Read the installation guide</a></p>
+  <p class="note"><b>Independent project.</b> S1E Panel is not made, endorsed or supported by Aqara or Lumi United Technology. Installing it means opening a mains-powered device and soldering to its board; it may void the warranty and, done wrong, damage the panel. You proceed at your own risk — read the <a href="https://github.com/alexshemr/s1e-panel/blob/main/docs/installation.md">safety notice</a> first.</p>
+</section>
+
+<footer>
+  <p><a href="https://github.com/alexshemr/s1e-panel/blob/main/docs/getting-started.md">Getting started</a> · <a href="https://github.com/alexshemr/s1e-panel/blob/main/docs/configuration.md">Configuration</a> · <a href="https://github.com/alexshemr/s1e-panel/blob/main/docs/architecture.md">How it works</a> · <a href="https://github.com/alexshemr/s1e-panel/blob/main/docs/troubleshooting.md">Troubleshooting</a> · <a href="https://github.com/alexshemr/s1e-panel/blob/main/API.md">API</a> · <a href="https://github.com/alexshemr/s1e-panel/blob/main/docs/credits.md">Credits &amp; licenses</a></p>
+  <p>S1E Panel — MIT License. Console access to the S1E was pioneered by oopuuu and niceboygithub. Aqara is a trademark of Lumi United Technology; this project is not affiliated with it.</p>
+</footer>
+</div>
+</body>
+</html>

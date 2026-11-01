@@ -1,0 +1,722 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Стенд заставок S1E</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&family=Noto+Sans+Display:wght@500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: same workbench as the card stands — sticky controls, the panel screen "now" beside "proposed", all four savers below. */
+:root {
+  --page: #0b0e12;
+  --tray: #101317;
+  --raised: #171b21;
+  --line: #2a3039;
+  --text: #f3f0e9;
+  --muted: #9da2aa;
+  --accent: #dfb98a;
+  --display: "Noto Sans Display", "Noto Sans", system-ui, sans-serif;
+  --body: "Noto Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  color-scheme: dark;
+  box-sizing: border-box; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+html, body { margin: 0; background: var(--page); color: var(--text); }
+body { font-family: var(--body); font-size: 14px; line-height: 1.5; }
+.wrap { max-width: 1480px; margin: 0 auto; padding-block: 20px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 18px; }
+header { display: grid; gap: 4px; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+h1 { font-family: var(--display); font-weight: 600; font-size: clamp(24px, 3vw, 32px); line-height: 1.15; margin: 0; text-wrap: balance; }
+.lede { color: var(--muted); max-width: 80ch; margin: 0; }
+.controls { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px); padding-block: 10px; border-bottom: 1px solid var(--line); display: grid; gap: 10px; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--page); }
+.row { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+.group { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.label { font-size: 12px; color: var(--muted); margin-right: 2px; }
+.seg { display: inline-flex; flex-wrap: wrap; background: var(--raised); border: 1px solid var(--line); border-radius: 10px; padding: 2px; }
+.seg button { font: inherit; font-size: 13px; color: var(--muted); background: none; border: 0; border-radius: 8px; padding: 4px 12px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: #2c3037; color: var(--text); }
+.chip { font: inherit; font-size: 13px; color: var(--text); background: var(--raised); border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; cursor: pointer; font-variant-numeric: tabular-nums; }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #17130e; font-weight: 600; }
+.swatch { width: 26px; height: 26px; border-radius: 50%; border: 2px solid transparent; outline: 1px solid var(--line); cursor: pointer; padding: 0; }
+.swatch[aria-pressed="true"] { border-color: var(--text); }
+.switch { display: inline-flex; gap: 8px; align-items: center; font-size: 13px; cursor: pointer; }
+.switch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.switch span { width: 34px; height: 20px; border-radius: 999px; background: var(--line); position: relative; transition: background .15s; }
+.switch span::after { content: ""; position: absolute; left: 3px; top: 3px; width: 14px; height: 14px; border-radius: 50%; background: var(--text); transition: transform .15s; }
+.switch input:checked + span { background: var(--accent); }
+.switch input:checked + span::after { transform: translateX(14px); background: #17130e; }
+input[type=range] { accent-color: var(--accent); }
+.text { font: inherit; font-size: 13px; color: var(--text); background: var(--raised); border: 1px solid var(--line); border-radius: 10px; padding: 4px 10px; width: 180px; }
+.readout { font-family: var(--mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.ha { font-family: var(--mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.ha b { color: var(--text); font-weight: 500; }
+.chip:focus-visible, .seg button:focus-visible, .swatch:focus-visible, .switch input:focus-visible + span, .text:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.bench { display: grid; grid-template-columns: minmax(0, 520px) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 1100px) { .bench { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 700px) { .controls { position: static; backdrop-filter: none; } }
+.device { background: #05070a; border: 1px solid var(--line); border-radius: 22px; padding: 20px; display: grid; gap: 10px; justify-items: center; }
+.device canvas { width: 100%; max-width: 480px; aspect-ratio: 1; display: block; touch-action: none; }
+.caption { font-family: var(--mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; text-align: center; }
+.kbd { display: grid; grid-template-columns: auto 1fr auto; gap: 6px 10px; align-items: center; width: 100%; max-width: 440px; font-size: 12px; color: var(--muted); }
+.kbd input { width: 100%; }
+.kbd output { font-family: var(--mono); color: var(--text); min-width: 9ch; text-align: right; font-variant-numeric: tabular-nums; }
+.tray { background: var(--tray); border: 1px solid var(--line); border-radius: 18px; padding: 18px; display: flex; flex-wrap: wrap; gap: 22px 16px; align-items: flex-start; min-width: 0; }
+figure { margin: 0; display: grid; gap: 6px; min-width: 0; max-width: 100%; }
+figure canvas { display: block; max-width: 100%; height: auto; touch-action: none; }
+figcaption { font-family: var(--mono); font-size: 12px; color: var(--muted); display: flex; gap: 8px; font-variant-numeric: tabular-nums; }
+figcaption b { color: var(--text); font-weight: 500; }
+.note { color: var(--muted); font-size: 13px; max-width: 92ch; margin: 0; }
+.note strong { color: var(--text); font-weight: 500; }
+.kbd2 { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; justify-content: center; font-size: 12px; color: var(--muted); }
+.kbd2 label { display: inline-flex; gap: 6px; align-items: center; }
+.kbd2 input, .kbd2 button { font: inherit; font-size: 13px; color: var(--text); background: #2c3037; border: 0; border-radius: 12px; min-height: 36px; padding: 0 12px; color-scheme: dark; }
+.kbd2 button { cursor: pointer; }
+.log { font-family: var(--mono); font-size: 12px; color: var(--muted); min-height: 1.5em; text-align: center; }
+.norms { border-collapse: collapse; font-size: 13px; color: var(--muted); }
+.norms th, .norms td { text-align: left; padding: 4px 14px 4px 0; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.norms th { color: var(--text); font-weight: 500; }
+@media (prefers-reduced-motion: reduce) { .switch span, .switch span::after { transition: none; } }
+
+[hidden] { display: none !important; }
+.kbd2 select { font: inherit; font-size: 13px; color: var(--text); background: #2c3037; border: 0; border-radius: 10px; min-height: 30px; padding: 0 10px; color-scheme: dark; }
+.pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 520px)); gap: 18px; }
+.check { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+#tray figure canvas { border-radius: 6px; }
+</style>
+
+<div class="wrap">
+  <header>
+    <a class="eyebrow" href="index.html" style="color:inherit;text-decoration:none">← Все стенды</a>
+    <div class="eyebrow">Aqara S1E · заставки</div>
+    <h1>Заставки</h1>
+    <p class="lede">Четыре заставки панели. <strong>Только время</strong> — крупные часы и дата, после даты значок погоды и температура на улице. <strong>Пульс дома</strong> — часы и до шести датчиков дома: у каждого цвет и слово по нормам, как на карточке «Микроклимат» («Влажность: сухо», «PM2.5 превышен», «Дверь открыта»), сверху общий вывод. <strong>Живая погода</strong> — анимированное небо, погода на улице и блок «Дома» в тех же цветах норм. <strong>Любимый момент</strong> — ваше фото с часами, датой и погодой.</p>
+  </header>
+
+  <section class="controls" aria-label="Параметры">
+    <div class="row">
+      <div class="group"><span class="label">Заставка</span><div class="seg" id="variant"><button type="button" data-v="clock">Только время</button><button type="button" data-v="sensors">Пульс дома</button><button type="button" data-v="weather">Живая погода</button><button type="button" data-v="photo">Любимый момент</button></div></div>
+      <div class="group" id="g-bg"><span class="label">Фон</span><div class="seg" id="bgSeg"><button type="button" data-v="dark">Без фото</button><button type="button" data-v="photo">Фото</button></div></div>
+    </div>
+    <div class="row">
+      <div class="group" id="g-scene"><span class="label">Дома</span><div class="seg" id="sceneSeg"><button type="button" data-v="ok">Всё в норме</button><button type="button" data-v="stuffy">Душно</button><button type="button" data-v="smog">Смог</button><button type="button" data-v="dry">Отопление, сухо</button></div>
+        <label class="switch"><input type="checkbox" id="door"><span></span>Дверь открыта</label><label class="switch"><input type="checkbox" id="leak"><span></span>Протечка</label></div>
+    </div>
+    <div class="row">
+      <div class="group" id="g-pulse"><span class="label">Датчики пульса, до 6</span><span class="group" id="pulseChips"></span></div>
+      <div class="group" id="g-weather"><span class="label">Датчики «Дома», до 4</span><span class="group" id="weatherChips"></span>
+</div>
+      <div class="group" id="g-cond"><span class="label">Погода</span><span class="kbd2"><select id="cond"></select></span><div class="seg" id="timeSeg"><button type="button" data-v="day">День</button><button type="button" data-v="night">Ночь</button></div></div>
+      <label class="switch"><input type="checkbox" id="reduced"><span></span>Меньше движения</label>
+      <span class="readout" id="msg"></span>
+    </div>
+  </section>
+
+  <main class="bench">
+    <div class="device"><canvas id="new" width="480" height="480" aria-label="Экран панели с заставкой"></canvas><div class="caption" id="newCap"></div></div>
+    <div class="tray" id="tray"></div>
+  </main>
+</div>
+<!-- embed-bridge -->
+<script>
+/* ---------- constructor bridge (tools/stand_bridge): lets home-stand.html host this stand as a widget ----------
+   Does nothing unless the page is opened as home-stand.html?embed=<id>&size=<WxH>&lang=<ru|en>.
+   Card mode shows only the card cut from the panel screen; settings mode shows the stand's own controls.
+   Settings are stored per widget (localStorage keys get "@<id>"), panel text is translated on the canvas.
+   A stand opened on its own with ?lang=en (the public demo) gets only the translation. */
+(() => {
+  const q = new URLSearchParams(location.search), id = q.get("embed"), solo = !id && q.get("lang") === "en";
+  if (!id && !solo) return;
+  const E = window.EMBED = { id, size: q.get("size") || "", lang: q.get("lang") === "en" ? "en" : "ru", mode: "card", solo };
+  const root = document.documentElement;
+  if (id) root.classList.add("embed", "embed-card");
+
+  /* each widget keeps its own settings */
+  if (id) try {
+    const S = Storage.prototype, gi = S.getItem, si = S.setItem;
+    S.getItem = function (k) { return gi.call(this, `${k}@${id}`); };
+    S.setItem = function (k, v) { return si.call(this, `${k}@${id}`, v); };
+  } catch (e) {}
+
+  /* panel language: Russian strings are translated where they are drawn */
+  const DICT = {"% · цвет":"% · color","(локально, без HA)":"(local, without HA)","(режим дома) и":"(home mode) and","(уставка бойлера, громкость),":"(water heater setpoint, volume),","+ температура":"+ temperature","+ цвет":"+ color",", фаза луны из":", moon phase from",", шаг":", step","1 вне нормы":"1 out of range","3 ступени":"3 steps","3D-принтер":"3D printer","4 ступени":"4 steps",": ошибка отрисовки":": render error",": текст «":": text «","CO₂ высокий":"CO₂ high","CO₂ повышен":"CO₂ elevated","HA подтвердил:":"HA confirmed:","HA подтвердил: print_status =":"HA confirmed: print_status =","HA подтвердил: печать прервана, принтер свободен":"HA confirmed: print cancelled, printer idle","HA подтвердил: цель":"HA confirmed: target","HA: время изменено извне →":"HA: time changed externally →","HA: дата изменена извне →":"HA: date changed externally →","PLA · 38 г":"PLA · 38 g","PM1 высокий":"PM1 high","PM1 превышен":"PM1 exceeded","PM2.5 высокий":"PM2.5 high","PM2.5 превышен":"PM2.5 exceeded","TVOC высокий":"TVOC high","TVOC повышен":"TVOC elevated","box: − и +":"box: − and +","sun.sun недоступен → запасной режим: день с 07:00 до 19:00 по часам панели.":"sun.sun unavailable → fallback: day from 07:00 to 19:00 by the panel clock.","«Время»":"«Time»","°   ·   Влажность 81 %":"°   ·   Humidity 81 %","° · азимут":"° · azimuth","° · восход":"° · sunrise","·  ещё":"·  more","· без HA":"· without HA","· высота":"· elevation","· ещё":"· more","· закат":"· sunset","· обогрев":"· heating","· по нажатию":"· on tap","· по расписанию":"· on schedule","· реле":"· relay","· сейчас":"· now","· сумерки":"· twilight","» выходит за":"» goes beyond","» выходит за карточку":"» goes beyond the card","Абажур":"Shade lamp","Авто":"Auto","Акцент":"Accent","Акцент интерфейса":"Interface accent","Без датчика":"No sensor","Без заголовка":"No title","Без названия":"Untitled","Без фото":"No photo","Белый PLA":"White PLA","Бирюза":"Teal","Бойлер":"Water heater","Бойлер 40…75 °C":"Water heater 40…75 °C","Бра":"Sconce","Бриз":"Breeze","Бризер":"Breezer","Бризер выключен":"Breezer off","Будильник":"Alarm","В комнате":"In the room","Вариантов":"Options","Вентилятор":"Fan","Вентилятор выключен":"Fan off","Весна":"Spring","Ветер и облака":"Wind and clouds","Ветрено":"Windy","Вечер":"Evening","Вид":"View","Вкл":"On","Вкл / выкл":"On / off","Включается…":"Turning on…","Включить":"Turn on","Включён":"On","Включён ·":"On ·","Включён · обогрев":"On · heating","Вкл…":"On…","Влажн.":"Hum.","Влажно":"Humid","Влажность":"Humidity","Влажность в комнате":"Room humidity","Влажность: влажно":"Humidity: humid","Влажность: очень сухо":"Humidity: very dry","Влажность: сухо":"Humidity: dry","Влажность: сыро":"Humidity: damp","Вода":"Water","Вода есть":"Water OK","Вода!":"Water!","Воздух":"Air","Воздух в комнате":"Room air","Волны":"Waves","Время":"Time","Время в HA":"Time in HA","Время по Москве":"Moscow time","Время суток":"Time of day","Все блоки скрыты: остались лампа и питание":"All blocks hidden: lamp and power remain","Все погоды":"All weathers","Все размеры":"All sizes","Всё в норме":"All normal","Вт":"W","Выберите датчики в веб-интерфейсе":"Select sensors in the web interface","Выбор":"Select","Выкл":"Off","Выкл · Обогрев":"Off · Heat","Выкл · Обогрев · Авто":"Off · Heat · Auto","Выкл.":"Off","Выключается…":"Turning off…","Выключатель":"Switch","Выключен":"Off","Выключить":"Turn off","Выкл…":"Off…","Выполняется…":"Running…","Высокий":"High","Гости":"Guests","Гости дома":"Guests home","Гостиная":"Living room","Готово":"Done","Град":"Hail","Греет":"Heating","Греет до":"Heating to","Гроза":"Thunderstorm","Гроза с дождём":"Thunderstorm, rain","Громкость":"Volume","Громкость 0…100 %, шаг 5":"Volume 0…100 %, step 5","Громкость оповещений":"Notification volume","Грязно":"Polluted","Дата":"Date","Дата в HA":"Date in HA","Дату и время":"Date and time","Датчик":"Sensor","Датчики":"Sensors","Датчики «Дома», до 4":"«Home» sensors, up to 4","Датчики на карточке":"Sensors on card","Датчики не выбраны":"No sensors selected","Датчики пульса, до 6":"Pulse sensors, up to 6","Дверь":"Door","Дверь открыта":"Door open","Действие":"Action","День":"Day","Держит":"Holding","Держите…":"Hold…","Дождь":"Rain","Долить воду":"Refill water","Дом":"Home","Дома":"Home","Дома всё в норме":"All normal at home","Душно":"Stuffy","Ед.":"Unit","Есть обогрев":"Has heater","Есть режимы":"Has effects","Жарко":"Hot","Ждёт":"Waiting","Ждёт · держит":"Waiting · holding","Живая погода":"Live weather","Заголовок":"Title","Задача":"Job","Зажмите и ведите":"Press and drag","Закрываются":"Closing","Закрыта":"Closed","Закрыто":"Closed","Закрыть":"Close","Замер мощности":"Power reading","Запуск":"Start","Запустить":"Run","Заставка":"Screensaver","Заставка:":"Screensaver:","Заставки":"Screensavers","Защита: удерживать":"Protection: hold","Зима":"Winter","Значение в Home Assistant":"Value in Home Assistant","Значения датчиков":"Sensor values","Зоны":"Zones","Идёт…":"Running…","Избранное":"Favorite","Иконка":"Icon","Иконка обогрева":"Heater icon","Какие сущности читает карточка":"Entities the card reads","Калибровка стола":"Bed leveling","Камера":"Camera","Камера недоступна":"Camera unavailable","Камин":"Fireplace","Картинка модели":"Model image","Карточка":"Card","Карточка света":"Light card","Карточка штор":"Curtain card","Качание":"Oscillation","Кельвины":"Kelvin","Кнопка":"Button","Кнопка HA":"HA button","Комфорт":"Comfort","Коралл":"Coral","Коснитесь, чтобы открыть дом":"Tap to open home","Котёл":"Boiler","Красный PETG":"Red PETG","Курьер приедет после 18:00 — позвоните в домофон 24, код подъезда 4512":"Courier arrives after 18:00 — ring intercom 24, entrance code 4512","Лампа":"Lamp","Лампа выключена":"Lamp off","Лампа умеет":"Lamp supports","Лампочка":"Bulb","Лето":"Summer","Ливень":"Pouring","Лист":"Leaf","Любимый момент":"Favorite moment","Люстра":"Chandelier","МСК":"MSK","Меньше движения":"Reduce motion","Микроклимат":"Climate","Модель":"Model","Мокрый снег":"Sleet","Мята":"Mint","Мятный PLA":"Mint PLA","На карточке":"On card","На экране":"On screen","Нагрев бойлера":"Water heater heating","Нагрев сопла":"Heating nozzle","Нагрев стола":"Heating bed","Название":"Name","Напольный вентилятор в кабинете":"Floor fan in the study","Направление":"Direction","Настольная":"Desk","Настольная лампа":"Desk lamp","Не греет":"Not heating","Не греет · держит":"Not heating · holding","Не дома":"Away","Не удалось запустить движок:":"Failed to start the engine:","Небо":"Sky","Нейтральный белый":"Neutral white","Нет":"No","Нет sun.sun":"No sun.sun","Нет воды":"No water","Нет воды — долейте":"No water — refill","Нет данных":"No data","Нет датчиков":"No sensors","Нет задачи":"No job","Нет связи":"Offline","Нет связи с HA":"No connection to HA","Норма":"Normal","Норма 20–24 °C":"Normal 20–24 °C","Норма 40–60 %":"Normal 40–60 %","Норма до 10 мкг/м³":"Normal up to 10 µg/m³","Норма до 15 мкг/м³":"Normal up to 15 µg/m³","Норма до 15 мкг/м³ (ВОЗ, за сутки)":"Normal up to 15 µg/m³ (WHO, daily)","Норма до 220 ppb":"Normal up to 220 ppb","Норма до 800 ppm":"Normal up to 800 ppm","Норма до 800 ppm, выше 1200 — проветрить":"Normal up to 800 ppm, above 1200 — ventilate","Норма ≤ 10":"Normal ≤ 10","Норма ≤ 15":"Normal ≤ 15","Норма ≤ 220":"Normal ≤ 220","Норма ≤ 800":"Normal ≤ 800","Нормы датчиков":"Sensor norms","Ночник":"Night light","Ночь":"Night","Облачно":"Cloudy","Обогрев":"Heating","Обратно":"Reverse","Обычный":"Normal","Огонь":"Fire","Одна карточка для всего, что включается одним касанием:":"One card for anything that switches with one tap:","Ожидание":"Idle","Оранжевый PLA":"Orange PLA","Органайзер для отвёрток":"Screwdriver organizer","Особые условия":"Exceptional","Останавливаем…":"Stopping…","Открываются":"Opening","Открыта":"Open","Открыто":"Open","Открыто на":"Open","Открыть":"Open","Отмена":"Cancel","Отменено":"Cancelled","Отопление":"Heating","Отопление, сухо":"Heating, dry","Отправка…":"Sending…","Отпуск":"Vacation","Оттенок":"Hue","Очень длинное название кнопки":"A very long button name","Очень длинное название комнаты":"A very long room name","Очень сухо":"Very dry","Оченьдлинноесловобезпробеловкотороенепомещаетсявстроку и ещё немного текста после него":"Averyverylongwordwithoutspacesthatdoesnotfitintheline and a bit more text after it","Очистка сопла":"Cleaning nozzle","Ошибка":"Error","Ошибка печати":"Print error","Ощущается как":"Feels like","Параметры":"Settings","Пауза":"Pause","Переменная облачность":"Partly cloudy","Песок":"Sand","Печать":"Printing","Печать идёт (×60)":"Printing (×60)","Плавно, %":"Smooth, %","План 59 × 55,5":"Plan 59 × 55.5","Пластик":"Filament","Плоское бра":"Flat sconce","Повышен":"Elevated","Погода":"Weather","Подача":"Airflow","Подача · авто":"Airflow · auto","Подача воздуха ·":"Airflow ·","Подготовка":"Preparing","Показывает значение":"Shows the value","Положение рулонной шторы, % открытия":"Roller blind position, % open","Положение шторы, % открытия":"Curtain position, % open","Потолочный":"Ceiling","Потолочный (контур)":"Ceiling (outline)","Потолочный свет":"Ceiling light","Правка времени: ведите вверх или вниз":"Edit time: drag up or down","Правка даты: ведите вверх или вниз":"Edit date: drag up or down","Превышен":"Exceeded","Пресет":"Preset","Пресеты (Комфорт, Эко, Не дома)":"Presets (Comfort, Eco, Away)","Пример":"Example","Принтер":"Printer","Приоткрыто":"Ajar","Прогресс":"Progress","Продолжаем…":"Resuming…","Продолжить":"Resume","Протечка":"Leak","Протечка!":"Leak!","Прохладно":"Cool","Прошивка 59 × 53,5":"Firmware 59 × 53.5","Прямо":"Forward","Пульс дома":"Home pulse","Пусто":"Empty","Радиатор":"Radiator","Радуга":"Rainbow","Размер":"Size","Рассвет":"Sunrise","Режим":"Mode","Режим «":"Mode «","Режим дома":"Home mode","Режимы":"Modes","Режимы (Авто, Сон, Турбо)":"Modes (Auto, Sleep, Turbo)","Режимы Бриз и Сон":"Breeze and Sleep modes","Реле":"Relay","Реле панели":"Panel relay","Рулонная штора":"Roller blind","Русский":"Russian","Ручной":"Manual","Ручной режим: небо не зависит от Home Assistant.":"Manual mode: the sky ignores Home Assistant.","Свежо":"Fresh","Свет":"Light","Свеча":"Candle","Свой цвет":"Custom color","Свой цвет акцента":"Custom accent color","Сейчас":"Now","Сейчас в комнате":"Now in the room","Серый PLA":"Grey PLA","Сетка":"Grid","Синий PLA":"Blue PLA","Скорости":"Speeds","Скорость":"Speed","Скорость, %":"Speed, %","Скрипт":"Script","Служебная карточка":"Helper card","Смог":"Smog","Смог за окном":"Smog outside","Снег":"Snow","Сон":"Sleep","Сообщение":"Message","Сохраняется…":"Saving…","Ставим на паузу…":"Pausing…","Стенд 59 × 59":"Stand 59 × 59","Стоп":"Stop","Суббота, 31 октября, ☁ 9°":"Saturday, 31 October, ☁ 9°","Сухо":"Dry","Сущность":"Entity","Сущность содержит":"Entity contains","Сцена":"Scene","Сыро":"Damp","Текст":"Text","Текст в HA":"Text in HA","Темп.":"Temp.","Температура":"Temperature","Температура: жарко":"Temperature: hot","Температура: прохладно":"Temperature: cool","Температура: тепло":"Temperature: warm","Температура: холодно":"Temperature: cold","Тепло":"Warm","Термостат":"Thermostat","Тип":"Type","Только «нет воды»":"Only «no water»","Только время":"Time only","Только дату":"Date only","Только чтение":"Read only","Торшер":"Floor lamp","Туман":"Fog","Турбо":"Turbo","Тёплый белый":"Warm white","Тёплый пол":"Floor heating","Увеличить ×2":"Zoom ×2","Увлажнитель":"Humidifier","Увлажнитель в детской спальне":"Humidifier in the nursery","Увлажняет":"Humidifying","Увлажняет до":"Humidifying to","Удерживайте":"Hold","Удерживайте «Стоп», чтобы прервать печать":"Hold «Stop» to cancel the print","Удерживайте, чтобы":"Hold to","Удерживайте, чтобы изменить":"Hold to change","Умеренно":"Moderate","Управление с клавиатуры":"Keyboard control","Уровень, %":"Level, %","Ушёл":"Away","Фиалка":"Violet","Флажок HA":"HA toggle","Фон":"Background","Фото":"Photo","Холодно":"Cold","Холодный белый":"Cool white","Цвет":"Color","Цвет пластика":"Filament color","Цвет шторы":"Curtain color","Цветной свет":"Colored light","Цель":"Target","Чайник":"Kettle","Чем греет":"Heat source","Число":"Number","Число, выбор, текст":"Number, select, text","Чисто":"Clean","Чтение":"Reading","Шаг":"Step","Штора":"Curtain","Шторы":"Curtains","Эко":"Eco","Язык панели":"Panel language","Яркость":"Brightness","Яркость лампы":"Lamp brightness","Ясная ночь":"Clear night","Ясно":"Clear","авг":"Aug","августа":"August","апр":"Apr","апреля":"April","бак долит":"tank refilled","в баке нет воды — увлажнитель остановился":"tank is empty — humidifier stopped","вес модели, г":"model weight, g","вне нормы":"out of range","воскресенье":"Sunday","вс":"Sun","всего слоёв":"total layers","всё в норме":"all normal","вт":"Tue","вторник":"Tuesday","вчера":"yesterday","выкл":"off","выключен":"off","выше цели на":"above target by","готово в":"done at","греет":"heating","датчики не выбраны":"no sensors selected","движок неба не запустился:":"sky engine failed to start:","дек":"Dec","декабря":"December","дн.":"d","до":"to","до цели":"to target","другие размеры недоступны":"other sizes unavailable","ещё":"more","ещё N":"N more","за":"in","за пределами карточки":"outside the card","завтра":"tomorrow","запустить":"run","засор сопла":"nozzle clog","заставка":"screensaver","и":"and","из":"of","изменено":"changed","изображение с камеры":"camera image","июл":"Jul","июля":"July","июн":"Jun","июня":"June","кВт":"kW","как задано":"as set","камера на весь экран: camera.":"camera full screen: camera.","камера недоступна":"camera unavailable","картинка модели из слайсера":"model image from the slicer","карточка":"card","качание":"oscillation","когда закончится":"when it ends","лампа не умеет:":"lamp can't do:","мар":"Mar","марта":"March","мая":"May","меньше 44 × 44 (":"smaller than 44 × 44 (","мин":"min","мин назад":"min ago","мин назад ·":"min ago ·","мкг/м³":"µg/m³","мс/кадр ·":"ms/frame ·","название модели (Task name)":"model name (Task name)","не больше":"at most","не греет":"not heating","нет воды":"no water","нет задачи":"no job","нет ответа от HA — состояние возвращено":"no reply from HA — state reverted","нет связи — цель не отправлена":"offline — target not sent","новый":"new","ноя":"Nov","ноября":"November","обратно":"reverse","окт":"Oct","октября":"October","осталось":"left","осталось, мин":"left, min","панели":"panel","пауза":"paused","переключить":"toggle","перекрываются":"overlap","плитку":"tile","плитку «Дома»":"the «Home» tile","пн":"Mon","подтвердил:":"confirmed:","понедельник":"Monday","прогресс, %":"progress, %","продолжить":"resume","пт":"Fri","пульс":"pulse","пятница":"Friday","реле":"relay","сб":"Sat","сб, 31 окт":"Sat, 31 Oct","сегодня":"today","сейчас":"now","сен":"Sep","сентября":"September","скрипт завершён":"script finished","слой":"layer","служебные карточки":"helper cards","сопло":"nozzle","сопло, °C (и nozzle_target_temperature)":"nozzle, °C (and nozzle_target_temperature)","ср":"Wed","среда":"Wednesday","стол":"bed","стол, °C (и bed_target_temperature)":"bed, °C (and bed_target_temperature)","стоп (на карточке — удержанием)":"stop (on the card — by holding)","суббота":"Saturday","суббота, 31 октября":"Saturday, 31 October","суббота, 31 октября 2026":"Saturday, 31 October 2026","сцен":"scenes","текущий слой":"current layer","у этого типа только эти размеры":"this type has only these sizes","фев":"Feb","февраля":"February","фон в браузере:":"background in browser:","цель":"target","ч":"h","через":"in","четверг":"Thursday","чт":"Thu","что делает принтер: idle, prepare, running, pause, finish, failed":"what the printer is doing: idle, prepare, running, pause, finish, failed","экран":"screen","этап: нагрев стола, калибровка, печать…":"stage: heating bed, leveling, printing…","янв":"Jan","января":"January","— ваше фото с часами, датой и погодой.":"— your photo with clock, date and weather.","← Все стенды":"← All stands"};
+  const CYR = /[А-Яа-яЁё]/, keys = Object.keys(DICT).sort((a, b) => b.length - a.length);
+  const lower = new Map(keys.map((k) => [k.toLowerCase(), DICT[k]]));
+  const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const RE = keys.length ? new RegExp(`(?<![А-Яа-яЁё])(?:${keys.map(esc).join("|")})(?![А-Яа-яЁё])`, "giu") : null;
+  const cap = (src, out) => {
+    if (!out) return src;
+    const up = src[0] !== src[0].toLowerCase(), outUp = out[0] !== out[0].toLowerCase();
+    return up && !outUp ? out[0].toUpperCase() + out.slice(1) : !up && outUp && src[0] !== src[0].toUpperCase() ? out[0].toLowerCase() + out.slice(1) : out;
+  };
+  const cache = new Map();
+  const tr = E.tr = (s) => {
+    if (E.lang !== "en" || typeof s !== "string" || !s) return s;
+    let v = cache.get(s);
+    if (v !== undefined) return v;
+    v = s;
+    if (CYR.test(v)) v = DICT[v] ?? (RE ? v.replace(RE, (m) => DICT[m] ?? cap(m, lower.get(m.toLowerCase()))) : v);
+    v = v.replace(/«/g, "“").replace(/»/g, "”").replace(/(\d),(\d)/g, "$1.$2");
+    if (cache.size > 5000) cache.clear();
+    cache.set(s, v);
+    return v;
+  };
+  for (const P of [window.CanvasRenderingContext2D, window.OffscreenCanvasRenderingContext2D]) {
+    if (!P) continue;
+    for (const m of ["fillText", "strokeText", "measureText"]) {
+      const o = P.prototype[m];
+      P.prototype[m] = function (t, ...a) { return o.call(this, tr(t), ...a); };
+    }
+  }
+
+  /* the stand's own controls (settings mode) in the panel language: text nodes and titles, originals kept */
+  const seen = new WeakMap();                                  // node → { o: original, w: what we wrote }
+  const ATTRS = ["title", "aria-label", "placeholder"];
+  const trText = (s) => { const m = /^(\s*)([\s\S]*?)(\s*)$/.exec(s); return m[1] + tr(m[2]) + m[3]; };
+  const SKIP = /^(SCRIPT|STYLE|TEXTAREA|NOSCRIPT)$/;
+  function domText(n) {
+    if (!n.parentNode || SKIP.test(n.parentNode.nodeName)) return;
+    let r = seen.get(n);
+    if (!r || n.nodeValue !== r.w) { if (!CYR.test(n.nodeValue)) { seen.delete(n); return; } r = { o: n.nodeValue }; seen.set(n, r); }
+    const v = E.lang === "en" ? trText(r.o) : r.o;
+    r.w = v;
+    if (n.nodeValue !== v) n.nodeValue = v;
+  }
+  function domAttrs(el) {
+    for (const a of ATTRS) {
+      if (!el.hasAttribute(a)) continue;
+      const k = "__tr_" + a, cur = el.getAttribute(a);
+      let r = el[k];
+      if (!r || cur !== r.w) { if (!CYR.test(cur)) continue; r = el[k] = { o: cur }; }
+      r.w = E.lang === "en" ? trText(r.o) : r.o;
+      if (cur !== r.w) el.setAttribute(a, r.w);
+    }
+  }
+  function domWalk(root0) {
+    if (!root0) return;
+    if (root0.nodeType === 3) return domText(root0);
+    if (root0.nodeType !== 1 || SKIP.test(root0.tagName)) return;
+    domAttrs(root0);
+    const it = document.createTreeWalker(root0, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT, { acceptNode: (n) => n.nodeType === 1 && SKIP.test(n.tagName) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT });
+    for (let n = it.nextNode(); n; n = it.nextNode()) n.nodeType === 3 ? domText(n) : domAttrs(n);
+  }
+  const domAll = () => { domWalk(document.body); if (document.documentElement.lang) document.documentElement.lang = E.lang; };
+  new MutationObserver((list) => {
+    for (const m of list) {
+      if (m.type === "characterData") domText(m.target);
+      else if (m.type === "attributes") domAttrs(m.target);
+      else for (const n of m.addedNodes) domWalk(n);
+    }
+  }).observe(root, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ATTRS });
+
+  /* layout of the iframe */
+  const css = document.createElement("style");
+  css.textContent = `
+html.embed, html.embed body { background: transparent !important; margin: 0; }
+html.embed body::before { display: none !important; }
+html.embed .embed-hide, html.embed .tray, html.embed .kbd, html.embed .kbd2, html.embed .caption { display: none !important; }
+html.embed .device canvas { border-radius: 0 !important; }
+html.embed-card, html.embed-card body { overflow: hidden !important; width: 100%; height: 100%; }
+html.embed-card .wrap { display: block !important; padding: 0 !important; margin: 0 !important; max-width: none !important; }
+html.embed-card .wrap > :not(.bench) { display: none !important; }
+html.embed-card .bench { display: block !important; }
+html.embed-card .device { display: block !important; padding: 0 !important; border: 0 !important; border-radius: 0 !important; background: none !important; }
+html.embed-card .device > :not(canvas) { display: none !important; }
+html.embed-card .device canvas { position: fixed !important; left: var(--ex, 0px); top: var(--ey, 0px); width: var(--ew, 480px) !important; max-width: none !important; height: auto !important; aspect-ratio: auto !important; }
+html.embed-settings body { overflow: auto; }
+html.embed-settings .wrap { max-width: none !important; padding: 14px 18px 24px !important; gap: 14px !important; }
+html.embed-settings .wrap > :not(.controls):not(.bench) { display: none !important; }
+html.embed-settings .controls { position: static !important; backdrop-filter: none !important; background: none !important; padding-top: 0 !important; }
+html.embed-settings .bench { display: flex !important; justify-content: center; }
+html.embed-settings .device { width: fit-content; max-width: 100%; box-sizing: border-box; }
+html.embed-settings .device canvas { width: var(--sw, 480px) !important; max-width: 100% !important; height: auto !important; aspect-ratio: auto !important; }
+`;
+  (document.head || root).append(css);
+
+  const $ = (s) => document.querySelector(s);
+  const sizeBox = () => document.getElementById("sizes");
+  const canvas = () => $(".device canvas");
+  const fullScreen = (s) => s === "screen" || s === "saver";
+  function sizes() {
+    const box = sizeBox();
+    if (!box) return ["screen"];                               // the screensaver stand: whole panel
+    return [...box.querySelectorAll("[data-v]")].map((b) => b.dataset.v).filter((v) => /^\d+x\d+$/.test(v) || v === "saver");
+  }
+  function current() {
+    try { if (typeof state === "object" && state) return state.screen || state.size || "screen"; } catch (e) {}
+    return E.size;
+  }
+  function applySize(s) {
+    if (!s || s === current()) return;
+    const b = sizeBox() && [...sizeBox().querySelectorAll("[data-v]")].find((x) => x.dataset.v === s);
+    if (b) b.click();
+  }
+  function geometry() {
+    const cv = canvas(), s = current();
+    if (!cv) return;
+    const screenCanvas = cv.id === "screen";                   // card stands draw the card at (8, 8) on the 480 × 480 screen
+    root.style.setProperty("--ex", screenCanvas && !fullScreen(s) ? "-8px" : "0px");
+    root.style.setProperty("--ey", screenCanvas && !fullScreen(s) ? "-8px" : "0px");
+    const w = screenCanvas ? 480 : cv.width;
+    root.style.setProperty("--ew", w + "px");
+    root.style.setProperty("--sw", w + "px");
+  }
+  function applyLang() {
+    cache.clear();
+    domAll();
+    const box = document.getElementById("lang");                // weather stand: the text layers come in both languages
+    const b = box && box.querySelector(`[data-v="${E.lang}"]`);
+    if (b) { if (b.getAttribute("aria-pressed") !== "true") b.click(); return; }
+    try { if (typeof window.rebuild === "function") window.rebuild(); } catch (e) {}
+  }
+  function hideStandOnly() {
+    for (const id of ["sizes", "lang", "view", "zoom", "grid"]) {
+      const el = document.getElementById(id);
+      if (!el) continue;
+      const g = (el.classList.contains("group") ? el.parentElement : el).closest(".group, .switch");
+      (g || el).classList.add("embed-hide");
+    }
+  }
+  let sent = "";
+  function report(force) {
+    geometry();
+    const msg = { source: "s1e-embed", id, type: "info", sizes: sizes(), size: current() };
+    const sig = JSON.stringify(msg);
+    if (!force && sig === sent) return;
+    sent = sig;
+    parent.postMessage(msg, "*");
+  }
+  function setMode(m) {
+    E.mode = m;
+    root.classList.toggle("embed-card", m === "card");
+    root.classList.toggle("embed-settings", m === "settings");
+    if (m === "settings") scrollTo(0, 0);
+    geometry();
+  }
+
+  addEventListener("message", (e) => {
+    const d = e.data;
+    if (!d || d.target !== "s1e-embed") return;
+    if (d.type === "mode") setMode(d.mode);
+    if (d.type === "size") { E.size = d.size; applySize(d.size); }
+    if (d.type === "lang" && d.lang !== E.lang) { E.lang = d.lang === "en" ? "en" : "ru"; applyLang(); }
+    report(true);
+  });
+
+  let tries = 0;
+  function init() {
+    if (sizeBox() && !sizeBox().querySelector("[data-v]") && tries++ < 150) return void setTimeout(init, 100);   // controls built after an async boot
+    if (typeof window.ellipsis === "function") { const o = window.ellipsis; window.ellipsis = (ctx, t, w) => o(ctx, tr(t), w); }
+    if (solo) {
+      applyLang();
+      for (const p of document.querySelectorAll("p")) if (CYR.test(p.textContent)) p.hidden = true;   // prose without an English text yet
+      const h = document.querySelector("h1");
+      if (h) document.title = `${h.textContent.trim()} · S1E Panel demo`;
+      return;
+    }
+    hideStandOnly();
+    domAll();
+    if (E.lang === "en") applyLang();
+    applySize(E.size);
+    report(true);
+    setInterval(() => report(false), 400);
+  }
+  if (document.readyState === "loading") addEventListener("DOMContentLoaded", () => setTimeout(init, 0)); else setTimeout(init, 0);
+})();
+</script>
+<!-- /embed-bridge -->
+<script>
+const ICONS = {"weather-sunny":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABWVgAAAAAAAAAAAAAAAAAAAAAAAAAAABvu7hoAAAAAAAAAAAAAAAAAAAAAAAAAAbv//7oBAAAAAAAAAAAAAAAAAAAAAAAAFTQQDzQVAAAAAAAAAAAAAAAABxsvQxkAAAAAAAAAABlDLxsHAAAAAAAAb///rQMAS7/y8r5JAAKq//9uAAAAAAAACuvpEACD////////gAAP6esKAAAAAAAAAH59AEz/+HMXGHT5/0kAf30AAAAAAAAAABInAMD/cgAAAAB0/74AKBEAAAAAAAAAAAAAAPP/FwAAAAAY//IAAAAAAAAAAAAAAAAAAPP/FwAAAAAX//IAAAAAAAAAAAAAABEnAMH/cAAAAABz/78AKBAAAAAAAAAAAHp/AE//93AXF3L4/0sAgHkAAAAAAAAAB+fqEACG////////gwAQ6ucHAAAAAAAAZP//qwIAT8Hz88BMAAOu//9jAAAAAAAABx42TRwAAAAAAAAAABpEMBsGAAAAAAAAAAAAAAAAFTMODzQVAAAAAAAAAAAAAAAAAAAAAAAAAbv//7oBAAAAAAAAAAAAAAAAAAAAAAAAABvu7hsAAAAAAAAAAAAAAAAAAAAAAAAAAABXVgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","weather-night":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEvMSAAAAAAAAAAAAAAAAAAAANw0AAAABa/9qAQAAAAAAAAAAAAAAAAKS/9sDPOX//////+U8AAAAAAAAAAAAAJb///8RAB/L////yx8AAAAAAAAAAAAAWP/6+v8WAABf////XwAAAAAAAAAAAAAH5P951/8sAACq4m3iqQAAAAAAAAAAAABa/9QCs/9mAASVEAAQlQQAAAAAAAAAAACp/3QAbv+wAAAAAAAAAAAAWwAAAAAAAADb/ysAGf3+KQAAAAAAAAQW7xUEAAAAAAD0/xEAAJz/tAEAAAAABo////6MBQAAAAD0/wwAABny/30AAAAAAAC8/7cAAAAAAADb/zMAAABN/f58AQAAAAm0PLEHAAAAAACp/3MAAAAAav3/sycAAAYBAAEGAAAAAABa/9wCAAAAAEzx//2sYSYREAMAAAAAAAAH5f92AAAAAAAXmfz//////98TAAAAAAAAWf/8SAAAAAAAABZortL5//84AAAAAAAAAJb//HcCAAAAAAAAAnj6/5IAAAAAAAAAAAKX///edTcQFS521f//lgIAAAAAAAAAAAAAWub//////////+ZaAAAAAAAAAAAAAAAAAAhgseX8/OWxYAgAAAAAAAAAAAAAAAAAAAAAAAABAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","weather-partly-cloudy":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAQOAAAAAAAAMrWYAAAAAAAAAAAAAAAAACH9yj0AAAACVazmAQAAAAAAAAAAAAAAAC7fMgAAAAAAAAA6GAAAAAAAAAAAAAAAAB0YAByT2vHelBgAAAAAAAAAAAAAAAAAAAAARPP//////+9GAAAAAAAAAAAAAAAAAAAd9P+pJgIqrP/uHwAAAAAAAAAAAAAAAACY/6sAAAAAAa7/ngA9ZgEAAAAAAAAvCwDj/ygAAAAAACz/6QAQ/6EAAAAAACLnDAD2/wMFbMr198v//gEA4yIAAAAAAJ//FQDf/0LQ////////+hwILQAAAAAAAAFoPACU//z/2E4MDVDa/9AEAAAAAAAAAAAAAAAa8v/YEAAAAAAS2/9pAAAAAAAAAAAAJa3v/v9OAAAAAAAAUv/HAAAAAAAAAAAl7f///PwMAAAAAAAAEP/yAAAAAAAAAACv/60WAAAAAAAAAAAABP//7OmIBQAAAADz/xMAAAAAAAAAAAAABP//////gQAAAAD0/xIAAAAAAAAAAAAAAAAAADz/3gAAAACy/6gSAAAAAAAAAAAAAAAAADj/4AAAAAAo7///+Pj4+Pj4+Pj4+Pj4+P//hQAAAAAAKLL0/////////////////+eJBQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","weather-cloudy":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALdcju6MNsDAAAAAAAAAAAAAAAAAAAACjf////////3DIAAAAAAAAAAAAAAAAAIOz/rz0LEUW6/+whAAAAAAAAAAAAAAAAsf90AAAAAAAAgv+4AAAAAAAAAAAARLfq/7AAAAAAAAAAALj/KgAAAAAAAAB8/////0IAAAAAAAAAAEL/ZwAAAAAAAEj/+nsgHgUAAAAAAAAAAA3//OqpIwAAAL7/dgAAAAAAAAAAAAAAAAD8////7SUAAPL/GAAAAAAAAAAAAAAAAAAAAB24/7EAAPT/FwAAAAAAAAAAAAAAAAAAAAAd//UAAMP/cQAAAAAAAAAAAAAAAAAAAAAa//cAAFP/92wQAAAAAAAAAAAAAAAAABSw/7UAAACL////+Pj4+Pj4+Pj4+Pj4+P//8CoAAAAAT77w//////////////////OyKQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","weather-windy":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIqnr6aUfAAAAAAAAAAAAAAAAAAAAAAAP6//////oHwAAAAAAAAAAAAAAAAAAAAAJw6QbHbj/pQAAAAAAAAAAAAAAAAAAAAAAAAAAAB3/6QAAAAAAAAAAAAAAAAAAAAAAAAAAABr/6wAAAAAAAAAAAAAAAAAAAAAAAAAAFLD/qQAAAAAAAAAAAAAAxPj4+Pj4+Pj4///sIgaF39+BBAAAAAAAzP//////////864kAFn/////gwAAAAAAAAAAAAAAAAAAAAAAABOMMT3/4wAAAAAAAAAAAAAAAAAAAAAAAAAAADj/4wAAAAAAAMz/////////////////////hQAAAAAAAM3//////////////////+qLBQAAAAAAAAAEBAQEBAQEBAQEBAQEBAAAAAAAAAAAAAQEBAQEBAQEBAQEBAQEAAAAAAAAAAAAy///////////////////640GAAAAAAAAzP////////////////////+JAAAAAAAAAAAAAAAAAAAAAAAAAAAAO//mAAAAAAAAAAAAAAAAAAAAAAAADoMqN//oAAAAAAAAAAAAAAAAAAAAAAAAVf////+NAAAAAAAAAAAAAAAAAAAAAAAAB4zo6Y4HAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","weather-fog":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOe8/28M12EAAAAAAAAAAAAAAAAAAAACri////////4joAAAAAAAAAAAAAAAAAIe7/tUMPE0S0//AoAAAAAAAAAAAAAAAAsf98AAAAAAAAeP+/AAAAAAAAAAAASb3y/7UAAAAAAAAAALD/MAAAAAAAAACC/////0UAAAAAAAAAADz/awAAAAAAAEz/+HMZFQUAAAAAAAAAAAn+/PKvJQAAAMD/cgAAAAAAAAAAAAAAAAD4////7SUAAPP/FwAAAAAAAAAAAAAAAAADBB+4/7AAAPP8FwAAAAAAAAAAAAAAAAAAAAAY+/MBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADE/////////////8oAxP//////yAAAAADE/////////////8sAxP//////yAAAAAAABAQEBAQEBAQEBAAAAAQEBAQEAAAAAAAABAQAAAADBAQEBAQEBAQEBAQEAAAAAADD///LAMT/////////////////xwAAAADE///MAMX/////////////////yAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","weather-rainy":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPfdD278luDAAAAAAAAAAAAAAAAAAAACvk////////2zEAAAAAAAAAAAAAAAAAIu7/s0EPFUm9/+wjAAAAAAAAAAAAAAAAsf94AAAAAAABhv+5AAAAAAAAAAAAR7bn/7EAAAAAAAAAAbr/LAAAAAAAAACC/////0EAAAAAAAAAAET/ZwAAAAAAAEz/+XUYFgQAAAAAAAAAAA7//fKxKAAAAMD/dgAAAAAAAAAAAAAAAAD8////8CkAAPP/GAAAAAAAAAAAAAAAAAADBCG7/7QAAPP/FgAAAAAAAABycQAAAAAAAAAd//YAAMH/bwAAAAAAAED8/D8AAAAAAAAb//cAAE//93AXAAAAE+X//+cXAAAAABu2/7YAAACG////vwAAqf+9vf+sAAC/////8iwAAAAAT8HzxQA+//EdHvL/PwDF//e2KwAAAAAAAAAAAACs/3cAAHj/rAAABAAAAAAAAAAAAAAAAADr/xQAABX/6gAAAAAAAAAAAAAAAAAAAADv/xcAABj/7QAAAAAAAAAAAAAAAAAAAACq/7EaGrP/qQAAAAAAAAAAAAAAAAAAAAAi6v/////qIQAAAAAAAAAAAAAAAAAAAAAAIajr66ghAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","weather-pouring":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALdcju6MNsDAAAAAAAAAAAAAAAAAAAACjf////////3DIAAAAAAAAAAAAAAAAAIOz/rz0LEUW6/+whAAAAAAAAAAAAAAAAsf90AAAAAAAAgv+4AAAAAAAAAAAARLfq/7AAAAAAAAAAALj/KgAAAAAAAAB8/////0IAAAAAAAAAAEL/ZwAAAAAAAEj/+nsgHgUAAAAAAAAAAA3//OqpIwAAAL7/dgAAAAAAAAAAAAAAAAD8////7SUAAPL/GAAAAAAAAAAAAAAAAAAAAB24/7EAAPT/EAAAAAAAAAAAAAAAAAAAAAAd//UAAMP/agAAABvrhQAd6YoAGemJAAAY//MAAFP/918AAG7/ngBz/5sAbP+iAAW2/7QAAACJ//AAALH/WgC3/1gAsf9eAHD/8ysAAAAARz4AA/D+Fgb0/hUE8f8ZACCPKAAAAAAAAAAAN//PAED/zwA9/9MAAAAAAAAAAAAAAAAAdv+JAIT/iwB7/40AAAAAAAAAAAAAAAAANrgnAMj/RwA2uSkAAAAAAAAAAAAAAAAAAAAAD/z5CgAAAAAAAAAAAAAAAAAAAAAAAAAARv++AAAAAAAAAAAAAAAAAAAAAAAAAAAAD51AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","weather-lightning-rainy":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALdcju6MRtDQAAAAAAAAAAAAAAAAAAACjf////////3jQAAAAAAAAAAAAAAAAAIOz/rz0LEUS4/+0kAAAAAAAAAAAAAAAAsf90AAAAAAAAfv+8AAAAAAAAAAAARLfq/7AAAAAAAAAAALT/LgAAAAAAAAB8/////0IAAAAAAAAAAD7/awAAAAAAAEj/+nsgHgUAAAAAAAAAAAr//OuqJAAAAL7/dgAAAAAAAAAAAAAAAAD4////7SUAAPL/GAAAAAAAAAAAAAAAAAAAABy4/7EAAPT/EAAAAAAAp/j4RgAAAAAAAAAd//UAAMP/agAAAAAb+//JAAAAAAAAAAAa//cAAFP/918AAACE//9IAAAAAAAAABSw/7UAAACJ//AAAAfp/8YAAAACLwAAvP//8CoAAAAARz4AAF7///78QgCA7BYAxPOyKQAAAAAAAAAAAMr///+8AC/8/6gAAAAAAAAAAAAAAAAAAAgIjv4zAK7///8uAAAAAAAAAAAAAAAAAAAAsagAAPT///9yAAAAAAAAAAAAAAAAAAAA0iQAAND///9OAAAAAAAAAAAAAAAAAAAEjwAAADLV9JEAAAAAAAAAAAAAAAAAAAAZGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","weather-snowy":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALdcju6MNsDAAAAAAAAAAAAAAAAAAAACjf////////3DIAAAAAAAAAAAAAAAAAIOz/rz0LEUW6/+whAAAAAAAAAAAAAAAAsf90AAAAAAAAgv+4AAAAAAAAAAAARLfq/7AAAAAAAAAAALj/KgAAAAAAAAB8/////0IAAAAAAAAAAEL/ZwAAAAAAAEj/+nsgHgUAAAAAAAAAAA3//OqpIwAAAL7/dgAAAAAAAAAAAAAAAAD8////7SUAAPL/GAAAAAAAAAAAAAAAAAAAAB24/7EAAPT/FwAAAAAAAAAAAAAAAAAAAAAd//UAAMP/cQAAAAAAAAAAAAAAAAAAAAAa//cAAFP/92wQAAAAAAAAjqMAAAAAABSw/7UAAACL////vAB0txcc//UCAAC8+P//8CoAAAAAT77wxAC9/9Nx/7YAAADE//OyKQAAAAAAAAAAAAAb2P/+/7yx8qMAAAAAAAAAAAAAAAAAAAAZcf///////5UAAAAAAAAAAAAAAAAAAI////////92IQAAAAAAAAAAAAAAAAAAAKz3usD////TFwAAAAAAAAAAAAAAAAAAAAAEALT/dtj/ugAAAAAAAAAAAAAAAAAAAAAAAvT/HRvAewAAAAAAAAAAAAAAAAAAAAAAAK2WAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","weather-snowy-rainy":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAALdcju6MNrCwAAAAAAAAAAAAAAAAAAACjf////////2jAAAAAAAAAAAAAAAAAAIOz/rz0LEUa8/+ofAAAAAAAAAAAAAAAAsf90AAAAAAABhv+0AAAAAAAAAAAARLfq/7AAAAAAAAAAAbz/JwAAAAAAAAB8/////0IAAAAAAAAAAEb/YwAAAAAAAEj/+nsgHgUAAAAAAAAAABL/++qnIQAAAL7/dgAAAAAAAAAAAAAAAAD/////7CQAAPL/GAAAAAAAAAAAAAAAAAAAAB24/7AAAPf/FgAAAAAAsrsAAAAAAAAAAAAd//UAAMP/bgCguBAi//AAAAAAAAAAAAAa//cAAE7/9RTa/8p4/68AAAAAAAAAABSw/7UAAAB8twkm5v/+/7uu7LwAAi0AxP//8CoAAAAAAAATfP///////7MAgOYRzPOxKQAAAAAAALL9//////99JQAv/P+cAAAAAAAAAAAAAtr8xtH////PEwCu///+KQAAAAAAAAAAAAsNAMb/geT/uAD0////cQAAAAAAAAAAAAAADfz/GSfdnQDQ////TgAAAAAAAAAAAAAAC+SvAAAAAAAy1fSRAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","home-outline":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGQiAAAAAAAAAAAAAAAAAAAAAAAAAAABqj//6AEAAAAAAAAAAAAAAAAAAAAAAANvP/v8v+2CwAAAAAAAAAAAAAAAAAAABfO/+MsMOf/yRQAAAAAAAAAAAAAAAAAJN3/1R0AACHZ/9kgAAAAAAAAAAAAAAA06v/DEQAAAAAUyf/mLgAAAAAAAAAAAEbz/68IAAAAAAAACrX/8EAAAAAAAAAAW/r/+QIAAAAAAAAAAAT///hUAAAAAABy/v//9wAAAAAAAAAAAAD////9bAAAAAAAAAD/9wAD////////AAD/9wAAAAAAAAAAAAD/9wAD////////AAD/9wAAAAAAAAAAAAD/9wAD//8DB///AAD/9wAAAAAAAAAAAAD/9wAD//8AA///AAD/9wAAAAAAAAAAAAD/9wAD//8AA///AAD/9wAAAAAAAAAAAAD/9wAD//8AA///AAD/9wAAAAAAAAAAAAD///////8AA///////9wAAAAAAAAAAAAD///////8AA///////9wAAAAAAAAAAAAADAwMDAwMAAAMDAwMDAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","thermometer":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABYTf34MFAAAAAAAAAAAAAAAAAAAAAAAAif////+GAAAAAAAAAAAAAAAAAAAAAAAA5/9AQP/lAAAAAAAAAAAAAAAAAAAAAAAA//8EBP//AAAAAAAAAAAAAAAAAAAAAAAA//8DA///AAAAAAAAAAAAAAAAAAAAAAAA//8DA///AAAAAAAAAAAAAAAAAAAAAAAA///4+P//AAAAAAAAAAAAAAAAAAAAAAAA////////AAAAAAAAAAAAAAAAAAAAAAAA////////AAAAAAAAAAAAAAAAAAAAAAAA////////AAAAAAAAAAAAAAAAAAAAAAAA////////AAAAAAAAAAAAAAAAAAAAAAB9////////fAAAAAAAAAAAAAAAAAAAAEf//////////0cAAAAAAAAAAAAAAAAAALr//////////7oAAAAAAAAAAAAAAAAAAOz//////////+sAAAAAAAAAAAAAAAAAAO3//////////+0AAAAAAAAAAAAAAAAAALr//////////7kAAAAAAAAAAAAAAAAAAEX//////////0QAAAAAAAAAAAAAAAAAAAB8////////fAAAAAAAAAAAAAAAAAAAAAAARLrs7LpEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","water-percent":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+PQAAAAAAAAAAAAAAAAAAAAAAAAAAAB3r6iAAAAAAAAAAAAAAAAAAAAAAAAAABMX//8wFAAAAAAAAAAAAAAAAAAAAAAAAif////+LAAAAAAAAAAAAAAAAAAAAAAA+/v/////+PgAAAAAAAAAAAAAAAAAAAAfY////////1wcAAAAAAAAAAAAAAAAAAHT//////////3cAAAAAAAAAAAAAAAAADe3GEFX//9s84OwNAAAAAAAAAAAAAAAAZP+QABD/2xwc2/9qAAAAAAAAAAAAAAAAvv/3kMbbHBzb///AAAAAAAAAAAAAAAAA7P///9scHNv////tAAAAAAAAAAAAAAAA8P//2xwc28aQ9//vAAAAAAAAAAAAAAAAyP/cHBzb/xAAkP/HAAAAAAAAAAAAAAAAaf/fO9v//1UQxv9oAAAAAAAAAAAAAAAAB8z//////////8sGAAAAAAAAAAAAAAAAABzN////////zBsAAAAAAAAAAAAAAAAAAAAIbczz88trBwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","molecule-co2":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAwMAAAADAwAAAAAAAAAAAAAAAAAATOf///8DTOf//+ZJAAAAAAAAAAAAAAAA5f////8D5f/////kAAAAAAAAAAAAAAAA//8DAAAA//8DA///AAAAAAAAAAAAAAAA//8DAAAA//8DA///AX9/f1wBAAAAAAAA//8DAAAA//8DA///A/////9cAAAAAAAA//8DAAAA//8DA///AAAAAP9/AAAAAAAA//8DAAAA//8DA///ACR5f/95AAAAAAAA//8DAAAA//8DA///AN///94lAAAAAAAA5f////8D5f/////kA/9/AAAAAAAAAAAATuj///8DTuj//+dMA/+/f38/AAAAAAAAAAADAwMAAAADAwAAA/////9/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","molecule":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIfzggAAAAAAAAAAAAAAAAAAAAAAAAAAAPf/9AAAAAAAAAAAAAAAAAAAAAAAAAAAP//8hgAAAAAAAAAAhPOCAAAAAwQEBAQI1P+BACVvIQAAAAAA9P/5AwAv/P////////UKAN7/3AAAAAAAh/r/bgHF//////////9XCfj/3AAAAAAAAFH/8Hn/9B0AAAAAZf/hjP/RGgAAAAAAAAC4////dwAAAAAAAsz///88AAAAAAAAAAAn+v/XBQAAAAAAADn+/6kAAAAAAAAAAAAAiv/WBQAAAAAAADj+/6kAAAAAAAAAAAAADOX/dwAAAAAAAsv///89AAAAAAAAAAAAAFr/9B0AAAAAZf/hj//OAgAAAAAAAAAAAADB//////////9XDOb/2yAAAAAAAAAAAABo//////////UKAIX//2wAAAAAAAAAAAng/4YEBAQI1P+BACje2yAAAAAAAAAAG9b/3AkAAAAAQP/8hgAAAAAAAAAAAAAAaP//owAAAAAAAPf/9AAAAAAAAAAAAAAAHdbnQAAAAAAAAIr0hAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","blur":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAtAAAALQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAuABH6k0AT+tGAADAuAAAAAAAAAAAAADIwABK8lIAU/NKAADIwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABKRgCD84cAh/OBAABKRgAAAAAAAAC0AADz6wD0//MA9P/zAADz6wC0AAAAAAAAAABTTwCJ9I0AjfSHAABTTwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABSTQCJ9IwAjPSHAABSTQAAAAAAAAC0AADy6gD0//QA9P/zAADy6gC0AAAAAAAAAABKRwCG9IkAifSDAABKRwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAuABH6k0AT+tGAADAuAAAAAAAAAAAAADIwABK8lIAU/NKAADIwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAtAAAALQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","scent":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAoAIAAGMrAAAAAAAAAAAAAAAAAAAAAAAAzlIAAFG5AAAAAAAAAAAAAAAAAAAAAAAV+JAAAG7/GAAAAAAAAAAAAAAAAAAAAACK/4gAAMD/QgB4AgAAAAAAAAAAAAAAADb7/0MAQv//OgCeYgAAAAAAAAAAAAAAFuL/vwAT4v/5DwC0xQAAAAAAAAAAAAACvv/nGwe+//+jAAzy9AAAAAAAAAAAAABk//QzBLH//+4ZAHb/8QAAAAAAAAAAAADL/2AAl///+UAAKPX/xwAAAAAAAAAAAAD3xQBe///9WAAO0v//awAAAAAAAAAAAADoWgvs//9tAAa9///WBQAAAAAAAAAAAACWNVr//6QAAJ3///IqAAAAAAAAAAAAAAAWL4n/5g0AXv//+0gAAAAAAAAAAAAAAAAAAI3/cAAK6f//ZAAAAAAAAAAAAAAAAAAAAFv/HgBX//+hAAAAAAAAAAAAAAAAAAAAAAroCACH/+gNAAAAAAAAAAAAAAAAAAAAAABVMQCO/3QAAAAAAAAAAAAAAAAAAAAAAAAAAABi/yIAAAAAAAAAAAAAAAAAAAAAAAAAAAAQ8AYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaykAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","door-closed":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE/l/////////+FEAAAAAAAAAAAAAAAAAOv////////////eAAAAAAAAAAAAAAAACP/8BAQEBAQEC//7AAAAAAAAAAAAAAAACP/8AAAAAAAACP/8AAAAAAAAAAAAAAAACP/8AAAAAAAACP/8AAAAAAAAAAAAAAAACP/8AAAAAAAACP/8AAAAAAAAAAAAAAAACP/8AAAAAAAACP/8AAAAAAAAAAAAAAAACP/8AAAAAAAACP/8AAAAAAAAAAAAAAAACP/8AAAAB/j0CP/8AAAAAAAAAAAAAAAACP/8AAAACP/8CP/8AAAAAAAAAAAAAAAACP/8AAAAAAAACP/8AAAAAAAAAAAAAAAACP/8AAAAAAAACP/8AAAAAAAAAAAAAAAACP/8AAAAAAAACP/8AAAAAAAAAAAAAAAACP/8AAAAAAAACP/8AAAAAAAAAAAAAAAACP/8AAAAAAAACP/8AAAAAAAEBAQEBAQEC//8BAQEBAQEC//8AwAAAAD/////////////////////////+AAAAAD/////////////////////////+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","door-open":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwMDAwMDAwAAAAAAAAAAAAAAAAAAAE/o/////////+VHAAAAAAAAAAAAAAAAAOj////////////gAAAAAAAD////////////AAAAAAAAB//7AAAAAAAD////////////AAAAAAAAB//7AAAAAAAD////////////AAAAAAAAB//7AAAAAAAD////////////AAAAAAAAB//7AAAAAAAD////////////AAAAAAAAB//7AAAAAAAD////////////AAAAAAAAB//7AAAAAAAD//8AA///////AAAAAAAAB//7AAAAAAAD//8DB///////AAAAAAAAB//7AAAAAAAD////////////AAAAAAAAB//7AAAAAAAD////////////AAAAAAAAB//7AAAAAAAD////////////AAAAAAAAB//7AAAAAAAD////////////AAAAAAAAB//7AAAAAAAD////////////AAAAAAAAB//7AAAAAAAH////////////AwMDAwMDC//8AwAAAAD/////////////////////////9wAAAAD/////////////////////////9wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","pipe-leak":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD38AAAAAAAAAAAAAAAAAAAAAD38AAAAAD/9wAAAAAAAAAAAAAAAAAAAAD/9wAAAAD//////////3cAhP//////////9wAAAAD///////////93AIT/////////9wAAAAD///////////9/AHz/////////9wAAAAD//////////4AAfP//////////9wAAAAD/+AcHBwcHBwAABwcHBwcHBwf/9wAAAAD/9wAAAAAAAAAAAAAAAAAAAAD/9wAAAAAAAAAAAAAAAABwaAAAAAAAAAAAAAAAAAAAAAAAAAAAADD59yoAAAAAAAAAAAAAAAAAAAAAAAAAAL///7YAAAAAAAAAAAAAAAAAAAAAAAAAAfr///MAAAAAAAAAAAAAAAAAAAAAAAAAALj//64AAAAAAAAAAAAAAAAAAAAAAAAAAApqaAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","water-alert":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPDsAAAAAAAAAAAAAAAAAAAAAAAAAAAAc6uobAAAAAAAAAAAAAAAAAAAAAAAAAAPD///CAwAAAAAAAAAAAAAAAAAAAAAAAIb/////hQAAAAAAAAAAAAAAAAAAAAAAPP7//////jwAAAAA//8EAAAAAAAAAAAG1////////9YGAAAA//8EAAAAAAAAAABz//////////9yAAAA//8EAAAAAAAAAAzs///////////sDAAA//8EAAAAAAAAAGP/////////////YgAA//8EAAAAAAAAAL7/////////////vQAA//8EAAAAAAAAAOz/////////////6gAAAAAAAAAAAAAAAPD/////////////8AAAAAAAAAAAAAAAAMf/////////////yAAA+PsDAAAAAAAAAGj/////////////agAA+/8DAAAAAAAAAAbJ///////////NBwAABwcAAAAAAAAAAAAZyv///////88dAAAAAAAAAAAAAAAAAAAAB2zN9vfQcAgAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"};
+const WASM = "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QCAAKALkAUUNAEEAIQIDQCAEIAJqIAAoAuABIAJqLQAAOgAAIAJBAWoiAiAAKALkAUkNAAsLIAAoAuABEKCAgIAAIAAgCDYC6AEgACAENgLgAQsCQCABRQ0AIAFBA3EhCEEAIQICQCABQQRJDQAgAUF8cSEEQQAhAgNAIAAoAuABIAJqQQA6AAAgACgC4AEgAmpBAWpBADoAACAAKALgASACakECakEAOgAAIAAoAuABIAJqQQNqQQA6AAAgBCACQQRqIgJHDQALCyAIRQ0AQQAgCGshBANAIAAoAuABIAJqQQA6AAAgAkEBaiECIARBAWoiBA0ACwsgAEEANgLwASAAIAE2AuQBAkAgACgC9AEiAiABTw0AIAJBAXRBCCACGyICIAEgAiABSxsiCBCfgICAACEEAkAgACgC8AFFDQBBACECA0AgBCACaiAAKALsASACai0AADoAACACQQFqIgIgACgC8AFJDQALCyAAKALsARCggICAACAAIAg2AvQBIAAgBDYC7AELAkAgAUUNACABQQNxIQhBACECAkAgAUEESQ0AIAFBfHEhBEEAIQIDQCAAKALsASACakEAOgAAIAAoAuwBIAJqQQFqQQA6AAAgACgC7AEgAmpBAmpBADoAACAAKALsASACakEDakEAOgAAIAQgAkEEaiICRw0ACwsgCEUNAEEAIAhrIQQDQCAAKALsASACakEAOgAAIAJBAWohAiAEQQFqIgQNAAsLIAAgATYC8AEgCiAHTA0AIAutIQwgBawhDSAJrSEOIAchDwNAAkAgCyAJTA0AIA8gA2siECAQQR91IgJzIAJrIQEgDyAHayERIBAgEGwhEiAOIRMDQCATIA19IhSnIgQgBGwgEmqtIRVCgICAgICAgIDAACEWA0AgFiIXQgKIIRYgFyAVVg0AC0EAIQVBACECAkAgF1ANAEIAIRYDQEIAIBcgFSAWIBd8IhhUIgIbIBZCAYh8IRYgFUIAIBggAht9IRUgF0IDViECIBdCAoghFyACDQALIBanIQILIAAoAuABIAAoAtgBIBFsIBOnIAlraiIIaiAGIAJrIgJBACACQQBKG0H/AWwgBm4iAiACbEH/AW46AAACQCAQIARyRQ0AQQBBgAFBwAAgASAEIARBH3UiAnMgAmsiAiABIAJJG0EIdCACIAEgAiABSxtuIgRBgAIgBGts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eHI2AgALIARBBGohBCAAQQFqIQAgA0F/aiIDDQALIBxBBGohHCAhIAVGIQAgIUEBaiEhIABFDQALCyAWQQFqIQAgFiAISQ0ACwvkAgECf0GIAhCigICAAEEAQYgCEJ6AgIAAIQBBARCfgICAACIBQQA6AAAgACgCHBCggICAACAAQgA3AvwBIABB9AFqQgA3AgAgAEHsAWpCADcCACAAQeQBakIANwIAIABB3AFqQgA3AgAgAEHUAWpCADcCACAAQcwBakIANwIAIABCADcCxAEgAEG8AWpCADcCACAAQbQBakIANwIAIABCADcCrAEgAEGkAWpCADcCACAAQZwBakIANwIAIABCADcClAEgAEGMAWpCADcCACAAQYQBakIANwIAIABCADcCfCAAQfQAakIANwIAIABB7ABqQgA3AgAgAEIANwJkIABB3ABqQgA3AgAgAEHUAGpCADcCACAAQgA3AkwgAEEAOgBIIABCgICAgICAgICAfzcDQCAAQpuktPgfNwM4IABCgAI3AzAgAEIANwMoIABBADsBJCAAQSBqQQA2AgAgACABNgIcIAALCABB4IqAgAAL1AIBCX8jgICAgABBEGsiCCSAgICAAEEAIQkDQCABIAlqIQogCUEBaiILIQkgCi0AAA0ACyALQX9qIQwgCxCfgICAACENAkAgC0EBRg0AIAxBA3EhDkEAIQkCQCAMQQRJDQAgDEF8cSEPQQAhCQNAIA0gCWoiCiABIAlqIhAtAAA6AAAgCkEBaiAQQQFqLQAAOgAAIApBAmogEEECai0AADoAACAKQQNqIBBBA2otAAA6AAAgDyAJQQRqIglHDQALCyAORQ0AIAxBA3EhECABIAlqIQogDSAJaiEJA0AgCSAKLQAAOgAAIApBAWohCiAJQQFqIQkgEEF/aiIQDQALCyANIAtqQX9qQQA6AABBABCggICAACAIIAw2AgwgCCANNgIIIAAgCEEIaiACQQBHIAMgBCAFIAYgBxCCgICAACAIKAIIEKCAgIAAIAhBEGokgICAgAALEwAgACABIAJBAEcgAxCMgICAAAsKACAAEIuAgIAACwoAIAAQn4CAgAAL4gEBBX8CQCACQQFIDQAgAkEBcSEDQQAhBAJAIAJBAUYNACACQf7///8HcSEFQQAhBCABIQIgACEGA0AgAiAGKAIAIgdBEHQgB0GA/gNxciAHQRB2Qf8BcXJBgICAeHI2AgAgAkEEaiAGQQRqKAIAIgdBEHQgB0GA/gNxciAHQRB2Qf8BcXJBgICAeHI2AgAgAkEIaiECIAZBCGohBiAFIARBAmoiBEcNAAsLIANFDQAgASAEQQJ0IgJqIAAgAmooAgAiAkEQdCACQYD+A3FyIAJBEHZB/wFxckGAgIB4cjYCAAsLmgEBA38CQCACRQ0AIAAhAyACIQQCQCACQQdxIgVFDQAgAkF4cSEEIAAhAwNAIAMgAToAACADQQFqIQMgBUF/aiIFDQALCyACQQhJDQADQCADIAE6AAcgAyABOgAGIAMgAToABSADIAE6AAQgAyABOgADIAMgAToAAiADIAE6AAEgAyABOgAAIANBCGohAyAEQXhqIgQNAAsLIAALVwECf0EAQQAoAqCLgIAAIgFBsIuEgAAgARtBD2pBcHEiASAAQQEgAEEBSxtqIgA2AqCLgIAAAkAgAD8AQRB0IgJNDQAgACACa0H//wNqQRB2QAAaCyABCwIACw0AQQBBADYCoIuAgAALVwECf0EAQQAoAqCLgIAAIgFBsIuEgAAgARtBD2pBcHEiASAAQQEgAEEBSxtqIgA2AqCLgIAAAkAgAD8AQRB0IgJNDQAgACACa0H//wNqQRB2QAAaCyABC1cBAn9BAEEAKAKgi4CAACIBQbCLhIAAIAEbQQ9qQXBxIgEgAEEBIABBAUsbaiIANgKgi4CAAAJAIAA/AEEQdCICTQ0AIAAgAmtB//8DakEQdkAAGgsgAQsCAAsCAAsL6AIBAEGACAvgAnNub3d5AHNub3d5LXJhaW55AGxpZ2h0bmluZy1yYWlueQBoYWlsAGV4Y2VwdGlvbmFsAGZvZwBwb3VyaW5nAGxpZ2h0bmluZwAAAAAAAAAAAAAAAAgAAAACAAAACgAAAAwAAAAEAAAADgAAAAYAAAADAAAACwAAAAEAAAAJAAAADwAAAAcAAAANAAAABQAAAAAAAABGAAAAggAAANwAAAD/////8Ovm/8i+tf+Sh33/5tzT/7+0qf+Hem7/Ukg//yQAAAA8AAAAVAAAAAkAAADz////EQAAAAAAAAAAAAAArl8d/9aXT/+XXyr/vY9f/19SRv+JfG//SDos/2laSv8tIxz/TD80/4JvXf+zo5P/YFVM/3pwZv89MCT/MCMb/yoQB/9SKhv/MBYN/1o2JP8lHBb/PzMq/x8WEP86LSL/FQ8L/ywiG/8zJBr/WkQ0/y8oIv9JQTn/PTAk/zAjG/8Aqg0EbmFtZQANDHdlYXRoZXIud2FzbQHzDCYAMHBhbmVsOjp3ZWF0aGVyX2VmZmVjdHMoc3RkOjpzdHJpbmcgY29uc3QmLCBib29sKQEwc3RkOjpvcGVyYXRvcj09KHN0ZDo6c3RyaW5nIGNvbnN0JiwgY2hhciBjb25zdCopAmpwYW5lbDo6V2VhdGhlclNjZW5lOjpjb25maWd1cmUoc3RkOjpzdHJpbmcgY29uc3QmLCBib29sLCBpbnQsIGludCwgdW5zaWduZWQgaW50IGNvbnN0KiwgaW50LCB1bnNpZ25lZCBpbnQpAzNwYW5lbDo6V2VhdGhlclNjZW5lOjpwYWludF9za3kodW5zaWduZWQgaW50IGNvbnN0KikEIXBhbmVsOjpXZWF0aGVyU2NlbmU6OmRpdGhlcl9za3koKQUhcGFuZWw6OldlYXRoZXJTY2VuZTo6YnVpbGRfZ2xvdygpBiNwYW5lbDo6V2VhdGhlclNjZW5lOjpidWlsZF9jbG91ZHMoKQcmcGFuZWw6OldlYXRoZXJTY2VuZTo6YnVpbGRfcGFydGljbGVzKCkIJHBhbmVsOjpXZWF0aGVyU2NlbmU6OmJ1aWxkX2Nvcm5lcnMoKQkxc3RkOjp2ZWN0b3I8cGFuZWw6OldlYXRoZXJTY2VuZTo6U3ByaXRlPjo6Y2xlYXIoKQo9c3RkOjp2ZWN0b3I8cGFuZWw6OldlYXRoZXJTY2VuZTo6U3ByaXRlPjo6Z3Jvdyh1bnNpZ25lZCBsb25nKQslcGFuZWw6OldlYXRoZXJTY2VuZTo6YW5pbWF0ZWQoKSBjb25zdAw7cGFuZWw6OldlYXRoZXJTY2VuZTo6cmVuZGVyKGxvbmcgbG9uZywgYm9vbCwgdW5zaWduZWQgaW50KikNPnBhbmVsOjpXZWF0aGVyU2NlbmU6OmRyYXdfZ2xvdyh1bnNpZ25lZCBpbnQqLCBsb25nIGxvbmcpIGNvbnN0Dj9wYW5lbDo6V2VhdGhlclNjZW5lOjpkcmF3X3N0YXJzKHVuc2lnbmVkIGludCosIGxvbmcgbG9uZykgY29uc3QPQHBhbmVsOjpXZWF0aGVyU2NlbmU6OmRyYXdfY2xvdWRzKHVuc2lnbmVkIGludCosIGxvbmcgbG9uZykgY29uc3QQPXBhbmVsOjpXZWF0aGVyU2NlbmU6OmRyYXdfZm9nKHVuc2lnbmVkIGludCosIGxvbmcgbG9uZykgY29uc3QRQXBhbmVsOjpXZWF0aGVyU2NlbmU6OmRyYXdfc3RyZWFrcyh1bnNpZ25lZCBpbnQqLCBsb25nIGxvbmcpIGNvbnN0Ej5wYW5lbDo6V2VhdGhlclNjZW5lOjpkcmF3X3JhaW4odW5zaWduZWQgaW50KiwgbG9uZyBsb25nKSBjb25zdBN+cGFuZWw6OldlYXRoZXJTY2VuZTo6ZHJhd19mbGFrZXModW5zaWduZWQgaW50Kiwgc3RkOjp2ZWN0b3I8cGFuZWw6OldlYXRoZXJTY2VuZTo6Rmxha2U+IGNvbnN0JiwgdW5zaWduZWQgaW50LCBsb25nIGxvbmcpIGNvbnN0FENwYW5lbDo6V2VhdGhlclNjZW5lOjpkcmF3X2xpZ2h0bmluZyh1bnNpZ25lZCBpbnQqLCBsb25nIGxvbmcpIGNvbnN0FTZwYW5lbDo6V2VhdGhlclNjZW5lOjpkcmF3X2Nvcm5lcnModW5zaWduZWQgaW50KikgY29uc3QWc3BhbmVsOjpXZWF0aGVyU2NlbmU6OmRyYXdfbGlnaHRuaW5nKHVuc2lnbmVkIGludCosIGxvbmcgbG9uZykgY29uc3Q6OiRfMTo6b3BlcmF0b3IoKShpbnQsIGludCwgaW50LCBpbnQsIGludCkgY29uc3QXCXNjZW5lX25ldxgLdGV4dF9idWZmZXIZD3NjZW5lX2NvbmZpZ3VyZRoMc2NlbmVfcmVuZGVyGw5zY2VuZV9hbmltYXRlZBwFYWxsb2MdB3RvX3JnYmEeBm1lbXNldB8GbWFsbG9jIARmcmVlIQpoZWFwX3Jlc2V0IhtvcGVyYXRvciBuZXcodW5zaWduZWQgbG9uZykjHW9wZXJhdG9yIG5ld1tdKHVuc2lnbmVkIGxvbmcpJBZvcGVyYXRvciBkZWxldGUodm9pZCopJRhvcGVyYXRvciBkZWxldGVbXSh2b2lkKikHEgEAD19fc3RhY2tfcG9pbnRlcgkKAQAHLnJvZGF0YQA4CXByb2R1Y2VycwEMcHJvY2Vzc2VkLWJ5AQxVYnVudHUgY2xhbmcRMTguMS4zICgxdWJ1bnR1MSkALA90YXJnZXRfZmVhdHVyZXMCKw9tdXRhYmxlLWdsb2JhbHMrCHNpZ24tZXh0";
+/* ---------- screensaver stand: four savers, "now in firmware" beside "proposed" ----------
+   Sky for the weather saver: src/weather_scene.cpp compiled to WebAssembly (same as the weather stand).
+   Sensor norms: the microclimate registry (climate-stand.html) — one source of words and colours for the
+   microclimate card, "Пульс дома" and the "Дома" tile on the weather saver. */
+const T = { bg: "#101317", text: "#f3f0e9", muted: "#b3b5b9", subtle: "#818792", error: "#ff9991" };
+const FONT = '"Noto Sans", system-ui, sans-serif';
+const LEVEL = { good: [155, 203, 168], mid: [232, 195, 106], bad: [255, 132, 120] };
+const RANK = { good: 0, mid: 1, bad: 2 };
+const rgb = (a, al = 1) => `rgba(${a.map((v) => Math.round(Math.max(0, Math.min(255, v)))).join(",")},${al})`;
+const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
+const hex = (c) => [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16));
+
+/* ---------- registry: zones go up the scale, value < to → level; phrases from long to short ---------- */
+const SENSORS = {
+  temp: { label: "Температура", unit: "°C", icon: "thermometer", dec: 1, cls: "temperature",
+    zones: [[16, "bad", ["Температура: холодно", "Холодно"]], [20, "mid", ["Температура: прохладно", "Прохладно"]], [24, "good", ["Комфорт"]], [26, "mid", ["Температура: тепло", "Тепло"]], [Infinity, "bad", ["Температура: жарко", "Жарко"]]] },
+  hum: { label: "Влажность", unit: "%", icon: "water-percent", dec: 0, cls: "humidity",
+    zones: [[25, "bad", ["Влажность: очень сухо", "Очень сухо"]], [40, "mid", ["Влажность: сухо", "Сухо"]], [60, "good", ["Норма"]], [70, "mid", ["Влажность: влажно", "Влажно"]], [Infinity, "bad", ["Влажность: сыро", "Сыро"]]] },
+  co2: { label: "CO₂", unit: "ppm", icon: "molecule-co2", dec: 0, round: 10, cls: "carbon_dioxide",
+    zones: [[800, "good", ["Норма"]], [1200, "mid", ["CO₂ повышен", "Повышен"]], [Infinity, "bad", ["CO₂ высокий", "Высокий"]]] },
+  pm25: { label: "PM2.5", unit: "мкг/м³", icon: "molecule", dec: 0, cls: "pm25",
+    zones: [[15, "good", ["Чисто"]], [35, "mid", ["PM2.5 превышен", "Превышен"]], [Infinity, "bad", ["PM2.5 высокий", "Высокий"]]] },
+  pm1: { label: "PM1", unit: "мкг/м³", icon: "blur", dec: 0, cls: "pm1",
+    zones: [[10, "good", ["Чисто"]], [25, "mid", ["PM1 превышен", "Превышен"]], [Infinity, "bad", ["PM1 высокий", "Высокий"]]] },
+  tvoc: { label: "TVOC", unit: "ppb", icon: "scent", dec: 0, round: 10, cls: "volatile_organic_compounds_parts",
+    zones: [[220, "good", ["Норма"]], [660, "mid", ["TVOC повышен", "Повышен"]], [Infinity, "bad", ["TVOC высокий", "Высокий"]]] },
+  door: { label: "Дверь", unit: "", icon: "door-closed", binary: true, cls: "door",
+    states: { off: ["good", "Закрыта", ["Закрыта"]], on: ["mid", "Открыта", ["Дверь открыта", "Открыта"]] } },
+  leak: { label: "Протечка", unit: "", icon: "pipe-leak", binary: true, cls: "moisture",
+    states: { off: ["good", "Нет", ["Сухо"]], on: ["bad", "Вода!", ["Протечка!"]] } },
+};
+const ORDER = Object.keys(SENSORS);
+const SCENES = {
+  ok:     { ru: "Всё в норме", v: { temp: 22.4, hum: 47, co2: 640, pm25: 7, pm1: 4, tvoc: 140 } },
+  stuffy: { ru: "Душно",       v: { temp: 25.1, hum: 58, co2: 1240, pm25: 11, pm1: 6, tvoc: 520 } },
+  smog:   { ru: "Смог",        v: { temp: 21.6, hum: 44, co2: 720, pm25: 52, pm1: 31, tvoc: 260 } },
+  dry:    { ru: "Отопление",   v: { temp: 26.8, hum: 22, co2: 880, pm25: 9, pm1: 5, tvoc: 180 } },
+};
+const CONDITIONS = [["sunny", "Ясно", 24], ["clear-night", "Ясно", 14], ["partlycloudy", "Переменная облачность", 19], ["cloudy", "Облачно", 12], ["windy", "Ветрено", 15], ["fog", "Туман", 6], ["rainy", "Дождь", 9], ["pouring", "Ливень", 13], ["lightning-rainy", "Гроза с дождём", 18], ["snowy", "Снег", -4], ["snowy-rainy", "Мокрый снег", 1]];
+const WICON = { sunny: "weather-sunny", "clear-night": "weather-night", partlycloudy: "weather-partly-cloudy", cloudy: "weather-cloudy", windy: "weather-windy", fog: "weather-fog", rainy: "weather-rainy", pouring: "weather-pouring", "lightning-rainy": "weather-lightning-rainy", snowy: "weather-snowy", "snowy-rainy": "weather-snowy-rainy" };
+const VARIANTS = [["clock", "Только время"], ["sensors", "Пульс дома"], ["weather", "Живая погода"], ["photo", "Любимый момент"]];
+
+const state = { variant: "clock", clock: 176, date: 28, sensors: ["temp", "hum", "co2", "pm25", "door", "leak"], weatherSensors: ["temp", "hum", "pm25", "co2"], scene: "dry", door: false, leak: false, condition: "rainy", night: false, bg: "dark", reduced: false };
+if (matchMedia("(prefers-reduced-motion: reduce)").matches) state.reduced = true;
+try { Object.assign(state, JSON.parse(localStorage.getItem("saver-stand") || "{}")); } catch (e) {}
+state.clock = 176; state.date = 28;
+const save = () => { try { localStorage.setItem("saver-stand", JSON.stringify(state)); } catch (e) {} };
+
+/* ---------- readings ---------- */
+const val = {};
+function setScene(id) { Object.assign(val, (SCENES[id] || SCENES.ok).v); }
+setScene(state.scene);
+function reading(k) { const S = SENSORS[k], v = val[k]; return S.round ? Math.round(v / S.round) * S.round : +v.toFixed(S.dec); }
+function valueText(k) {
+  const S = SENSORS[k]; if (S.binary) return S.states[state[k] ? "on" : "off"][1];
+  const v = reading(k); return S.dec ? v.toFixed(S.dec).replace(".", ",") : String(v);
+}
+function level(k) {
+  const S = SENSORS[k];
+  if (S.binary) { const [lv, , words] = S.states[state[k] ? "on" : "off"]; return { lv, words }; }
+  const v = reading(k); for (const [to, lv, words] of S.zones) if (v < to) return { lv, words }; return { lv: "good", words: [""] };
+}
+const bad = (keys) => keys.filter((k) => level(k).lv !== "good").sort((a, b) => RANK[level(b).lv] - RANK[level(a).lv]);
+
+/* ---------- text helpers (LVGL label: y is the top of the line box, baseline ≈ y + 1.07·size) ---------- */
+let checkLog = null, region = null;
+function txt(ctx, s, x, y, size, color, o = {}) {
+  ctx.font = `${o.w || 400} ${size}px ${FONT}`; ctx.fillStyle = color; ctx.textAlign = o.align || "left"; ctx.textBaseline = "alphabetic";
+  ctx.letterSpacing = o.ls ? `${o.ls}px` : "0px";
+  let t = s; if (o.max) t = ellipsis(ctx, s, o.max);
+  const by = o.baseline ? y : y + size * (o.asc || 1.07);
+  ctx.fillText(t, x, by);
+  if (checkLog && region) {
+    const m = ctx.measureText(t), w = m.width, x0 = ctx.textAlign === "center" ? x - w / 2 : ctx.textAlign === "right" ? x - w : x;
+    if (x0 < region.x - 0.5 || x0 + w > region.x + region.w + 0.5 || by - m.actualBoundingBoxAscent < region.y - 0.5 || by + m.actualBoundingBoxDescent > region.y + region.h + 0.5) checkLog.push(`${region.tag}: «${t}» выходит за ${region.name}`);
+  }
+  ctx.letterSpacing = "0px";
+  return ctx.measureText(t).width;
+}
+function ellipsis(ctx, s, w) { if (ctx.measureText(s).width <= w) return s; while (s.length > 1 && ctx.measureText(s + "…").width > w) s = s.slice(0, -1); return s + "…"; }
+const width = (s, size, w = 400) => { M2.font = `${w} ${size}px ${FONT}`; M2.letterSpacing = "0px"; return M2.measureText(s).width; };
+const M2 = document.createElement("canvas").getContext("2d");
+function fitPhrase(list, size, w) { return list.find((s) => width(s, size) <= w) || list[list.length - 1]; }
+function rr(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.roundRect(x, y, w, h, Math.min(r, w / 2, h / 2)); }
+
+/* ---------- icons: firmware MDI masks ---------- */
+const maskCache = new Map();
+function icon(ctx, name, x, y, size, color) {
+  const key = name + color;
+  if (!maskCache.has(key)) {
+    const bytes = Uint8Array.from(atob(ICONS[name]), (c) => c.charCodeAt(0)), c = document.createElement("canvas"); c.width = c.height = 24;
+    const g = c.getContext("2d"), img = g.createImageData(24, 24), col = color.startsWith("#") ? hex(color) : color.match(/[\d.]+/g).slice(0, 3).map(Number);
+    for (let i = 0; i < 576; i++) img.data.set([col[0], col[1], col[2], bytes[i]], i * 4);
+    g.putImageData(img, 0, 0); maskCache.set(key, c);
+    if (maskCache.size > 300) maskCache.delete(maskCache.keys().next().value);
+  }
+  ctx.drawImage(maskCache.get(key), x, y, size, size);
+}
+
+/* ---------- clock and date ---------- */
+const DAYS = ["воскресенье", "понедельник", "вторник", "среда", "четверг", "пятница", "суббота"];
+const MONTHS = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
+function now() { const d = new Date(); return { hm: `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`, date: `${DAYS[d.getDay()]}, ${d.getDate()} ${MONTHS[d.getMonth()]}` }; }
+const cap = (s) => s[0].toUpperCase() + s.slice(1);
+// firmware clock: panel_font_120 (digits only), letter spacing −6, centred; the bigger sizes scale the spacing
+function drawClock(ctx, size, yTop, region0) {
+  region = region0;
+  txt(ctx, now().hm, 240, yTop, size, "#ffffff", { align: "center", ls: -6 * size / 120, asc: 1.04 });
+}
+
+/* ---------- backgrounds ---------- */
+let wasm = null, sky = null;
+const skyCanvas = document.createElement("canvas"); skyCanvas.width = skyCanvas.height = 480;
+const bytes = (b64) => Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
+function skyScene() {
+  if (!wasm) return;
+  wasm.heap_reset();
+  const mem = new Uint8Array(wasm.memory.buffer), text = wasm.text_buffer(); mem.set(new TextEncoder().encode(state.condition + "\0"), text);
+  const s = wasm.scene_new();
+  wasm.scene_configure(s, text, state.night || state.condition === "clear-night" ? 1 : 0, 480, 480, 0, 0, 0xff0d121b);
+  sky = { s, out: wasm.alloc(480 * 480 * 4), rgba: wasm.alloc(480 * 480 * 4), ctx: skyCanvas.getContext("2d") };
+}
+const epoch = Date.UTC(2026, 9, 28, 17, 0, 0), t0 = performance.now();
+function skyTick(t) {
+  if (!sky) return false;
+  const changed = wasm.scene_render(sky.s, BigInt(Math.floor(epoch + (t - t0))), state.reduced ? 1 : 0, sky.out);
+  if (!changed && sky.drawn) return false;
+  wasm.to_rgba(sky.out, sky.rgba, 480 * 480);
+  sky.ctx.putImageData(new ImageData(new Uint8ClampedArray(wasm.memory.buffer, sky.rgba, 480 * 480 * 4), 480, 480), 0, 0); sky.drawn = true;
+  return true;
+}
+// "Favourite moment": a painted placeholder photo (lake at dusk) — the real one comes from the panel's gallery
+const photo = document.createElement("canvas"); photo.width = photo.height = 480;
+(function paintPhoto() {
+  const g = photo.getContext("2d"), s = g.createLinearGradient(0, 0, 0, 300);
+  s.addColorStop(0, "#1d2b4f"); s.addColorStop(0.45, "#7a4e7e"); s.addColorStop(0.75, "#e38a6b"); s.addColorStop(1, "#f6c27a"); g.fillStyle = s; g.fillRect(0, 0, 480, 300);
+  const sun = g.createRadialGradient(330, 262, 0, 330, 262, 120); sun.addColorStop(0, "rgba(255,236,190,.95)"); sun.addColorStop(0.15, "rgba(255,214,150,.7)"); sun.addColorStop(1, "rgba(255,190,120,0)"); g.fillStyle = sun; g.fillRect(0, 0, 480, 300);
+  const ridge = (base, amp, col, seed) => { g.beginPath(); g.moveTo(0, 480); for (let x = 0; x <= 480; x += 6) g.lineTo(x, base - amp * (0.5 + 0.5 * Math.sin(x / 61 + seed) * Math.cos(x / 23 + seed * 2))); g.lineTo(480, 480); g.closePath(); g.fillStyle = col; g.fill(); };
+  ridge(250, 70, "#4a3a63", 1); ridge(275, 50, "#2c2946", 3); ridge(300, 26, "#1a1a2e", 5);
+  const lake = g.createLinearGradient(0, 300, 0, 480); lake.addColorStop(0, "#d9866f"); lake.addColorStop(0.4, "#6b4b70"); lake.addColorStop(1, "#151a2c"); g.fillStyle = lake; g.fillRect(0, 300, 480, 180);
+  g.globalAlpha = 0.5; for (let y = 304; y < 470; y += 7) { g.fillStyle = `rgba(255,220,170,${0.25 * (1 - (y - 300) / 180)})`; g.fillRect(300 - (y - 300) * 0.2, y, 60 + (y - 300) * 0.4, 1.5); } g.globalAlpha = 1;
+})();
+function background(ctx, kind, t) {
+  if (kind === "weather") { if (sky && sky.drawn) ctx.drawImage(skyCanvas, 0, 0); else { ctx.fillStyle = "#0d121b"; ctx.fillRect(0, 0, 480, 480); } return; }
+  if (kind === "photo") {
+    ctx.drawImage(photo, 0, 0);
+    ctx.fillStyle = "rgba(7,17,27,.61)"; ctx.fillRect(0, 0, 480, 480);                              // firmware shade 0x07111b @ 155
+    return;
+  }
+  ctx.fillStyle = "#0b1017"; ctx.fillRect(0, 0, 480, 480);                                          // no photo: the plain panel page
+}
+// the proposed photo shade: lighter in the middle so the picture breathes, darker under the text
+function newPhotoShade(ctx, top, bottom) {
+  ctx.drawImage(photo, 0, 0);
+  const g = ctx.createLinearGradient(0, 0, 0, 480); g.addColorStop(0, "rgba(7,17,27,.62)"); g.addColorStop(top / 480, "rgba(7,17,27,.5)"); g.addColorStop(Math.min(1, bottom / 480), "rgba(7,17,27,.45)"); g.addColorStop(1, "rgba(7,17,27,.7)");
+  ctx.fillStyle = g; ctx.fillRect(0, 0, 480, 480);
+}
+function newDark(ctx) {                                                                          // dark page with a slow ambient glow
+  ctx.fillStyle = "#0b1017"; ctx.fillRect(0, 0, 480, 480);
+  const t = state.reduced ? 0 : performance.now() / 9000, x = 240 + Math.cos(t) * 90, y = 200 + Math.sin(t * 1.3) * 50;
+  const g = ctx.createRadialGradient(x, y, 0, x, y, 340); g.addColorStop(0, "rgba(70,96,128,.28)"); g.addColorStop(1, "rgba(70,96,128,0)"); ctx.fillStyle = g; ctx.fillRect(0, 0, 480, 480);
+}
+const hint = (ctx) => { region = SCREEN; txt(ctx, "Коснитесь, чтобы открыть дом", 240, 446, 12, "#93aebb", { align: "center" }); };
+const SCREEN = { x: 0, y: 0, w: 480, h: 480, name: "экран", tag: "" };
+
+/* ---------- NOW: what the firmware draws today (src/ui.cpp, saver()) ---------- */
+function drawOld(ctx, v, t) {
+  const weather = v === "weather";
+  background(ctx, weather ? "weather" : v === "photo" ? "photo" : "dark", t);
+  drawClock(ctx, 120, weather ? 0 : 22, SCREEN);
+  txt(ctx, now().date, 240, weather ? 134 : 166, 21, "#dbe6ee", { align: "center" });
+  if (weather) { outdoor(ctx); oldHome(ctx); }
+  else if (v === "sensors") {
+    state.sensors.slice(0, 4).forEach((k, i) => {
+      const S = SENSORS[k], x = 36 + (i % 2) * 222, y = 318 + Math.floor(i / 2) * 68;
+      icon(ctx, S.icon, x, y, 24, "#a7bdc7"); txt(ctx, S.label, x + 28, y, 12, "#a7bdc7", { max: 172 });
+      txt(ctx, `${valueText(k)}${S.unit ? " " + S.unit : ""}`, x + 28, y + 22, 21, "#e8f0f2", { max: 172 });
+    });
+  }
+  hint(ctx);
+}
+function outdoor(ctx) {
+  const [, text, temp] = CONDITIONS.find((c) => c[0] === state.condition) || CONDITIONS[0], top = 176;
+  const T0 = `${temp}°`, line = `Ощущается как ${temp - 4}°   ·   Влажность 81 %`;
+  const tw = width(T0, 64), title = [28, 21, 18].find((s) => width(text, s) <= 432 - tw - 20) || 18, small = [18, 14].find((s) => width(line, s) <= 432 - tw - 20) || 14;
+  const rw = Math.min(432 - tw - 20, Math.max(width(text, title), width(line, small))), x = (480 - tw - 20 - rw) / 2;
+  region = SCREEN;
+  txt(ctx, T0, x, top - 6, 64, "#f6f9fb"); txt(ctx, text, x + tw + 20, top + 6, title, "#f1f5f8");
+  txt(ctx, line, x + tw + 20, top + 6 + title * 1.36 + 2, small, "#d2dee7");
+}
+function glassTile(ctx, x, y, w, h, r = 22, alpha = 150 / 255) {
+  rr(ctx, x, y, w, h, r); ctx.fillStyle = `rgba(7,11,18,${alpha})`; ctx.fill();
+  ctx.strokeStyle = "rgba(255,255,255,.11)"; ctx.lineWidth = 1; rr(ctx, x + .5, y + .5, w - 1, h - 1, r); ctx.stroke();
+}
+function oldHome(ctx) {
+  const keys = state.weatherSensors.slice(0, 4); if (!keys.length) return;
+  glassTile(ctx, 24, 290, 432, 134);
+  region = { x: 24, y: 290, w: 432, h: 134, name: "плитку «Дома»", tag: "сейчас" };
+  icon(ctx, "home-outline", 40, 302, 24, "#dfe8ef"); txt(ctx, "Дома", 72, 302, 18, "#dfe8ef");
+  const col = (432 - 32) / keys.length;
+  keys.forEach((k, i) => {
+    const S = SENSORS[k], x = 24 + 16 + i * col, v = valueText(k);
+    txt(ctx, S.binary ? S.label : S.label, x, 340, 13, "#a9b9c6", { max: col - 6 });
+    const size = [28, 21, 18].find((s) => width(v, s) <= col - 6) || 18, w = txt(ctx, v, x, 360, size, "#f3f7fa");
+    if (S.unit) txt(ctx, S.unit, x + w + 4, 375, 14, "#a9b9c6", { max: Math.max(1, col - 6 - w - 4) });
+  });
+}
+
+/* ---------- NEW ---------- */
+// "Суббота, 31 октября, ☁ 9°": the date, then the outdoor condition icon and temperature from the weather entity
+function dateWeather(ctx, text, baseline, size, color) {
+  const [id, , temp] = CONDITIONS.find((c) => c[0] === state.condition) || CONDITIONS[0];
+  const ic = size <= 21 ? 24 : size <= 28 ? 28 : 36, t = `${temp}°`, head = `${text}, `;
+  const w1 = width(head, size), w2 = width(t, size), total = w1 + ic + 4 + w2, x = 240 - total / 2;
+  region = SCREEN;
+  txt(ctx, head, x, baseline, size, color, { baseline: true });
+  icon(ctx, WICON[id] || "weather-cloudy", x + w1, baseline - size * 0.36 - ic / 2, ic, color);
+  txt(ctx, t, x + w1 + ic + 4, baseline, size, color, { baseline: true });
+}
+function drawNew(ctx, v, t) {
+  if (v === "weather") { background(ctx, "weather", t); drawClock(ctx, 120, 0, SCREEN); txt(ctx, now().date, 240, 134, 21, "#dbe6ee", { align: "center" }); outdoor(ctx); newHome(ctx, t); hint(ctx); return; }
+  if (v === "sensors") { state.bg === "photo" ? newPhotoShade(ctx, 160, 430) : newDark(ctx); pulse(ctx, t); hint(ctx); return; }
+  if (v === "photo") {                                        // favourite moment: as today (clock 120 and date on top), plus the weather after the date
+    background(ctx, "photo", t);
+    drawClock(ctx, 120, 22, SCREEN);
+    dateWeather(ctx, now().date, 166 + 21 * 1.07, 21, "#dbe6ee");
+    hint(ctx); return;
+  }
+  // clock only: one large centred block
+  const S = state.clock, D = state.date;
+  if (state.bg === "photo") newPhotoShade(ctx, 140, 330); else newDark(ctx);
+  const cap0 = 0.714 * S, gap = Math.round(S * 0.17), block = cap0 + gap + D * 0.75, top = Math.round(222 - block / 2);
+  const clockBase = top + cap0;
+  region = SCREEN;
+  txt(ctx, now().hm, 240, clockBase, S, "#ffffff", { align: "center", ls: -6 * S / 120, baseline: true });
+  dateWeather(ctx, cap(now().date), clockBase + gap + D * 0.75, D, "#e3ecf2");
+  hint(ctx);
+}
+// level paint for a value and its phrase
+const tone = (lv, good = "#f3f7fa") => lv === "good" ? good : rgb(LEVEL[lv]);
+function newHome(ctx, t) {
+  const keys = state.weatherSensors.slice(0, 4); if (!keys.length) return;
+  const off = bad(keys), breath = state.reduced ? 0.5 : 0.5 - 0.5 * Math.cos(t / 2600 * 2 * Math.PI);
+  glassTile(ctx, 24, 290, 432, 134);
+  region = { x: 24, y: 290, w: 432, h: 134, name: "плитку «Дома»", tag: "новый" };
+  icon(ctx, "home-outline", 40, 302, 24, "#dfe8ef"); txt(ctx, "Дома", 72, 302, 18, "#dfe8ef");
+  // right of the title: a one-line verdict in the worst level's colour
+  const verdict = !off.length ? "всё в норме" : off.length === 1 ? "1 вне нормы" : `${off.length} вне нормы`, vlv = off.length ? level(off[0]).lv : "good";
+  const vw = width(verdict, 14); ctx.fillStyle = rgb(LEVEL[vlv]); ctx.beginPath(); ctx.arc(456 - 16 - vw - 10, 314, 4, 0, 7); ctx.fill();
+  txt(ctx, verdict, 456 - 16, 306, 14, rgb(LEVEL[vlv], vlv === "good" ? 0.9 : 1), { align: "right" });
+  const col = (432 - 32) / keys.length;
+  keys.forEach((k, i) => {
+    const S = SENSORS[k], x = 24 + 16 + i * col, v = valueText(k), l = level(k), cw = col - 8;
+    if (l.lv !== "good") {                                   // out of norm: a soft glow behind the column, breathing when bad
+      const a = l.lv === "bad" ? 0.12 + 0.08 * breath : 0.08, g = ctx.createRadialGradient(x + cw / 2, 372, 0, x + cw / 2, 372, col * 0.75);
+      g.addColorStop(0, rgb(LEVEL[l.lv], a)); g.addColorStop(1, rgb(LEVEL[l.lv], 0)); ctx.save(); rr(ctx, 25, 291, 430, 132, 21); ctx.clip(); ctx.fillStyle = g; ctx.fillRect(x - 8, 330, col, 92); ctx.restore();
+    }
+    // caption: the sensor's name when fine (with a quiet green dot), the deviation in its colour when not
+    if (l.lv === "good") { ctx.fillStyle = rgb(LEVEL.good, 0.85); ctx.beginPath(); ctx.arc(x + 3, 347, 3, 0, 7); ctx.fill(); txt(ctx, S.label, x + 11, 338, 13, "#a9b9c6", { max: cw - 11 }); }
+    else txt(ctx, fitPhrase(l.words, 13, cw), x, 338, 13, rgb(LEVEL[l.lv]), { max: cw, w: 500 });
+    const size = [28, 21, 18].find((s) => width(v, s) + (S.unit ? 4 + width(S.unit, 14) : 0) <= cw) || [28, 21, 18].find((s) => width(v, s) <= cw) || 18;
+    const w = txt(ctx, v, x, 360, size, tone(l.lv));
+    if (S.unit && w + 4 + width(S.unit, 14) <= cw) txt(ctx, S.unit, x + w + 4, 375, 14, l.lv === "good" ? "#a9b9c6" : rgb(LEVEL[l.lv], 0.8));
+    if (l.lv !== "good") { rr(ctx, x, 408, Math.min(cw, 36), 3, 1.5); ctx.fillStyle = rgb(LEVEL[l.lv], 0.9); ctx.fill(); }
+  });
+}
+/* Пульс дома: clock, date, a verdict pill and up to six sensor tiles — a mini microclimate card made for the dark. */
+function pulse(ctx, t) {
+  const keys = state.sensors.slice(0, 6), D = Math.min(state.date, 28);
+  region = SCREEN;
+  drawClock(ctx, 120, 0, SCREEN);
+  txt(ctx, cap(now().date), 240, 132, D, "#e3ecf2", { align: "center" });
+  const off = bad(keys);
+  // verdict pill
+  const vl = off.length ? level(off[0]) : { lv: "good" }, words = off.length ? fitPhrase(level(off[0]).words, 14, 300) + (off.length > 1 ? `  ·  ещё ${off.length - 1}` : "") : keys.length ? "Дома всё в норме" : "Выберите датчики в веб-интерфейсе";
+  const pw = width(words, 14) + 36, py = 132 + D * 1.36 + 10;
+  rr(ctx, 240 - pw / 2, py, pw, 28, 14); ctx.fillStyle = off.length ? rgb(mix([7, 11, 18], LEVEL[vl.lv], 0.18), 0.85) : "rgba(7,11,18,.55)"; ctx.fill();
+  ctx.strokeStyle = keys.length ? rgb(LEVEL[vl.lv], off.length ? 0.55 : 0.3) : "rgba(255,255,255,.12)"; ctx.lineWidth = 1; rr(ctx, 240 - pw / 2 + .5, py + .5, pw - 1, 27, 13.5); ctx.stroke();
+  ctx.fillStyle = keys.length ? rgb(LEVEL[vl.lv]) : T.subtle; ctx.beginPath(); ctx.arc(240 - pw / 2 + 16, py + 14, 4, 0, 7); ctx.fill();
+  txt(ctx, words, 240 - pw / 2 + 26, py + 3, 14, off.length ? rgb(LEVEL[vl.lv]) : "#dfe8ef");
+  if (!keys.length) return;
+  // tiles
+  const n = keys.length, cols = n <= 2 ? n : n <= 4 ? 2 : 3, rows = Math.ceil(n / cols), top = py + 28 + 14, bottom = 434;
+  const th = Math.min(n <= 2 ? 150 : 120, (bottom - top - (rows - 1) * 8) / rows), tw = (432 - (cols - 1) * 8) / cols, y0 = top + (bottom - top - rows * th - (rows - 1) * 8) / 2;
+  const breath = state.reduced ? 0.5 : 0.5 - 0.5 * Math.cos(t / 2600 * 2 * Math.PI);
+  keys.forEach((k, i) => {
+    const S = SENSORS[k], l = level(k), x = 24 + (i % cols) * (tw + 8), y = y0 + Math.floor(i / cols) * (th + 8), pad = 14, inner = tw - 2 * pad;
+    glassTile(ctx, x, y, tw, th, 18, 0.56);
+    if (l.lv !== "good") {
+      ctx.save(); rr(ctx, x, y, tw, th, 18); ctx.clip();
+      const g = ctx.createRadialGradient(x + tw, y, 0, x + tw, y, Math.max(tw, th) * 1.1), a = l.lv === "bad" ? 0.2 + 0.12 * breath : 0.13;
+      g.addColorStop(0, rgb(LEVEL[l.lv], a)); g.addColorStop(1, rgb(LEVEL[l.lv], 0)); ctx.fillStyle = g; ctx.fillRect(x, y, tw, th); ctx.restore();
+      ctx.strokeStyle = rgb(LEVEL[l.lv], l.lv === "bad" ? 0.45 + 0.35 * breath : 0.4); ctx.lineWidth = 1.5; rr(ctx, x + .75, y + .75, tw - 1.5, th - 1.5, 17.25); ctx.stroke();
+    }
+    region = { x, y, w: tw, h: th, name: `плитку ${S.label}`, tag: `пульс ${n}` };
+    const ic = S.binary ? (state[k] ? (k === "door" ? "door-open" : "water-alert") : S.icon) : S.icon;
+    icon(ctx, ic, x + tw - pad - 24, y + 12, 24, l.lv === "good" ? "#8fa3b3" : rgb(LEVEL[l.lv]));
+    // caption: name (green dot) when fine, the phrase in its colour when not
+    const cw = inner - 30;
+    if (l.lv === "good") { ctx.fillStyle = rgb(LEVEL.good, 0.85); ctx.beginPath(); ctx.arc(x + pad + 3, y + 24, 3, 0, 7); ctx.fill(); txt(ctx, S.label, x + pad + 11, y + 14, 14, "#a9b9c6", { max: cw - 11 }); }
+    else txt(ctx, fitPhrase(l.words, 14, cw), x + pad, y + 14, 14, rgb(LEVEL[l.lv]), { max: cw, w: 500 });
+    // value
+    const v = valueText(k), big = th >= 100 && !S.binary ? (tw >= 180 ? 64 : 44) : S.binary ? (tw >= 180 ? 28 : 21) : 28;
+    const unitSize = big >= 44 ? 18 : 14, uw = S.unit ? width(S.unit, unitSize) + 5 : 0;
+    const size = [big, 44, 28, 21].filter((s) => s <= big).find((s) => width(v, s) + uw <= inner) || 21;
+    const base = y + th - (th >= 100 ? 18 : 14);
+    const w = txt(ctx, v, x + pad, base, size, tone(l.lv, "#f6f9fb"), { baseline: true, max: inner });
+    if (S.unit && w + uw <= inner) txt(ctx, S.unit, x + pad + w + 5, base, unitSize, l.lv === "good" ? "#a9b9c6" : rgb(LEVEL[l.lv], 0.8), { baseline: true });
+  });
+}
+
+/* ---------- views ---------- */
+const views = [];
+function makeView(canvas, kind, variant) { const ctx = canvas.getContext("2d"); const v = { canvas, ctx, kind, variant }; views.push(v); return v; }
+function rebuild() {
+  views.length = 0;
+  makeView(document.getElementById("new"), "new", () => state.variant);
+  const tray = document.getElementById("tray"); tray.replaceChildren();
+  for (const [id, ru] of VARIANTS) {
+    const fig = document.createElement("figure"), c = document.createElement("canvas"), cp = document.createElement("figcaption");
+    c.width = c.height = 480; c.style.width = "240px"; c.setAttribute("aria-label", `Заставка: ${ru}`); cp.innerHTML = `<b>${ru}</b>`;
+    c.onclick = () => { state.variant = id; sync(); }; c.style.cursor = "pointer";
+    fig.append(cp, c); tray.append(fig); makeView(c, "new", () => id);
+  }
+  document.getElementById("newCap").textContent = VARIANTS.find((v) => v[0] === state.variant)[1];
+}
+function frame(t) {
+  skyTick(t);
+  for (const v of views) { v.ctx.save(); (v.kind === "old" ? drawOld : drawNew)(v.ctx, v.variant(), t); v.ctx.restore(); }
+  requestAnimationFrame(frame);
+}
+
+/* ---------- self-check: every variant × every sensor count × scenes; text must stay in its tile / on screen ---------- */
+function saverCheck() {
+  const saved = JSON.stringify(state), c = document.createElement("canvas"); c.width = c.height = 480; const ctx = c.getContext("2d");
+  checkLog = []; let n = 0;
+  for (const scene of Object.keys(SCENES)) for (const flags of [[false, false], [true, true]]) for (let count = 0; count <= 6; count++) for (const clock of [120, 150, 176]) for (const date of [21, 28, 36]) {
+    Object.assign(state, { scene, door: flags[0], leak: flags[1], clock, date, sensors: ["temp", "hum", "co2", "pm25", "door", "leak"].slice(0, count), weatherSensors: ["temp", "hum", "pm25", "co2"].slice(0, Math.min(4, count)) });
+    setScene(scene);
+    for (const [id] of VARIANTS) { drawNew(ctx, id, 0); drawOld(ctx, id, 0); n++; }
+  }
+  const out = [...new Set(checkLog)]; checkLog = null; region = null;
+  Object.assign(state, JSON.parse(saved)); setScene(state.scene);
+  return { ok: !out.length, drawn: n, problems: out };
+}
+window.saverCheck = saverCheck;
+
+/* ---------- controls ---------- */
+function pressed(box, value) { for (const b of box.querySelectorAll("[data-v]")) b.setAttribute("aria-pressed", String(b.dataset.v === String(value))); }
+function seg(id, key, cast = String, after) {
+  const box = document.getElementById(id); pressed(box, state[key]);
+  box.addEventListener("click", (e) => { const v = e.target.closest("[data-v]")?.dataset.v; if (v == null) return; state[key] = cast(v); pressed(box, v); after?.(); save(); });
+}
+function sensorChips(id, key, max) {
+  const box = document.getElementById(id);
+  const paint = () => { for (const b of box.children) { const i = state[key].indexOf(b.dataset.k); b.setAttribute("aria-pressed", String(i >= 0)); b.textContent = (i >= 0 ? `${i + 1} · ` : "") + SENSORS[b.dataset.k].label; } };
+  for (const k of ORDER) {
+    if (key === "weatherSensors" && SENSORS[k].binary) continue;
+    const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.dataset.k = k;
+    b.onclick = () => { const a = state[key]; if (a.includes(k)) state[key] = a.filter((x) => x !== k); else if (a.length < max) state[key] = [...a, k]; else { document.getElementById("msg").textContent = `не больше ${max}`; setTimeout(() => (document.getElementById("msg").textContent = ""), 1400); } paint(); save(); };
+    box.append(b);
+  }
+  paint();
+}
+function sync() {
+  pressed(document.getElementById("variant"), state.variant);
+  for (const [g, show] of [["g-cond", ["clock", "photo", "weather"]], ["g-pulse", ["sensors"]], ["g-weather", ["weather"]], ["g-bg", ["clock", "sensors"]], ["g-scene", ["sensors", "weather"]]])
+    document.getElementById(g).hidden = !show.includes(state.variant);
+  rebuild(); save();
+}
+function setup() {
+  seg("variant", "variant", String, sync);
+  seg("bgSeg", "bg");
+  seg("sceneSeg", "scene", String, () => setScene(state.scene));
+  seg("timeSeg", "night", (v) => v === "night", skyScene);
+  const cond = document.getElementById("cond");
+  for (const [id, ru] of CONDITIONS) cond.add(new Option(`${ru}${id === "clear-night" ? " (ночь)" : ""}`, id));
+  cond.value = state.condition; cond.onchange = () => { state.condition = cond.value; skyScene(); save(); };
+  pressed(document.getElementById("timeSeg"), state.night ? "night" : "day");
+  sensorChips("pulseChips", "sensors", 6); sensorChips("weatherChips", "weatherSensors", 4);
+  for (const k of ["door", "leak", "reduced"]) { const el = document.getElementById(k); el.checked = !!state[k]; el.onchange = () => { state[k] = el.checked; save(); }; }
+  sync();
+}
+(async function boot() {
+  setup();
+  try { const { instance } = await WebAssembly.instantiate(bytes(WASM), {}); wasm = instance.exports; skyScene(); } catch (e) { document.getElementById("msg").textContent = "движок неба не запустился: " + e.message; }
+  if (document.fonts) await Promise.all(["400 14px", "500 14px", "400 64px", "400 120px"].map((f) => document.fonts.load(`${f} "Noto Sans"`))).catch(() => {});
+  requestAnimationFrame(frame);
+})();
+
+</script>

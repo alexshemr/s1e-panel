@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Демо карточек Aqara S1E</title>
+<style>
+/* Hub for every card stand: one tile per stand, same dark workbench palette as the stands. */
+:root {
+  --page: #0b0e12; --raised: #171b21; --hover: #1d2229; --line: #2a3039;
+  --text: #f3f0e9; --muted: #9da2aa; --accent: #dfb98a;
+  --body: "Noto Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  color-scheme: dark;
+}
+html, body { margin: 0; background: var(--page); color: var(--text); }
+body { font-family: var(--body); font-size: 14px; line-height: 1.5; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 28px 16px 48px; display: grid; gap: 22px; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+h1 { font-size: clamp(24px, 3vw, 32px); font-weight: 600; line-height: 1.15; margin: 4px 0 0; }
+h2 { font-size: 13px; font-weight: 500; color: var(--muted); margin: 8px 0 0; letter-spacing: .02em; }
+.lede { color: var(--muted); max-width: 72ch; margin: 6px 0 0; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 14px; }
+a.card { display: grid; grid-template-rows: auto auto 1fr auto; gap: 8px; padding: 18px; border-radius: 18px;
+  background: var(--raised); border: 1px solid var(--line); color: inherit; text-decoration: none; min-height: 168px; }
+a.card:hover { background: var(--hover); border-color: #3a414c; }
+a.card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.icon { width: 40px; height: 40px; border-radius: 12px; background: #2a2620; display: grid; place-items: center; }
+.icon svg { width: 24px; height: 24px; fill: var(--accent); }
+.icon i { width: 24px; height: 24px; background: var(--accent); -webkit-mask: var(--m) center / contain no-repeat; mask: var(--m) center / contain no-repeat; }
+.name { font-size: 17px; font-weight: 600; }
+.desc { color: var(--muted); font-size: 13px; }
+.meta { font-family: var(--mono); font-size: 12px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 6px; }
+.tag { border: 1px solid var(--line); border-radius: 999px; padding: 1px 8px; }
+.tag.new { border-color: var(--accent); color: var(--accent); }
+.sheets { display: flex; flex-wrap: wrap; gap: 8px; }
+.sheets a { font-family: var(--mono); font-size: 12px; color: var(--text); background: var(--raised); border: 1px solid var(--line);
+  border-radius: 999px; padding: 5px 11px; text-decoration: none; }
+.sheets a:hover { border-color: var(--accent); }
+.note { color: var(--muted); font-size: 13px; max-width: 80ch; margin: 0; }
+code { font-family: var(--mono); font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Aqara S1E</div>
+    <h1>Демо карточек</h1>
+    <p class="lede">Живые демо карточек и заставок панели. Каждую карточку можно потрогать: включить, подвигать слайдеры, поменять режимы, и сразу увидеть её во всех размерах.</p>
+  </header>
+
+  <section class="grid" aria-label="Стенды">
+    <a class="card" href="home-stand.html">
+      <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 3h8v8H3V3m2 2v4h4V5H5m8-2h8v5h-8V3m2 2v1h4V5h-4M3 13h8v8H3v-8m2 2v4h4v-4H5m8-5h8v11h-8V10m2 2v7h4v-7h-4Z"/></svg></span>
+      <span class="name">Конструктор</span>
+      <span class="desc">Любые виджеты из стендов на одном экране панели: расстановка по сетке, несколько страниц. Настройки у каждого виджета свои, общий только язык — английский или русский.</span>
+      <span class="meta"><span class="tag new">новое</span><span class="tag">14 наборов</span></span>
+    </a>
+    <a class="card" href="cover-stand.html">
+      <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M23 3H1V1h22v2M2 4h8c0 4-3.4 8.5-1 18H2V4m20 0h-8c0 4 3.4 8.5 1 18h7V4Z"/></svg></span>
+      <span class="name">Шторы</span>
+      <span class="desc">Окно с городом за ним и штора цвета карточки. Небо за окном следует за солнцем и луной: зимой темнеет рано, летом солнце стоит высоко.</span>
+      <span class="meta"><span class="tag">11 размеров</span></span>
+    </a>
+    <a class="card" href="roller-stand.html">
+      <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M20 19V3H4v16H2v2h20v-2h-2M6 5h12v8h-5v1.3c.6.3 1 1 1 1.7a2 2 0 0 1-4 0c0-.7.4-1.4 1-1.7V13H6V5Z"/></svg></span>
+      <span class="name">Рулонная штора</span>
+      <span class="desc">То же окно и небо, ткань опускается из короба сверху, рулон в торцах короба толще, когда штора поднята.</span>
+      <span class="meta"><span class="tag">11 размеров</span></span>
+    </a>
+    <a class="card" href="light-stand.html">
+      <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-4 12.7V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.3A7 7 0 0 0 12 2M9 21a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-1H9v1Z"/></svg></span>
+      <span class="name">Свет</span>
+      <span class="desc">Яркость, температура, цвет и режимы лампы, быстрые пресеты. Лампа светится своим цветом, лучи плавно «дышат».</span>
+      <span class="meta"><span class="tag">11 размеров</span></span>
+    </a>
+    <a class="card" href="breezer-stand.html">
+      <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 11a1 1 0 1 0 0 2 1 1 0 0 0 0-2m.5-9c4.5 0 4.6 3.6 2.2 4.8-1 .5-1.4 1.4-1.6 2.2.5.2.9.5 1.2.9 3.7-2 7.7-1.2 7.7 2.6 0 4.5-3.6 4.6-4.8 2.2-.5-1-1.4-1.4-2.2-1.6-.2.5-.5.9-.9 1.2 2 3.7 1.2 7.7-2.6 7.7-4.5 0-4.6-3.6-2.2-4.8 1-.5 1.4-1.4 1.6-2.2-.5-.2-.9-.5-1.2-.9-3.7 2-7.7 1.2-7.7-2.6 0-4.5 3.6-4.6 4.8-2.2.5 1 1.4 1.4 2.2 1.6.2-.5.5-.9.9-1.2C7.4 5.9 8.7 2 12.5 2Z"/></svg></span>
+      <span class="name">Бризер</span>
+      <span class="desc">Подача воздуха, режимы «Авто», «Сон», «Избранное», обогрев и до трёх датчиков (CO₂, PM2.5, TVOC) с цветом уровня.</span>
+      <span class="meta"><span class="tag">11 размеров</span></span>
+    </a>
+    <a class="card" href="climate-stand.html">
+      <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 15c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2c0-.7.4-1.4 1-1.7V12c0-.6.4-1 1-1s1 .4 1 1v3.3M12 3 2 12h3v8h7.4a5 5 0 0 1-1.4-1.3c-.4.2-.8.3-1.3.3-1.9 0-3.4-1.6-3.4-3.5 0-1 .4-1.9 1.1-2.5V12c0-1.6 1.3-3 3-3s3 1.4 3 3v1c.7.6 1.1 1.5 1.1 2.5 0 .7-.2 1.4-.6 2v.5H19v-6h3L12 3m8 13h-4v-2h4v2Z"/></svg></span>
+      <span class="name">Микроклимат</span>
+      <span class="desc">Датчики комнаты на одной карточке: температура, влажность, CO₂, PM2.5 и другие. Цвет показывает норму, плитки вне нормы мягко светятся.</span>
+      <span class="meta"><span class="tag">11 размеров</span></span>
+    </a>
+    <a class="card" href="time-stand.html">
+      <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16m0-18a10 10 0 1 1 0 20 10 10 0 0 1 0-20m.5 5v5.3l4.5 2.6-.8 1.3L11 13V7h1.5Z"/></svg></span>
+      <span class="name">Время</span>
+      <span class="desc">Дата и время из Home Assistant: будильник, напоминание, срок. Меняется удержанием и прокруткой барабанов, как в iPhone.</span>
+      <span class="meta"><span class="tag">4 размера</span></span>
+    </a>
+    <a class="card" href="button-stand.html">
+      <span class="icon" aria-hidden="true"><i style="--m:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAAArUlEQVR42u2TPQoCMRBGJ+odogcSEZQtrCy8gywodoKV4HlsF8UDrLewFFzBH5BnlWRXEtbUOmky8B4M3yQKiauG/KDQ+uibHuZV6TAnYU+Bry5k9A1n8DV1tSwLwwB0J0XTYcET6DohCwipHXgObJ1wDgjaCm3ghBAVK24PeQAZ29tERI4u1iQw0o0pGs2MB9Arx7qpjXVV3YMw4sDVixbsGBhOEfk01P/HfVFvCopBDKZBAnIAAAAASUVORK5CYII=)"></i></span>
+      <span class="name">Кнопка</span>
+      <span class="desc">Выключатель, реле панели или действие (сцена, скрипт): нажимается вся карточка. В 2×4 — настенная клавиша, есть защита удержанием.</span>
+      <span class="meta"><span class="tag">3 размера</span></span>
+    </a>
+    <a class="card" href="thermostat-stand.html">
+      <span class="icon" aria-hidden="true"><i style="--m:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAABT0lEQVR42rWUsUoDQRRFz4qkiKI2grVapREbP0LUwirxQwQRRAW/INaCoIUgsbD3A9LGSouFQEhQuyCKiMfC0dndJIWIb5ph3z3MnffebCK/izH+CJSocsYdfV5IuWSLUkFhdtVMLUbb1awmbsetOzw+PHJsEDgO6a4HLjtj2SX3fAxfj4pALSQaTuVMVnwLp6xmgVLwfmWSk896qwFpW4pAVdWe0yLOe+GjHU9sqbdWgrGtCJyreijiok+ZC7ecFfdUvYzAvarLIjZyFToRcUnVNAJ91WConwM6IpZVfRFznX4HICl0Ps7De9z2AFgA4CYH3GQy3Qg0AVgDYJvXH/kzOwBsZFS5sk6I+7k77IiTPqhaHWzcaUGuuhuKnmYbF0djdNRGDd/wqA8b79HIseODwKgHlH6b+VqJxSe6yTorzAE9mlzT4C0rSP79r/EJcgo8hqWX5mQAAAAASUVORK5CYII=)"></i></span>
+      <span class="name">Термостат</span>
+      <span class="desc">Целевая температура кнопками − и +, сразу видно, греет ли. На узких карточках градусник, на больших полукруглая шкала.</span>
+      <span class="meta"><span class="tag">11 размеров</span></span>
+    </a>
+    <a class="card" href="humidifier-stand.html">
+      <span class="icon" aria-hidden="true"><i style="--m:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAABEklEQVR42rWUQU4CQRBF38BwBwMkhBVCjN5Cb+PC23ALMZJgiImaeAo3xAtIGANRJ3kunIGZsUFcULXprq7f1f9XqiP5n9U4NCDeuU8DCHMfOHZl2ZaO7UvR80XfuWGbexwC3Kh3tsu32XaqjkKARO1U0hG76qIYicypQCNAMuYLiHbJ2mfEgoQRPSAlKqZvVFKNxUGB/Ju97LTpUZVDDrhVJ3bseq9eixj77JO1MGCpmVYbupeqXoUBK7UpYkdNRHxR9fUns0r6ERjSosUQeACgAQWlKhVOTdakFw5EPHfmzIvwk/DMqZ9+OPEk0MgtjYuyyN7z4Dq9Tlruf/zHvETUtw/M+z4TV+Swq84vwOE+gW+GQF3YKC+uSwAAAABJRU5ErkJggg==)"></i></span>
+      <span class="name">Увлажнитель</span>
+      <span class="desc">Целевая влажность кнопками − и +, пар, пока увлажнитель работает, режимы «Авто», «Сон», «Турбо» и уровень воды в баке.</span>
+      <span class="meta"><span class="tag">11 размеров</span></span>
+    </a>
+    <a class="card" href="fan-stand.html">
+      <span class="icon" aria-hidden="true"><i style="--m:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAABM0lEQVR42rWUvUoDQRCAJ1b+XC7gA9hZBNIoIsTOykZMIYIYCIKN+kCChY2FYMDG9EJeQaLIeRIUPA4u1pprPguX3b3sHkHQ2eJ2bvbb+WUryO9kRv4EOJFYxpLIlSw7NtzVwsg7c0WrD+hjy8p0ILGOp8wWrb4cxnoXy7Z8+XOo0mRB7Xvq9nsC1//Pp04GpKwiCB0F7HrCVUBXHYkIEGrkAJwRcsgtMa/csWMDqU7ygQMutJYX6nVqgKIBoMmm829oqvTm7eekLJkqHRduMv7OafOotcxuXIs+CUN6dKhxCcAn8whVnhRwU9ZpYV8d2UMQ1hgBIxplQMBAAde6rRuEZbO0TqSjHpQ1zqyQDyv9yAUmh68hi5b24hlNx0NmediaHpJQp0tKzjNHvgpW/v3V+AZkYRyjKUMU9gAAAABJRU5ErkJggg==)"></i></span>
+      <span class="name">Вентилятор</span>
+      <span class="desc">Скорость ступенями или плавно, качание и направление вращения. Крыльчатка крутится с настоящей скоростью.</span>
+      <span class="meta"><span class="tag">11 размеров</span></span>
+    </a>
+    <a class="card" href="inputs-stand.html">
+      <span class="icon" aria-hidden="true"><i style="--m:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAAAn0lEQVR42t2UQRLCIAxFXxQs9+m6C6+hl3M8ZbF26IIiHUqprboxC4ZJwvzk5wdxbLPDxnzUYqQFHtzQXDkBxrtlsaQ0IGslCUIDwBkJ6SWEiKN5pj2obGo/3o5Tj0fIwVhMErGYD2i1gbaM+R7czsH9w4PAUjWbReSt+wKCLqrVjCJxu8RXLqmenKvyboHqRcCbG9dxR3NBxY2Tn/8aA382Jx3QdZbNAAAAAElFTkSuQmCC)"></i></span>
+      <span class="name">Число, выбор, текст</span>
+      <span class="desc">Вспомогательные значения Home Assistant: число кнопками или слайдером, выбор из списка, текстовое сообщение.</span>
+      <span class="meta"><span class="tag">5 размеров</span></span>
+    </a>
+    <a class="card" href="printer-stand.html">
+      <span class="icon" aria-hidden="true"><i style="--m:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAAAvElEQVR4Xs2TTQoCMQyFX/xhZuHCO7jxBOLCQ7jzFm49gwfxbIKCIIhUGH1Ch5FmmiDdTbpL+qV57asQZTEq2w5MFFDhbjSo05wGBNW/E4tHGiCQig6O4ICAeVdLAe+GVH6AotORBIIlbkr6BQuIMgf7a8PALp5c9es5AO74icSb26ydCYCHCOzz7YQ4H6gG8bIe0gMaBMwswH64Nca42kZprfHIfh5wcpwVhTW/i2zjzCOnlmRftBvF5vsCovKIGi97iu0AAAAASUVORK5CYII=)"></i></span>
+      <span class="name">3D-принтер</span>
+      <span class="desc">Текущая печать Bambu Lab: что делает принтер, модель, прогресс и время до конца, камера. На больших — картинка модели, слои, температуры, «Пауза» и «Стоп».</span>
+      <span class="meta"><span class="tag">9 размеров</span><span class="tag">прототип</span></span>
+    </a>
+    <a class="card" href="saver-stand.html">
+      <span class="icon" aria-hidden="true"><i style="--m:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAQAAABKfvVzAAAApUlEQVR42rWUzQ7CIBCEPyxGjRdvvpDxZHz/Q681+gS0ETJetEVtlVYcLsvPTIZlWSPGYcYEwp4SlzBKdoDQSamohFGBB0yCGwF20h06BSGumbNkn2YN6zEEjyf0nCmgW48J8wFRT83qp5ceRoFQ1iy9Irzv2ygTn821hMCFLT7Jz5mA0FFVYq0ehOn5cQvqe2Sy1xKAi3QdDZtvhOVA/HD5965xA7EtipJ/e3M5AAAAAElFTkSuQmCC)"></i></span>
+      <span class="name">Заставки</span>
+      <span class="desc">«Только время», «Пульс дома», «Живая погода» и «Любимый момент»: часы, погода и датчики дома в цветах норм.</span>
+      <span class="meta"><span class="tag">4 заставки</span></span>
+    </a>
+    <a class="card" href="weather-stand.html">
+      <span class="icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12.7 6.1A5 5 0 0 1 22 8.5a5 5 0 0 1-1.6 3.7A4.5 4.5 0 0 1 17.5 20H6a4 4 0 0 1-.9-7.9 6 6 0 0 1 7.6-6ZM6 18h11.5a2.5 2.5 0 0 0 0-5H16v-1a4 4 0 0 0-7.6-1.7l-.4.8-.9-.1H6a2 2 0 0 0 0 4Z"/></svg></span>
+      <span class="name">Погода</span>
+      <span class="desc">Все состояния погоды Home Assistant на заставке и карточках: анимированное небо днём и ночью, подписи на русском и английском.</span>
+      <span class="meta"><span class="tag">11 размеров</span></span>
+    </a>
+  </section>
+</div>
+</body>
+</html>

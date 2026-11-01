@@ -1,0 +1,867 @@
+<meta charset="utf-8">
+<title>Стенд бризера S1E</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&family=Noto+Sans+Display:wght@500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: same workbench as the light and curtain stands — sticky controls, the 480×480 panel screen beside every card size. */
+:root {
+  --page: #0b0e12;
+  --tray: #101317;
+  --raised: #171b21;
+  --line: #2a3039;
+  --text: #f3f0e9;
+  --muted: #9da2aa;
+  --accent: #dfb98a;
+  --display: "Noto Sans Display", "Noto Sans", system-ui, sans-serif;
+  --body: "Noto Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  color-scheme: dark;
+}
+html, body { background: var(--page); color: var(--text); }
+body { font-family: var(--body); font-size: 14px; line-height: 1.5; }
+.wrap { max-width: 1480px; margin: 0 auto; padding-block: 20px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 18px; }
+header { display: grid; gap: 4px; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+h1 { font-family: var(--display); font-weight: 600; font-size: clamp(24px, 3vw, 32px); line-height: 1.15; margin: 0; text-wrap: balance; }
+.lede { color: var(--muted); max-width: 80ch; margin: 0; }
+.controls { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px); padding-block: 10px; border-bottom: 1px solid var(--line); display: grid; gap: 10px; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--page); }
+.row { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+.group { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.label { font-size: 12px; color: var(--muted); margin-right: 2px; }
+.seg { display: inline-flex; flex-wrap: wrap; background: var(--raised); border: 1px solid var(--line); border-radius: 10px; padding: 2px; }
+.seg button { font: inherit; font-size: 13px; color: var(--muted); background: none; border: 0; border-radius: 8px; padding: 4px 12px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: #2c3037; color: var(--text); }
+.chip { font: inherit; font-size: 13px; color: var(--text); background: var(--raised); border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; cursor: pointer; font-variant-numeric: tabular-nums; }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #17130e; font-weight: 600; }
+.swatch { width: 26px; height: 26px; border-radius: 50%; border: 2px solid transparent; outline: 1px solid var(--line); cursor: pointer; padding: 0; }
+.swatch[aria-pressed="true"] { border-color: var(--text); }
+.switch { display: inline-flex; gap: 8px; align-items: center; font-size: 13px; cursor: pointer; }
+.switch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.switch span { width: 34px; height: 20px; border-radius: 999px; background: var(--line); position: relative; transition: background .15s; }
+.switch span::after { content: ""; position: absolute; left: 3px; top: 3px; width: 14px; height: 14px; border-radius: 50%; background: var(--text); transition: transform .15s; }
+.switch input:checked + span { background: var(--accent); }
+.switch input:checked + span::after { transform: translateX(14px); background: #17130e; }
+input[type=range] { accent-color: var(--accent); }
+.readout { font-family: var(--mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.ha { font-family: var(--mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.ha b { color: var(--text); font-weight: 500; }
+.chip:focus-visible, .seg button:focus-visible, .swatch:focus-visible, .switch input:focus-visible + span, .kbd button:focus-visible, .kbd select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.bench { display: grid; grid-template-columns: minmax(0, 520px) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 1100px) { .bench { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 700px) { .controls { position: static; backdrop-filter: none; } }
+.device { background: #05070a; border: 1px solid var(--line); border-radius: 22px; padding: 20px; display: grid; gap: 10px; justify-items: center; }
+.device canvas { width: 100%; max-width: 480px; aspect-ratio: 1; display: block; touch-action: none; }
+.caption { font-family: var(--mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; text-align: center; }
+.kbd { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; justify-content: center; font-size: 12px; color: var(--muted); }
+.kbd label { display: inline-flex; gap: 6px; align-items: center; }
+.kbd button, .kbd select { font: inherit; font-size: 13px; color: var(--text); background: #2c3037; border: 0; border-radius: 12px; min-height: 36px; padding: 0 12px; cursor: pointer; }
+.kbd input { width: 120px; }
+.tray { background: var(--tray); border: 1px solid var(--line); border-radius: 18px; padding: 18px; display: flex; flex-wrap: wrap; gap: 22px 16px; align-items: flex-start; min-width: 0; }
+figure { margin: 0; display: grid; gap: 6px; min-width: 0; max-width: 100%; }
+figure canvas { display: block; max-width: 100%; height: auto; touch-action: none; }
+figcaption { font-family: var(--mono); font-size: 12px; color: var(--muted); display: flex; gap: 8px; font-variant-numeric: tabular-nums; }
+figcaption b { color: var(--text); font-weight: 500; }
+.note { color: var(--muted); font-size: 13px; max-width: 92ch; margin: 0; }
+.note strong { color: var(--text); font-weight: 500; }
+@media (prefers-reduced-motion: reduce) { .switch span, .switch span::after { transition: none; } }
+[hidden] { display: none !important; }
+</style>
+
+<div class="wrap">
+  <header>
+    <a class="eyebrow" href="index.html" style="color:inherit;text-decoration:none">← Все стенды</a>
+    <div class="eyebrow">Aqara S1E · бризер</div>
+    <h1>Бризер</h1>
+    <p class="lede">Главное на карточке — подача воздуха: вентилятор в плашке крутится со скоростью бризера, слайдер задаёт мощность. Ниже режимы «Авто», «Сон», «Избранное» и кнопка обогрева: когда обогрев включён, она горит тёплым светом. Над слайдером до трёх датчиков бризера — CO₂, PM2.5 и TVOC, цвет показывает уровень. На больших карточках крупно показана мощность и поток воздуха, который теплеет при включённом обогреве.</p>
+  </header>
+
+  <section class="controls" aria-label="Параметры">
+    <div class="row">
+      <div class="group"><span class="label">Воздух в комнате</span>
+        <div class="seg" id="air"><button type="button" data-v="fresh">Свежо</button><button type="button" data-v="stuffy">Душно</button><button type="button" data-v="smog">Смог за окном</button></div>
+      </div>
+      <div class="group"><span class="label">Датчики на карточке</span><span class="group" id="sensorsBox"></span></div>
+      <div class="group"><span class="label">Иконка обогрева</span><div class="seg" id="heatIcon"></div></div>
+      <label class="switch"><input type="checkbox" id="heater"><span></span>Есть обогрев</label>
+      <div class="group" role="group" aria-label="Акцент интерфейса"><span class="label">Акцент</span><span class="group" id="swatches"></span></div>
+    </div>
+    <span class="ha" id="haOut" hidden></span>
+    <div class="row">
+      <div class="group"><span class="label">На экране</span><span class="group" id="sizes"></span></div>
+      <div class="group" hidden><span class="label">Сетка</span><div class="seg" id="grid"><button type="button" data-v="59">Стенд 59 × 59</button><button type="button" data-v="55.5">План 59 × 55,5</button><button type="button" data-v="53.5">Прошивка 59 × 53,5</button></div><span class="readout" id="pitchOut"></span></div>
+      <label class="switch"><input type="checkbox" id="offline"><span></span>Нет связи</label>
+      <label class="switch"><input type="checkbox" id="reduced"><span></span>Меньше движения</label>
+      <label class="switch" hidden><input type="checkbox" id="zoom"><span></span>Увеличить ×2</label>
+    </div>
+  </section>
+
+  <main class="bench">
+    <div class="device">
+      <canvas id="screen" width="480" height="480" aria-label="Экран панели с карточкой бризера"></canvas>
+      <div class="caption" id="screenCaption"></div>
+      <div class="kbd" hidden aria-label="Управление с клавиатуры">
+        <button type="button" id="kPower">Вкл / выкл</button>
+        <button type="button" id="kHeat">Обогрев</button>
+        <label>Подача <input type="range" id="kSpeed" min="10" max="100"></label>
+        <label>Режим <select id="kPreset"></select></label>
+      </div>
+    </div>
+    <div class="tray" id="tray"></div>
+  </main>
+</div>
+
+<!-- embed-bridge -->
+<script>
+/* ---------- constructor bridge (tools/stand_bridge): lets home-stand.html host this stand as a widget ----------
+   Does nothing unless the page is opened as home-stand.html?embed=<id>&size=<WxH>&lang=<ru|en>.
+   Card mode shows only the card cut from the panel screen; settings mode shows the stand's own controls.
+   Settings are stored per widget (localStorage keys get "@<id>"), panel text is translated on the canvas.
+   A stand opened on its own with ?lang=en (the public demo) gets only the translation. */
+(() => {
+  const q = new URLSearchParams(location.search), id = q.get("embed"), solo = !id && q.get("lang") === "en";
+  if (!id && !solo) return;
+  const E = window.EMBED = { id, size: q.get("size") || "", lang: q.get("lang") === "en" ? "en" : "ru", mode: "card", solo };
+  const root = document.documentElement;
+  if (id) root.classList.add("embed", "embed-card");
+
+  /* each widget keeps its own settings */
+  if (id) try {
+    const S = Storage.prototype, gi = S.getItem, si = S.setItem;
+    S.getItem = function (k) { return gi.call(this, `${k}@${id}`); };
+    S.setItem = function (k, v) { return si.call(this, `${k}@${id}`, v); };
+  } catch (e) {}
+
+  /* panel language: Russian strings are translated where they are drawn */
+  const DICT = {"% · цвет":"% · color","(локально, без HA)":"(local, without HA)","(режим дома) и":"(home mode) and","(уставка бойлера, громкость),":"(water heater setpoint, volume),","+ температура":"+ temperature","+ цвет":"+ color",", фаза луны из":", moon phase from",", шаг":", step","1 вне нормы":"1 out of range","3 ступени":"3 steps","3D-принтер":"3D printer","4 ступени":"4 steps",": ошибка отрисовки":": render error",": текст «":": text «","CO₂ высокий":"CO₂ high","CO₂ повышен":"CO₂ elevated","HA подтвердил:":"HA confirmed:","HA подтвердил: print_status =":"HA confirmed: print_status =","HA подтвердил: печать прервана, принтер свободен":"HA confirmed: print cancelled, printer idle","HA подтвердил: цель":"HA confirmed: target","HA: время изменено извне →":"HA: time changed externally →","HA: дата изменена извне →":"HA: date changed externally →","PLA · 38 г":"PLA · 38 g","PM1 высокий":"PM1 high","PM1 превышен":"PM1 exceeded","PM2.5 высокий":"PM2.5 high","PM2.5 превышен":"PM2.5 exceeded","TVOC высокий":"TVOC high","TVOC повышен":"TVOC elevated","box: − и +":"box: − and +","sun.sun недоступен → запасной режим: день с 07:00 до 19:00 по часам панели.":"sun.sun unavailable → fallback: day from 07:00 to 19:00 by the panel clock.","«Время»":"«Time»","°   ·   Влажность 81 %":"°   ·   Humidity 81 %","° · азимут":"° · azimuth","° · восход":"° · sunrise","·  ещё":"·  more","· без HA":"· without HA","· высота":"· elevation","· ещё":"· more","· закат":"· sunset","· обогрев":"· heating","· по нажатию":"· on tap","· по расписанию":"· on schedule","· реле":"· relay","· сейчас":"· now","· сумерки":"· twilight","» выходит за":"» goes beyond","» выходит за карточку":"» goes beyond the card","Абажур":"Shade lamp","Авто":"Auto","Акцент":"Accent","Акцент интерфейса":"Interface accent","Без датчика":"No sensor","Без заголовка":"No title","Без названия":"Untitled","Без фото":"No photo","Белый PLA":"White PLA","Бирюза":"Teal","Бойлер":"Water heater","Бойлер 40…75 °C":"Water heater 40…75 °C","Бра":"Sconce","Бриз":"Breeze","Бризер":"Breezer","Бризер выключен":"Breezer off","Будильник":"Alarm","В комнате":"In the room","Вариантов":"Options","Вентилятор":"Fan","Вентилятор выключен":"Fan off","Весна":"Spring","Ветер и облака":"Wind and clouds","Ветрено":"Windy","Вечер":"Evening","Вид":"View","Вкл":"On","Вкл / выкл":"On / off","Включается…":"Turning on…","Включить":"Turn on","Включён":"On","Включён ·":"On ·","Включён · обогрев":"On · heating","Вкл…":"On…","Влажн.":"Hum.","Влажно":"Humid","Влажность":"Humidity","Влажность в комнате":"Room humidity","Влажность: влажно":"Humidity: humid","Влажность: очень сухо":"Humidity: very dry","Влажность: сухо":"Humidity: dry","Влажность: сыро":"Humidity: damp","Вода":"Water","Вода есть":"Water OK","Вода!":"Water!","Воздух":"Air","Воздух в комнате":"Room air","Волны":"Waves","Время":"Time","Время в HA":"Time in HA","Время по Москве":"Moscow time","Время суток":"Time of day","Все блоки скрыты: остались лампа и питание":"All blocks hidden: lamp and power remain","Все погоды":"All weathers","Все размеры":"All sizes","Всё в норме":"All normal","Вт":"W","Выберите датчики в веб-интерфейсе":"Select sensors in the web interface","Выбор":"Select","Выкл":"Off","Выкл · Обогрев":"Off · Heat","Выкл · Обогрев · Авто":"Off · Heat · Auto","Выкл.":"Off","Выключается…":"Turning off…","Выключатель":"Switch","Выключен":"Off","Выключить":"Turn off","Выкл…":"Off…","Выполняется…":"Running…","Высокий":"High","Гости":"Guests","Гости дома":"Guests home","Гостиная":"Living room","Готово":"Done","Град":"Hail","Греет":"Heating","Греет до":"Heating to","Гроза":"Thunderstorm","Гроза с дождём":"Thunderstorm, rain","Громкость":"Volume","Громкость 0…100 %, шаг 5":"Volume 0…100 %, step 5","Громкость оповещений":"Notification volume","Грязно":"Polluted","Дата":"Date","Дата в HA":"Date in HA","Дату и время":"Date and time","Датчик":"Sensor","Датчики":"Sensors","Датчики «Дома», до 4":"«Home» sensors, up to 4","Датчики на карточке":"Sensors on card","Датчики не выбраны":"No sensors selected","Датчики пульса, до 6":"Pulse sensors, up to 6","Дверь":"Door","Дверь открыта":"Door open","Действие":"Action","День":"Day","Держит":"Holding","Держите…":"Hold…","Дождь":"Rain","Долить воду":"Refill water","Дом":"Home","Дома":"Home","Дома всё в норме":"All normal at home","Душно":"Stuffy","Ед.":"Unit","Есть обогрев":"Has heater","Есть режимы":"Has effects","Жарко":"Hot","Ждёт":"Waiting","Ждёт · держит":"Waiting · holding","Живая погода":"Live weather","Заголовок":"Title","Задача":"Job","Зажмите и ведите":"Press and drag","Закрываются":"Closing","Закрыта":"Closed","Закрыто":"Closed","Закрыть":"Close","Замер мощности":"Power reading","Запуск":"Start","Запустить":"Run","Заставка":"Screensaver","Заставка:":"Screensaver:","Заставки":"Screensavers","Защита: удерживать":"Protection: hold","Зима":"Winter","Значение в Home Assistant":"Value in Home Assistant","Значения датчиков":"Sensor values","Зоны":"Zones","Идёт…":"Running…","Избранное":"Favorite","Иконка":"Icon","Иконка обогрева":"Heater icon","Какие сущности читает карточка":"Entities the card reads","Калибровка стола":"Bed leveling","Камера":"Camera","Камера недоступна":"Camera unavailable","Камин":"Fireplace","Картинка модели":"Model image","Карточка":"Card","Карточка света":"Light card","Карточка штор":"Curtain card","Качание":"Oscillation","Кельвины":"Kelvin","Кнопка":"Button","Кнопка HA":"HA button","Комфорт":"Comfort","Коралл":"Coral","Коснитесь, чтобы открыть дом":"Tap to open home","Котёл":"Boiler","Красный PETG":"Red PETG","Курьер приедет после 18:00 — позвоните в домофон 24, код подъезда 4512":"Courier arrives after 18:00 — ring intercom 24, entrance code 4512","Лампа":"Lamp","Лампа выключена":"Lamp off","Лампа умеет":"Lamp supports","Лампочка":"Bulb","Лето":"Summer","Ливень":"Pouring","Лист":"Leaf","Любимый момент":"Favorite moment","Люстра":"Chandelier","МСК":"MSK","Меньше движения":"Reduce motion","Микроклимат":"Climate","Модель":"Model","Мокрый снег":"Sleet","Мята":"Mint","Мятный PLA":"Mint PLA","На карточке":"On card","На экране":"On screen","Нагрев бойлера":"Water heater heating","Нагрев сопла":"Heating nozzle","Нагрев стола":"Heating bed","Название":"Name","Напольный вентилятор в кабинете":"Floor fan in the study","Направление":"Direction","Настольная":"Desk","Настольная лампа":"Desk lamp","Не греет":"Not heating","Не греет · держит":"Not heating · holding","Не дома":"Away","Не удалось запустить движок:":"Failed to start the engine:","Небо":"Sky","Нейтральный белый":"Neutral white","Нет":"No","Нет sun.sun":"No sun.sun","Нет воды":"No water","Нет воды — долейте":"No water — refill","Нет данных":"No data","Нет датчиков":"No sensors","Нет задачи":"No job","Нет связи":"Offline","Нет связи с HA":"No connection to HA","Норма":"Normal","Норма 20–24 °C":"Normal 20–24 °C","Норма 40–60 %":"Normal 40–60 %","Норма до 10 мкг/м³":"Normal up to 10 µg/m³","Норма до 15 мкг/м³":"Normal up to 15 µg/m³","Норма до 15 мкг/м³ (ВОЗ, за сутки)":"Normal up to 15 µg/m³ (WHO, daily)","Норма до 220 ppb":"Normal up to 220 ppb","Норма до 800 ppm":"Normal up to 800 ppm","Норма до 800 ppm, выше 1200 — проветрить":"Normal up to 800 ppm, above 1200 — ventilate","Норма ≤ 10":"Normal ≤ 10","Норма ≤ 15":"Normal ≤ 15","Норма ≤ 220":"Normal ≤ 220","Норма ≤ 800":"Normal ≤ 800","Нормы датчиков":"Sensor norms","Ночник":"Night light","Ночь":"Night","Облачно":"Cloudy","Обогрев":"Heating","Обратно":"Reverse","Обычный":"Normal","Огонь":"Fire","Одна карточка для всего, что включается одним касанием:":"One card for anything that switches with one tap:","Ожидание":"Idle","Оранжевый PLA":"Orange PLA","Органайзер для отвёрток":"Screwdriver organizer","Особые условия":"Exceptional","Останавливаем…":"Stopping…","Открываются":"Opening","Открыта":"Open","Открыто":"Open","Открыто на":"Open","Открыть":"Open","Отмена":"Cancel","Отменено":"Cancelled","Отопление":"Heating","Отопление, сухо":"Heating, dry","Отправка…":"Sending…","Отпуск":"Vacation","Оттенок":"Hue","Очень длинное название кнопки":"A very long button name","Очень длинное название комнаты":"A very long room name","Очень сухо":"Very dry","Оченьдлинноесловобезпробеловкотороенепомещаетсявстроку и ещё немного текста после него":"Averyverylongwordwithoutspacesthatdoesnotfitintheline and a bit more text after it","Очистка сопла":"Cleaning nozzle","Ошибка":"Error","Ошибка печати":"Print error","Ощущается как":"Feels like","Параметры":"Settings","Пауза":"Pause","Переменная облачность":"Partly cloudy","Песок":"Sand","Печать":"Printing","Печать идёт (×60)":"Printing (×60)","Плавно, %":"Smooth, %","План 59 × 55,5":"Plan 59 × 55.5","Пластик":"Filament","Плоское бра":"Flat sconce","Повышен":"Elevated","Погода":"Weather","Подача":"Airflow","Подача · авто":"Airflow · auto","Подача воздуха ·":"Airflow ·","Подготовка":"Preparing","Показывает значение":"Shows the value","Положение рулонной шторы, % открытия":"Roller blind position, % open","Положение шторы, % открытия":"Curtain position, % open","Потолочный":"Ceiling","Потолочный (контур)":"Ceiling (outline)","Потолочный свет":"Ceiling light","Правка времени: ведите вверх или вниз":"Edit time: drag up or down","Правка даты: ведите вверх или вниз":"Edit date: drag up or down","Превышен":"Exceeded","Пресет":"Preset","Пресеты (Комфорт, Эко, Не дома)":"Presets (Comfort, Eco, Away)","Пример":"Example","Принтер":"Printer","Приоткрыто":"Ajar","Прогресс":"Progress","Продолжаем…":"Resuming…","Продолжить":"Resume","Протечка":"Leak","Протечка!":"Leak!","Прохладно":"Cool","Прошивка 59 × 53,5":"Firmware 59 × 53.5","Прямо":"Forward","Пульс дома":"Home pulse","Пусто":"Empty","Радиатор":"Radiator","Радуга":"Rainbow","Размер":"Size","Рассвет":"Sunrise","Режим":"Mode","Режим «":"Mode «","Режим дома":"Home mode","Режимы":"Modes","Режимы (Авто, Сон, Турбо)":"Modes (Auto, Sleep, Turbo)","Режимы Бриз и Сон":"Breeze and Sleep modes","Реле":"Relay","Реле панели":"Panel relay","Рулонная штора":"Roller blind","Русский":"Russian","Ручной":"Manual","Ручной режим: небо не зависит от Home Assistant.":"Manual mode: the sky ignores Home Assistant.","Свежо":"Fresh","Свет":"Light","Свеча":"Candle","Свой цвет":"Custom color","Свой цвет акцента":"Custom accent color","Сейчас":"Now","Сейчас в комнате":"Now in the room","Серый PLA":"Grey PLA","Сетка":"Grid","Синий PLA":"Blue PLA","Скорости":"Speeds","Скорость":"Speed","Скорость, %":"Speed, %","Скрипт":"Script","Служебная карточка":"Helper card","Смог":"Smog","Смог за окном":"Smog outside","Снег":"Snow","Сон":"Sleep","Сообщение":"Message","Сохраняется…":"Saving…","Ставим на паузу…":"Pausing…","Стенд 59 × 59":"Stand 59 × 59","Стоп":"Stop","Суббота, 31 октября, ☁ 9°":"Saturday, 31 October, ☁ 9°","Сухо":"Dry","Сущность":"Entity","Сущность содержит":"Entity contains","Сцена":"Scene","Сыро":"Damp","Текст":"Text","Текст в HA":"Text in HA","Темп.":"Temp.","Температура":"Temperature","Температура: жарко":"Temperature: hot","Температура: прохладно":"Temperature: cool","Температура: тепло":"Temperature: warm","Температура: холодно":"Temperature: cold","Тепло":"Warm","Термостат":"Thermostat","Тип":"Type","Только «нет воды»":"Only «no water»","Только время":"Time only","Только дату":"Date only","Только чтение":"Read only","Торшер":"Floor lamp","Туман":"Fog","Турбо":"Turbo","Тёплый белый":"Warm white","Тёплый пол":"Floor heating","Увеличить ×2":"Zoom ×2","Увлажнитель":"Humidifier","Увлажнитель в детской спальне":"Humidifier in the nursery","Увлажняет":"Humidifying","Увлажняет до":"Humidifying to","Удерживайте":"Hold","Удерживайте «Стоп», чтобы прервать печать":"Hold «Stop» to cancel the print","Удерживайте, чтобы":"Hold to","Удерживайте, чтобы изменить":"Hold to change","Умеренно":"Moderate","Управление с клавиатуры":"Keyboard control","Уровень, %":"Level, %","Ушёл":"Away","Фиалка":"Violet","Флажок HA":"HA toggle","Фон":"Background","Фото":"Photo","Холодно":"Cold","Холодный белый":"Cool white","Цвет":"Color","Цвет пластика":"Filament color","Цвет шторы":"Curtain color","Цветной свет":"Colored light","Цель":"Target","Чайник":"Kettle","Чем греет":"Heat source","Число":"Number","Число, выбор, текст":"Number, select, text","Чисто":"Clean","Чтение":"Reading","Шаг":"Step","Штора":"Curtain","Шторы":"Curtains","Эко":"Eco","Язык панели":"Panel language","Яркость":"Brightness","Яркость лампы":"Lamp brightness","Ясная ночь":"Clear night","Ясно":"Clear","авг":"Aug","августа":"August","апр":"Apr","апреля":"April","бак долит":"tank refilled","в баке нет воды — увлажнитель остановился":"tank is empty — humidifier stopped","вес модели, г":"model weight, g","вне нормы":"out of range","воскресенье":"Sunday","вс":"Sun","всего слоёв":"total layers","всё в норме":"all normal","вт":"Tue","вторник":"Tuesday","вчера":"yesterday","выкл":"off","выключен":"off","выше цели на":"above target by","готово в":"done at","греет":"heating","датчики не выбраны":"no sensors selected","движок неба не запустился:":"sky engine failed to start:","дек":"Dec","декабря":"December","дн.":"d","до":"to","до цели":"to target","другие размеры недоступны":"other sizes unavailable","ещё":"more","ещё N":"N more","за":"in","за пределами карточки":"outside the card","завтра":"tomorrow","запустить":"run","засор сопла":"nozzle clog","заставка":"screensaver","и":"and","из":"of","изменено":"changed","изображение с камеры":"camera image","июл":"Jul","июля":"July","июн":"Jun","июня":"June","кВт":"kW","как задано":"as set","камера на весь экран: camera.":"camera full screen: camera.","камера недоступна":"camera unavailable","картинка модели из слайсера":"model image from the slicer","карточка":"card","качание":"oscillation","когда закончится":"when it ends","лампа не умеет:":"lamp can't do:","мар":"Mar","марта":"March","мая":"May","меньше 44 × 44 (":"smaller than 44 × 44 (","мин":"min","мин назад":"min ago","мин назад ·":"min ago ·","мкг/м³":"µg/m³","мс/кадр ·":"ms/frame ·","название модели (Task name)":"model name (Task name)","не больше":"at most","не греет":"not heating","нет воды":"no water","нет задачи":"no job","нет ответа от HA — состояние возвращено":"no reply from HA — state reverted","нет связи — цель не отправлена":"offline — target not sent","новый":"new","ноя":"Nov","ноября":"November","обратно":"reverse","окт":"Oct","октября":"October","осталось":"left","осталось, мин":"left, min","панели":"panel","пауза":"paused","переключить":"toggle","перекрываются":"overlap","плитку":"tile","плитку «Дома»":"the «Home» tile","пн":"Mon","подтвердил:":"confirmed:","понедельник":"Monday","прогресс, %":"progress, %","продолжить":"resume","пт":"Fri","пульс":"pulse","пятница":"Friday","реле":"relay","сб":"Sat","сб, 31 окт":"Sat, 31 Oct","сегодня":"today","сейчас":"now","сен":"Sep","сентября":"September","скрипт завершён":"script finished","слой":"layer","служебные карточки":"helper cards","сопло":"nozzle","сопло, °C (и nozzle_target_temperature)":"nozzle, °C (and nozzle_target_temperature)","ср":"Wed","среда":"Wednesday","стол":"bed","стол, °C (и bed_target_temperature)":"bed, °C (and bed_target_temperature)","стоп (на карточке — удержанием)":"stop (on the card — by holding)","суббота":"Saturday","суббота, 31 октября":"Saturday, 31 October","суббота, 31 октября 2026":"Saturday, 31 October 2026","сцен":"scenes","текущий слой":"current layer","у этого типа только эти размеры":"this type has only these sizes","фев":"Feb","февраля":"February","фон в браузере:":"background in browser:","цель":"target","ч":"h","через":"in","четверг":"Thursday","чт":"Thu","что делает принтер: idle, prepare, running, pause, finish, failed":"what the printer is doing: idle, prepare, running, pause, finish, failed","экран":"screen","этап: нагрев стола, калибровка, печать…":"stage: heating bed, leveling, printing…","янв":"Jan","января":"January","— ваше фото с часами, датой и погодой.":"— your photo with clock, date and weather.","← Все стенды":"← All stands"};
+  const CYR = /[А-Яа-яЁё]/, keys = Object.keys(DICT).sort((a, b) => b.length - a.length);
+  const lower = new Map(keys.map((k) => [k.toLowerCase(), DICT[k]]));
+  const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const RE = keys.length ? new RegExp(`(?<![А-Яа-яЁё])(?:${keys.map(esc).join("|")})(?![А-Яа-яЁё])`, "giu") : null;
+  const cap = (src, out) => {
+    if (!out) return src;
+    const up = src[0] !== src[0].toLowerCase(), outUp = out[0] !== out[0].toLowerCase();
+    return up && !outUp ? out[0].toUpperCase() + out.slice(1) : !up && outUp && src[0] !== src[0].toUpperCase() ? out[0].toLowerCase() + out.slice(1) : out;
+  };
+  const cache = new Map();
+  const tr = E.tr = (s) => {
+    if (E.lang !== "en" || typeof s !== "string" || !s) return s;
+    let v = cache.get(s);
+    if (v !== undefined) return v;
+    v = s;
+    if (CYR.test(v)) v = DICT[v] ?? (RE ? v.replace(RE, (m) => DICT[m] ?? cap(m, lower.get(m.toLowerCase()))) : v);
+    v = v.replace(/«/g, "“").replace(/»/g, "”").replace(/(\d),(\d)/g, "$1.$2");
+    if (cache.size > 5000) cache.clear();
+    cache.set(s, v);
+    return v;
+  };
+  for (const P of [window.CanvasRenderingContext2D, window.OffscreenCanvasRenderingContext2D]) {
+    if (!P) continue;
+    for (const m of ["fillText", "strokeText", "measureText"]) {
+      const o = P.prototype[m];
+      P.prototype[m] = function (t, ...a) { return o.call(this, tr(t), ...a); };
+    }
+  }
+
+  /* the stand's own controls (settings mode) in the panel language: text nodes and titles, originals kept */
+  const seen = new WeakMap();                                  // node → { o: original, w: what we wrote }
+  const ATTRS = ["title", "aria-label", "placeholder"];
+  const trText = (s) => { const m = /^(\s*)([\s\S]*?)(\s*)$/.exec(s); return m[1] + tr(m[2]) + m[3]; };
+  const SKIP = /^(SCRIPT|STYLE|TEXTAREA|NOSCRIPT)$/;
+  function domText(n) {
+    if (!n.parentNode || SKIP.test(n.parentNode.nodeName)) return;
+    let r = seen.get(n);
+    if (!r || n.nodeValue !== r.w) { if (!CYR.test(n.nodeValue)) { seen.delete(n); return; } r = { o: n.nodeValue }; seen.set(n, r); }
+    const v = E.lang === "en" ? trText(r.o) : r.o;
+    r.w = v;
+    if (n.nodeValue !== v) n.nodeValue = v;
+  }
+  function domAttrs(el) {
+    for (const a of ATTRS) {
+      if (!el.hasAttribute(a)) continue;
+      const k = "__tr_" + a, cur = el.getAttribute(a);
+      let r = el[k];
+      if (!r || cur !== r.w) { if (!CYR.test(cur)) continue; r = el[k] = { o: cur }; }
+      r.w = E.lang === "en" ? trText(r.o) : r.o;
+      if (cur !== r.w) el.setAttribute(a, r.w);
+    }
+  }
+  function domWalk(root0) {
+    if (!root0) return;
+    if (root0.nodeType === 3) return domText(root0);
+    if (root0.nodeType !== 1 || SKIP.test(root0.tagName)) return;
+    domAttrs(root0);
+    const it = document.createTreeWalker(root0, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT, { acceptNode: (n) => n.nodeType === 1 && SKIP.test(n.tagName) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT });
+    for (let n = it.nextNode(); n; n = it.nextNode()) n.nodeType === 3 ? domText(n) : domAttrs(n);
+  }
+  const domAll = () => { domWalk(document.body); if (document.documentElement.lang) document.documentElement.lang = E.lang; };
+  new MutationObserver((list) => {
+    for (const m of list) {
+      if (m.type === "characterData") domText(m.target);
+      else if (m.type === "attributes") domAttrs(m.target);
+      else for (const n of m.addedNodes) domWalk(n);
+    }
+  }).observe(root, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ATTRS });
+
+  /* layout of the iframe */
+  const css = document.createElement("style");
+  css.textContent = `
+html.embed, html.embed body { background: transparent !important; margin: 0; }
+html.embed body::before { display: none !important; }
+html.embed .embed-hide, html.embed .tray, html.embed .kbd, html.embed .kbd2, html.embed .caption { display: none !important; }
+html.embed .device canvas { border-radius: 0 !important; }
+html.embed-card, html.embed-card body { overflow: hidden !important; width: 100%; height: 100%; }
+html.embed-card .wrap { display: block !important; padding: 0 !important; margin: 0 !important; max-width: none !important; }
+html.embed-card .wrap > :not(.bench) { display: none !important; }
+html.embed-card .bench { display: block !important; }
+html.embed-card .device { display: block !important; padding: 0 !important; border: 0 !important; border-radius: 0 !important; background: none !important; }
+html.embed-card .device > :not(canvas) { display: none !important; }
+html.embed-card .device canvas { position: fixed !important; left: var(--ex, 0px); top: var(--ey, 0px); width: var(--ew, 480px) !important; max-width: none !important; height: auto !important; aspect-ratio: auto !important; }
+html.embed-settings body { overflow: auto; }
+html.embed-settings .wrap { max-width: none !important; padding: 14px 18px 24px !important; gap: 14px !important; }
+html.embed-settings .wrap > :not(.controls):not(.bench) { display: none !important; }
+html.embed-settings .controls { position: static !important; backdrop-filter: none !important; background: none !important; padding-top: 0 !important; }
+html.embed-settings .bench { display: flex !important; justify-content: center; }
+html.embed-settings .device { width: fit-content; max-width: 100%; box-sizing: border-box; }
+html.embed-settings .device canvas { width: var(--sw, 480px) !important; max-width: 100% !important; height: auto !important; aspect-ratio: auto !important; }
+`;
+  (document.head || root).append(css);
+
+  const $ = (s) => document.querySelector(s);
+  const sizeBox = () => document.getElementById("sizes");
+  const canvas = () => $(".device canvas");
+  const fullScreen = (s) => s === "screen" || s === "saver";
+  function sizes() {
+    const box = sizeBox();
+    if (!box) return ["screen"];                               // the screensaver stand: whole panel
+    return [...box.querySelectorAll("[data-v]")].map((b) => b.dataset.v).filter((v) => /^\d+x\d+$/.test(v) || v === "saver");
+  }
+  function current() {
+    try { if (typeof state === "object" && state) return state.screen || state.size || "screen"; } catch (e) {}
+    return E.size;
+  }
+  function applySize(s) {
+    if (!s || s === current()) return;
+    const b = sizeBox() && [...sizeBox().querySelectorAll("[data-v]")].find((x) => x.dataset.v === s);
+    if (b) b.click();
+  }
+  function geometry() {
+    const cv = canvas(), s = current();
+    if (!cv) return;
+    const screenCanvas = cv.id === "screen";                   // card stands draw the card at (8, 8) on the 480 × 480 screen
+    root.style.setProperty("--ex", screenCanvas && !fullScreen(s) ? "-8px" : "0px");
+    root.style.setProperty("--ey", screenCanvas && !fullScreen(s) ? "-8px" : "0px");
+    const w = screenCanvas ? 480 : cv.width;
+    root.style.setProperty("--ew", w + "px");
+    root.style.setProperty("--sw", w + "px");
+  }
+  function applyLang() {
+    cache.clear();
+    domAll();
+    const box = document.getElementById("lang");                // weather stand: the text layers come in both languages
+    const b = box && box.querySelector(`[data-v="${E.lang}"]`);
+    if (b) { if (b.getAttribute("aria-pressed") !== "true") b.click(); return; }
+    try { if (typeof window.rebuild === "function") window.rebuild(); } catch (e) {}
+  }
+  function hideStandOnly() {
+    for (const id of ["sizes", "lang", "view", "zoom", "grid"]) {
+      const el = document.getElementById(id);
+      if (!el) continue;
+      const g = (el.classList.contains("group") ? el.parentElement : el).closest(".group, .switch");
+      (g || el).classList.add("embed-hide");
+    }
+  }
+  let sent = "";
+  function report(force) {
+    geometry();
+    const msg = { source: "s1e-embed", id, type: "info", sizes: sizes(), size: current() };
+    const sig = JSON.stringify(msg);
+    if (!force && sig === sent) return;
+    sent = sig;
+    parent.postMessage(msg, "*");
+  }
+  function setMode(m) {
+    E.mode = m;
+    root.classList.toggle("embed-card", m === "card");
+    root.classList.toggle("embed-settings", m === "settings");
+    if (m === "settings") scrollTo(0, 0);
+    geometry();
+  }
+
+  addEventListener("message", (e) => {
+    const d = e.data;
+    if (!d || d.target !== "s1e-embed") return;
+    if (d.type === "mode") setMode(d.mode);
+    if (d.type === "size") { E.size = d.size; applySize(d.size); }
+    if (d.type === "lang" && d.lang !== E.lang) { E.lang = d.lang === "en" ? "en" : "ru"; applyLang(); }
+    report(true);
+  });
+
+  let tries = 0;
+  function init() {
+    if (sizeBox() && !sizeBox().querySelector("[data-v]") && tries++ < 150) return void setTimeout(init, 100);   // controls built after an async boot
+    if (typeof window.ellipsis === "function") { const o = window.ellipsis; window.ellipsis = (ctx, t, w) => o(ctx, tr(t), w); }
+    if (solo) {
+      applyLang();
+      for (const p of document.querySelectorAll("p")) if (CYR.test(p.textContent)) p.hidden = true;   // prose without an English text yet
+      const h = document.querySelector("h1");
+      if (h) document.title = `${h.textContent.trim()} · S1E Panel demo`;
+      return;
+    }
+    hideStandOnly();
+    domAll();
+    if (E.lang === "en") applyLang();
+    applySize(E.size);
+    report(true);
+    setInterval(() => report(false), 400);
+  }
+  if (document.readyState === "loading") addEventListener("DOMContentLoaded", () => setTimeout(init, 0)); else setTimeout(init, 0);
+})();
+</script>
+<!-- /embed-bridge -->
+<script>
+const ICONS = {"fan":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE/H9dKiJwAAAAAAAAAAAAAAAAAAAAAATf//////4AYAAAAAAAAAAAAAAAAAAAAAw////////zIAAAAAAAAAAAAAAAAAAAAA8P//////5wUAAAAAAAAAAAAAAAAAAAAA5//////gMwAAAAAAAAAAAAAABjkSAAAAu////9ERAAAAAAAAAAAAAAAY2f/eIgAAaf///1EAAAAAAAAAAAAAAACj////2gcADPr//38BVcDo9cdtAAAAAADi/////9xUnf/////m////////ZgAAAAD2//////////8+P///////////0AAAAADP//////////8+Q////////////AAAAABS////////3/////+BQsD/////5AAAAAAARsj0zYktAH////oKAAjb////pgAAAAAAAAAAAAAAAFT///9hAABB+//bGQAAAAAAAAAAAAAAEtX///+wAAAAHDoGAAAAAAAAAAAAAAA64P/////dAAAAAAAAAAAAAAAAAAAAAA7v///////hAAAAAAAAAAAAAAAAAAAAAD////////+2AAAAAAAAAAAAAAAAAAAAAAzp//////5CAAAAAAAAAAAAAAAAAAAAAAAvqNf2xEYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","fan-off":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFns+9KiKAAAAAAAAAAAAAAAAAAAAAAASv//////4gYAAAAAAAAAAABDtwkAAAAAw////////zIAAAAAAAAAAACv/7wIAAAA7///////5wcAAAAAAAAAAAAIvP+8CQAA6f/////gNQAAAAAAAAAAAAAAD9z/vAkAnf///9ERAAAAAAAAAAAAAAAb3P///7wJBLT//1IAAAAAAAAAAAAAAACm//////+8CQay/38BVcDo9cdtAAAAAADj////////uwgGtf/m////////ZgAAAAD2/////////7sIBrf/////////0QAAAADQ//////////+7CAa6/////////QAAAABS////////3///uggIcOP/////5AAAAAAARsj0zYktAH///7oIABjf////pgAAAAAAAAAAAAAAAFX///+6CABA+//bGQAAAAAAAAAAAAAAEtX/////vAgAHDoGAAAAAAAAAAAAAAA64P///////7wIAAAAAAAAAAAAAAAAAA7v///////ow/+4BgAAAAAAAAAAAAAAAD////////+8C8T/tgYAAAAAAAAAAAAAAAzr//////9SAAvD/60AAAAAAAAAAAAAAAAwqNf30mMAAAAJt0MAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","power":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//wAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//wAAAAAAAAAAAAAAAAAAAAAAAkMAAAD//wAAAEIAAAAAAAAAAAAAAAAKuv9kAAD//wAAaP+nAgAAAAAAAAAAAACe//dPAAD//wAAYv7/gQAAAAAAAAAAADv//1AAAAD//wAAAGL//iMAAAAAAAAAAJz/qAAAAAD//wAAAAC6/4cAAAAAAAAAANj/NwAAAAD//wAAAABv/8sAAAAAAAAAAPX/CQAAAAD//wAAAAAl/+0AAAAAAAAAAOb/FgAAAAD//wAAAAAX/+YAAAAAAAAAALf/RgAAAAAAAAAAAABL/7UAAAAAAAAAAIf/rAAAAAAAAAAAAAC4/4MAAAAAAAAAACD5/0EAAAAAAAAAAE//9h8AAAAAAAAAAAB3/+dEAAAAAAAARun/cwAAAAAAAAAAAAADyf//pE8WHVGk///IAwAAAAAAAAAAAAAABon9/////////IcGAAAAAAAAAAAAAAAAAAA5mcHu7MGYNwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","molecule-co2":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVNj///8AVNj//9hUAAAAAAAAAAAAAAAA1P////8A1f/////VAAAAAAAAAAAAAAAA//8AAAAA//8AAP//AAAAAAAAAAAAAAAA//8AAAAA//8AAP//AICAgEgAAAAAAAAA//8AAAAA//8AAP//AP////9QAAAAAAAA//8AAAAA//8AAP//AAAAAP+AAAAAAAAA//8AAAAA//8AAP//ABVygP92AAAAAAAA//8AAAAA//8AAP//AND//+QsAAAAAAAA1P////8A1f/////VAP+AAAAAAAAAAAAAVNv///8AVNv//9hUAP/AgIBAAAAAAAAAAAAAAAAAAAAAAAAAAP////+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","molecule":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHMjIHAAAAAAAAAAAAAAAAAAAAAAAAAAAb///bgAAAAAAAAAAAAAAAAAAAAAAAAAAt//fJgAAAAAAAAAAcuRxAAAAAAAAAABM//YYAEhIAAAAAAAA7f/0BABJ/////////4gAUP//UAAAAAAAffn/agXZ/////////84Bgf//XgAAAAAAAFP/637/2AQAAAAF2f986/95AgAAAAAAAADD////RQAAAAAAS////8MAAAAAAAAAAAAp/P+0AAAAAAAAALr//ikAAAAAAAAAAAAAkf+0AAAAAAAAALb//ioAAAAAAAAAAAAADe7/RQAAAAAASv///8EAAAAAAAAAAAAAAGX/2wMAAAAF2/957v9QAAAAAAAAAAAAAAHN/////////84Bbv/4dAAAAAAAAAAAAACK/////////4gABfr/6wAAAAAAAAAAABn2/0cAAABJ//UVAJjzlQAAAAAAAAAAKOL/sQAAAAAAuP/gJQAAAAAAAAAAAAAAcf//cAAAAAAAcf//agAAAAAAAAAAAAAALebkLAAAAAAALebkLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","scent":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAAAAAAAAAAAAiwkAAGomAAAAAAAAAAAAAAAAAAAAAAAAmGcAAFawAAAAAAAAAAAAAAAAAAAAAAAC250AAHf9EgAAAAAAAAAAAAAAAAAAAABe/6EAALz/PwCOBAAAAAAAAAAAAAAAABzy/2YAQ///PACjYwAAAAAAAAAAAAAABsr/0QgT5P/8EgDEwwAAAAAAAAAAAAAAmP/yIgK7//+uABT28gAAAAAAAAAAAABH//9LAIT///ciAJH/8AAAAAAAAAAAAADG/3EAVv///1MAR///wgAAAAAAAAAAAAD2xAAo+P//bQAe7v//YgAAAAAAAAAAAADgXAC1//+IAAfN///MAQAAAAAAAAAAAACSORf//7wCAKT//+ceAAAAAAAAAAAAAAAKLED//yQAb///8jAAAAAAAAAAAAAAAAAAAED/sQAQ8///QQAAAAAAAAAAAAAAAAAAABL9cQBi//+OAAAAAAAAAAAAAAAAAAAAAACwUwCO/+YJAAAAAAAAAAAAAAAAAAAAAAAnaACN/2gAAAAAAAAAAAAAAAAAAAAAAAAAAABe/yYAAAAAAAAAAAAAAAAAAAAAAAAAAAAN8AUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAbSIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","fan-auto":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE/H9dKiJwAAAAAAAAAAAAAAAAAAAAAAUP//////4AYAAAAAAAAAAAAAAAAAAAAAx////////y8AAAAAAAAAAAAAAAAAAAAA9P//////5QUAAAAAAAAAAAAAAAAAAAAA6//////eMgAAAAAAAAAAAAAABjkSAAAAv////9APAAAAAAAAAAAAAAAY2f/eIQAAbf///0sAAAAAAAAAAAAAAACj////2AYADPr//3oBV8Lp9MVoAAAAAADi/////9tUn//////n////////XAAAAAD2//////////8nL///////////yAAAAADP//////////8pMf//////////9QAAAABT////////4P////9+SKRMGBJJkgAAAAAARsj0zYctAIP///kKAAAAAAAAAAAAAAAAAAAAAAAAAFf///YdAFTW///WSgAAAAAAAAAAAAAAEtb//4kAANb/////3QAAAAAAAAAAAAA64P///zEAAP//AAD//wAAAAAAAAAAAA3v/////wgAAP//AAD//wAAAAAAAAAAADv//////wsAAP///////wAAAAAAAAAAAArn/////zMAAP///////wAAAAAAAAAAAAAtptf790cAAP//AAD//wAAAAAAAAAAAAAAAAAAAAAAAP//AAD//wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","sleep":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD///////8AAAAAAAAAAAAAAAAAAAAAAAD///////8AAAAAAAAAAAAAAAAAAAAAAAAAABzr/5MAAAAAAAAAAAAAAAAAAAAAAAAAC9b/ugIAAAAAAAAAAAAA////////AAADuv/WCwAAAAAAAAAAAAAA////////AACW/+scAAAAAAAAAAAAAAAAAAAc6/+TAAD///////8AAAAAAAAAAAAAAAvW/7oCAAD///////8AAP///////wAAA7r/1gsAAAAAAAAAAAAAAP///////wAAlv/rHAAAAAAAAAAAAAAAAAAAHOv/kwAA////////AAAAAAAAAAAAAAAL1v+6AgAA////////AAAAAAAAAAAAAAO6/9YLAAAAAAAAAAAAAAAAAAAAAAAAAJP/6xwAAAAAAAAAAAAAAAAAAAAAAAAAAP///////wAAAAAAAAAAAAAAAAAAAAAAAP///////wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","weather-night":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAFkAAAAAAAAAAAAAAAAAAAAAAAAAAAAADPUMAAAAAAAAAAAAAAAAAAAAPRUAAAAAYv9eAAAAAAAAAAAAAAAAAACn/9YANuf//////+c2AAAAAAAAAAAAAH7///8PABXH////whUAAAAAAAAAAAAAT//+/P8QAABf////XQAAAAAAAAAAAAAD3v972P8iAACu4GjjqgAAAAAAAAAAAABX/9cCsf9fAAeLCQAMjgYAAAAAAAAAAACh/2cAb/+tAAAAAAAAAAAAVwAAAAAAAADc/yYAI///KAAAAAAAAAAN8QwAAAAAAAH5/wUAALD/twIAAAAABpH///+RBgAAAAH8/wQAAB71/4gAAAAAAAC9/7oAAAAAAADl/x4AAABR//+dDQAAAAayLrEFAAAAAACz/10AAAAAavz/4D0AAAgBAAEIAAAAAABh/70AAAAAADDX///Tl1MTAAAAAAAAAAAH5f9UAAAAAAAGj////////8IIAAAAAAAAWf/0MAAAAAAAABNSjs3+//8uAAAAAAAAAIL/91oAAAAAAAAAAE/2/5cAAAAAAAAAAAB0/f/DVAcAAA1kxP/+dwAAAAAAAAAAAAAAPNX//////////9E7AAAAAAAAAAAAAAAAAAJPmM3x8MyXTAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","star":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAACmpQAAAAAAAAAAAAAAAAAAAAAAAAAAABf7+xcAAAAAAAAAAAAAAAAAAAAAAAAAAIP//4EAAAAAAAAAAAAAAAAAAAAAAAAAB+3//+0EAAAAAAAAAAAAAAAAAAAAAAAAYf////9dAAAAAAAAAAAAAAAAAAQeOVNu2v/////YblM5HgQAAAAAAAB36f7///////////////////7odwAAAAABj/////////////////////+NAQAAAAAAAGX+/////////////////WUAAAAAAAAAAABM9//////////////1RwAAAAAAAAAAAAAAM+7//////////+guAAAAAAAAAAAAAAAAAKv//////////6cAAAAAAAAAAAAAAAAAAOz//////////+UAAAAAAAAAAAAAAAAAI/////////////8fAAAAAAAAAAAAAAAAXv////2Kiv3///9bAAAAAAAAAAAAAAAAm///xSoAACrF//+XAAAAAAAAAAAAAAAA1+lfAAAAAAAAYOrTAAAAAAAAAAAAAAARlQ4AAAAAAAAAABCXCwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","heart":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABeU+PrNlikAADCczfr4kRUAAAAAAAAAV/b///////pma/v///////FMAAAAAAAh+P/////////////////////xGAAAAACn////////////////////////kgAAAADp////////////////////////0wAAAAD7////////////////////////9gAAAADo////////////////////////5QAAAACt////////////////////////qAAAAAA+////////////////////////NwAAAAAAqf////////////////////+dAAAAAAAAFvD//////////////////+kOAAAAAAAAADz1////////////////8DIAAAAAAAAAAAA9+P/////////////xMgAAAAAAAAAAAAAARfn///////////EzAAAAAAAAAAAAAAAAADvv////////5ysAAAAAAAAAAAAAAAAAAAAr6v/////cHAAAAAAAAAAAAAAAAAAAAAAAIN///9gXAAAAAAAAAAAAAAAAAAAAAAAAABTMzBQAAAAAAAAAAAAAAAAAAAAAAAAAAAAKCAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","radiator":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAdyz8AAAAkyz8AAAAfy0gAAAAAAAAAAAC2/6AAAAHE/5cAAAC9/6IAAAAAAAAAAFH/7BMAAHL/2AgAAGr/3gsAAAAAAAAAAJb/uQAAAHj/0gQAAHD/2gcAAAAAAAAAABPv/1EAAATY/3kAAAPT/4QAAAAAAAAAAACJ/8YAAACP/74AAACH/80AAAAAAAAAAB3x/0MAACv7/C0AACb4/zoAAAAAAAAAAHj/mgAAAHv/jQAAAHT/nQAAAAAAAAAAAAA/DAAAAAA/CQAAAAA4EwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABU2P/////////////////////YVAAAAADV////////////////////////1QAAAAD///8+P///Pj///z4///8+P////wAAAAD///8AAP//AAD//wAA//8AAP///wAAAAD///8AAP//AAD//wAA//8AAP///wAAAAD///8+Q///PkP//z5D//8+Q////wAAAAD//////////////////////////wAAAAD//////////////////////////wAAAAD//wAAAAAAAAAAAAAAAAAAAAD//wAAAAD//wAAAAAAAAAAAAAAAAAAAAD//wAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","heat-wave":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANhcAAAAAISkAAAAAAVAAAAAAAAAAAAAJ4fc6AAAAt/5kAAAAaf+yAAAAAAAAAACI/94HAABV//YcAAAT8/9gAAAAAAAAACf7/0AAAAzn/3QAAACm/8YAAAAAAAAAAMb/ogAAAJH/0wMAAED/+ycAAAAAAAAAYv/vEwAALP7+MwAAB97/gwAAAAAAAAAA2f+KAAAApf+/AAAAWP/+DgAAAAAAAAAAaf/uEQAALPz/MwAAB97/hAAAAAAAAAAAAdD/kwAAAJD/0wMAAED/+ycAAAAAAAAAADb//CkAAAzn/3QAAACk/8YAAAAAAAAAAACk/8MAAABT//YcAAAT7/9fAAAAAAAAAAAZ//9OAAAA2v+KAAAAi//YAAAAAAAAAABU//UZAAA7//okAAAI6P9sAAAAAAAAAAXg/30AAADM/4wAAAB7/9UDAAAAAAAAAHf/5gcAAFP/6g0AABL0/z4AAAAAAAAAFfX/VgAAA97/ZQAAAJD/sgAAAAAAAAAAVPvFAAAAKd/QAQAAAr36IgAAAAAAAAAAACIoAAAAAAEXAAAAAAAXAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","fire":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABaqQAAAAAAAAAAAAAAAAAAAAAAAAAABPB/4AAAAAAAAAAAAAAAAAAAAAAAAAABdD//3QAAAAAAAAAAAAAAAAAAAAAAAAAb////5gAAAAAAAAAAAAAAAAAAAAAAAAC4v///+YKAAAAAAAAAAAAAAAAAAAAAARA//////+jAQAAAAAAAAAAAAAAAAAAPC5t////////vQ4AAAAAAAAAAAAAAAAQ6AV6/////////80LAAAAAAAAAAAAAACB/wVo////lf7///++BAAAAAAAAAAAAADJ/0Eu////S27/////awAAAAAAAAAAAADy/80H8///dABl////ugAAAAAAAAAAAAD8////////lQAAx///7AAAAAAAAAAAAADX////////gQAAoP//3wAAAAAAAAAAAACR///////LEQAE2///sgAAAAAAAAAAAAAq+v///9wUABSa////UgAAAAAAAAAAAAAAcP/////50/////+vAgAAAAAAAAAAAAAAAHn//////////50IAAAAAAAAAAAAAAAAAAAhg9r/8r+LLQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","chevron-down":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD0AAAAAAAAAAD4AAAAAAAAAAAAAAAAAiP5dAAAAAAAAXf6GAAAAAAAAAAAAAAAAgP/9VwAAAABX/f+AAAAAAAAAAAAAAAAAAIv//FAAAFD8/4sAAAAAAAAAAAAAAAAAAACL//tKSvv/iwAAAAAAAAAAAAAAAAAAAAAAg//4+v+DAAAAAAAAAAAAAAAAAAAAAAAAAIv//4sAAAAAAAAAAAAAAAAAAAAAAAAAAACLiwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","air-purifier":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAE/F8P/////////wxUsAAAAAAAAAAAAATP////////////////9KAAAAAAAAAAAAxf+rKgAAAAAAAAAqq//FAAAAAAAAAAAA7P8pAAAAAAAAAAAAKv/tAAAAAAAAAAAA//8AAAAAAAAAAAAAAP//AAAAAAAAAAAA//8AAABPxfDwxUsAAAAAF6vsAAAAAAAA//8AAEv///////9KABRT6P//AAAAAAAA//8AAMX/qyoqq//FAP//6VQUAAAAAAAA//8AAO7/KAAAKf/rAOytFwAAAAAAAAAA//8AAOz/KAAAKv/sAAAAF6vsAAAAAAAA//8AAMX/qygurf/FABRU6f//AAAAAAAA//8AAEz///////9IAP//6VQUAAAAAAAA//8AAABMxvHuxEoAAOytFwAAAAAAAAAA//8AAAAAAAAAAAAAAAAAAAAAAAAAAAAA//8AAAAAAAAAAAAAAP//AAAAAAAAAAAA//8AAAAAAAAAAAAAAP//AAAAAAAAAAAA////////////////////AAAAAAAAAAAA////////////////////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"};
+const T = { bg: "#101317", surface: "#20242a", raised: "#2c3037", outline: "#3a3f47", text: "#f3f0e9", muted: "#b3b5b9", subtle: "#818792", unavailable: "#92979e", error: "#ff9991", ink: "#17191d" };
+const ACCENTS = [["Песок", "#dfb98a"], ["Небо", "#82bdf5"], ["Коралл", "#e6a18d"], ["Бирюза", "#75cfc7"], ["Фиалка", "#b5a0e8"], ["Мята", "#9bcba8"]];
+const SIZES = [[2,2],[2,4],[2,6],[2,8],[4,2],[4,4],[4,6],[8,2],[8,4],[8,6],[8,8]];
+const PRESETS = [
+  { id: "Auto", ru: "Авто", icon: "fan-auto" },
+  { id: "Sleep", ru: "Сон", icon: "weather-night" },
+  { id: "Favorite", ru: "Избранное", icon: "star" },
+];
+const PRESET_SPEED = { Sleep: 20, Favorite: 70 };
+const HEAT_ICONS = { radiator: ["Радиатор", "radiator"], wave: ["Волны", "heat-wave"], fire: ["Огонь", "fire"] };
+const WARM = [255, 160, 84], COLD = [134, 192, 246];          // heater on / off
+const LEVEL = { good: [155, 203, 168], mid: [232, 195, 106], bad: [255, 153, 145] };
+const AIR = {
+  fresh:  { co2: 640,  pm: 6,  tvoc: 140, gen: 2.2, out: 8,  vgen: 1.6 },
+  stuffy: { co2: 1380, pm: 12, tvoc: 520, gen: 6,   out: 10, vgen: 6 },
+  smog:   { co2: 820,  pm: 48, tvoc: 260, gen: 2.6, out: 70, vgen: 2.6 },
+};
+const FONT = '"Noto Sans", system-ui, sans-serif', FPS = 30, P = 12, GAP = 8;
+
+const SENSOR_KEYS = ["co2", "pm", "tvoc"];
+const state = { sensors: ["co2", "pm", "tvoc"], air: "fresh", heatIcon: "radiator", heater: true, accent: "#dfb98a", screen: "8x8", gridY: 59, offline: false, reduced: false, zoom: false };
+if (matchMedia("(prefers-reduced-motion: reduce)").matches) state.reduced = true;
+try { Object.assign(state, JSON.parse(localStorage.getItem("breezer-stand") || "{}")); } catch (e) {}
+state.gridY = 53.5; state.zoom = false;
+if (!Array.isArray(state.sensors)) state.sensors = ["co2", "pm", "tvoc"];
+const active = () => SENSOR_KEYS.filter((k) => state.sensors.includes(k));   // card config: 0…3 sensors, fixed order
+const save = () => { try { localStorage.setItem("breezer-stand", JSON.stringify(state)); } catch (e) {} };
+
+/* ---------- entity: simulated HA fan + heater switch + up to three sensors ---------- */
+const fan = { on: true, pct: 45, preset: "Auto", heat: false, heatAt: -1e9, drag: null, sheet: null, spin: 0.45, angle: 0 };
+const air = { co2: AIR[state.air]?.co2 ?? 640, pm: AIR[state.air]?.pm ?? 6, tvoc: AIR[state.air]?.tvoc ?? 140 };
+const heatOn = () => fan.on && fan.heat && state.heater && !state.offline;
+function setOn(v) { if (state.offline || fan.on === v) return; fan.on = v; }
+function setHeat(v) {
+  if (state.offline || !state.heater) return;
+  if (v && !fan.on) fan.on = true;                 // the heater needs airflow
+  if (fan.heat !== v || v) { fan.heat = v; fan.heatAt = performance.now(); }
+}
+function setSpeed(v) {
+  if (state.offline) return;
+  if (!fan.on) fan.on = true;
+  fan.pct = Math.max(10, Math.min(100, Math.round(v))); fan.preset = null;   // set_percentage leaves the preset
+}
+function setPreset(id) {
+  if (state.offline) return;
+  if (!fan.on) fan.on = true;
+  fan.preset = id;
+  if (id in PRESET_SPEED) fan.pct = PRESET_SPEED[id];
+  if (id === "Auto") fan.pct = autoSpeed();
+}
+const autoSpeed = () => Math.max(20, Math.min(100, Math.round((25 + (air.co2 - 600) / 800 * 75) / 5) * 5));
+const presetRu = (id) => PRESETS.find((p) => p.id === id)?.ru;
+let autoTick = 0;
+function pump(dt, now) {                                       // stand only: stands in for the room and the device
+  const A = AIR[state.air] || AIR.fresh, flow = fan.on && !state.offline ? fan.pct / 100 : 0;
+  air.co2 += (A.gen - flow * 0.012 * (air.co2 - 420)) * dt * 1.4;
+  air.co2 = Math.max(420, Math.min(2600, air.co2));
+  const pmTarget = flow > 0 ? 2 + (A.out * 0.08) * (1 - flow * 0.6) : A.out * 0.5 + 3;
+  air.pm += (pmTarget - air.pm) * Math.min(1, dt / 9);
+  air.tvoc += (A.vgen - flow * 0.02 * (air.tvoc - 40)) * dt * 1.4;
+  air.tvoc = Math.max(40, Math.min(3000, air.tvoc));
+  if (fan.on && fan.preset === "Auto" && !fan.drag && now - autoTick > 900) {     // device follows CO₂ in steps of 5 %
+    autoTick = now; const t = autoSpeed(); if (t !== fan.pct) fan.pct += Math.sign(t - fan.pct) * Math.min(5, Math.abs(t - fan.pct));
+  }
+  const target = fan.on && !state.offline ? fan.pct / 100 : 0;  // impeller spins up and coasts down
+  fan.spin += (target - fan.spin) * Math.min(1, dt / (target > fan.spin ? 0.5 : 1.1));
+  if (!state.reduced) fan.angle = (fan.angle + dt * fan.spin * 2 * Math.PI * 1.15) % (2 * Math.PI);
+}
+function co2Level(v) { return v < 800 ? ["good", "Норма"] : v < 1200 ? ["mid", "Повышен"] : ["bad", "Высокий"]; }
+function tvocLevel(v) { return v <= 220 ? ["good", "Норма"] : v <= 660 ? ["mid", "Повышен"] : ["bad", "Высокий"]; }
+function pmLevel(v) { return v <= 15 ? ["good", "Чисто"] : v <= 35 ? ["mid", "Умеренно"] : ["bad", "Грязно"]; }
+const SENSORS = {
+  co2: { label: "CO₂", unit: "ppm", icon: "molecule-co2", value: () => Math.round(air.co2 / 10) * 10, level: () => co2Level(air.co2) },
+  pm:  { label: "PM2.5", unit: "мкг/м³", icon: "molecule", value: () => Math.round(air.pm), level: () => pmLevel(air.pm) },
+  tvoc: { label: "TVOC", unit: "ppb", icon: "scent", value: () => Math.round(air.tvoc / 10) * 10, level: () => tvocLevel(air.tvoc) },
+};
+
+/* ---------- colour ---------- */
+const hex = (c) => [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16));
+const rgb = (a, al = 1) => `rgba(${a.map((v) => Math.round(Math.max(0, Math.min(255, v)))).join(",")},${al})`;
+const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
+function theme() { const a = hex(state.accent), s = hex(T.surface); return { accent: state.accent, a, fill: rgb(mix(s, a, 0.5)), surface: rgb(mix(s, a, 0.14)) }; }
+// Air colour follows the heater: warm stream while heating, cool stream otherwise. warmMix cross-fades in ~240 ms.
+let warmMix = 0;
+function airColor() { return mix(mix(COLD, [235, 242, 250], 0.25), WARM, warmMix); }
+
+/* ---------- icons ---------- */
+const maskCache = new Map();
+function icon(ctx, name, x, y, size, color, alpha = 1) {
+  const key = name + color;
+  if (!maskCache.has(key)) {
+    const bytes = Uint8Array.from(atob(ICONS[name]), (c) => c.charCodeAt(0)), c = document.createElement("canvas"); c.width = c.height = 24;
+    const g = c.getContext("2d"), img = g.createImageData(24, 24), col = color.startsWith("#") ? hex(color) : color.match(/[\d.]+/g).slice(0, 3).map(Number);
+    for (let i = 0; i < 576; i++) { img.data.set([col[0], col[1], col[2], bytes[i]], i * 4); }
+    g.putImageData(img, 0, 0); maskCache.set(key, c);
+    if (maskCache.size > 400) maskCache.delete(maskCache.keys().next().value);
+  }
+  ctx.globalAlpha = alpha; ctx.drawImage(maskCache.get(key), x, y, size, size); ctx.globalAlpha = 1;
+}
+function rr(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.roundRect(x, y, w, h, Math.min(r, w / 2, h / 2)); }
+const qc = (c) => rgb(c.map((v) => Math.round(v / 4) * 4));   // quantised colour keeps the icon cache small during fades
+
+/* ---------- breezer glyph: the impeller turns at the real speed ---------- */
+function drawFan(ctx, cx, cy, size, now) {
+  const on = fan.on && !state.offline, col = airColor(), s = 24 * size / 44;
+  if (on && fan.spin > 0.02) {
+    const g = ctx.createRadialGradient(cx, cy, 0, cx, cy, size * 0.62);
+    g.addColorStop(0, rgb(col, (0.16 + 0.22 * warmMix) * Math.min(1, fan.spin * 2))); g.addColorStop(1, rgb(col, 0));
+    ctx.fillStyle = g; ctx.fillRect(cx - size, cy - size, size * 2, size * 2);
+  }
+  ctx.save(); ctx.translate(cx, cy); if (on) ctx.rotate(fan.angle);
+  icon(ctx, on ? "fan" : "fan-off", -s / 2, -s / 2, s, on ? qc(col) : T.subtle);
+  ctx.restore();
+}
+// Moving air: short streaks drift left → right at the fan speed, faded in from the left so text stays clean.
+const STREAKS = Array.from({ length: 14 }, (_, i) => ({ y: ((i * 0.618) % 1), p: (i * 0.371) % 1, l: 0.12 + ((i * 0.53) % 1) * 0.16, a: 0.5 + ((i * 0.29) % 1) * 0.5 }));
+function drawStreams(ctx, r, now, from) {
+  if (fan.spin < 0.02) return;
+  const col = airColor(), t = state.reduced ? 0 : now / 1000, x0 = from ?? r.x + r.w * 0.38, w = r.x + r.w - x0;
+  if (w < 40) return;
+  ctx.save(); ctx.beginPath(); ctx.rect(x0, r.y, w, r.h); ctx.clip(); ctx.lineCap = "round";
+  for (const s of STREAKS) {
+    const len = s.l * w, u = ((s.p + t * (0.08 + 0.5 * fan.spin) * (0.7 + s.a * 0.6)) % 1), x = x0 - len + u * (w + len);
+    const y = r.y + 8 + s.y * (r.h - 16) + Math.sin(t * 1.6 + s.p * 9 + u * 5) * 3;
+    const fade = Math.min(1, (x + len - x0) / (w * 0.35));
+    const g = ctx.createLinearGradient(x, 0, x + len, 0); g.addColorStop(0, rgb(col, 0)); g.addColorStop(1, rgb(col, (0.3 + 0.38 * s.a) * fade * Math.min(1, fan.spin * 1.6)));
+    ctx.strokeStyle = g; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.moveTo(x, y); ctx.quadraticCurveTo(x + len / 2, y - 3 * Math.sin(u * 6 + s.p * 4), x + len, y); ctx.stroke();
+  }
+  ctx.restore();
+}
+
+/* ---------- layout ---------- */
+const measure = document.createElement("canvas").getContext("2d");
+function layout(W, H) {
+  const heater = state.heater, L = { W, H, items: [] }, add = (o) => (L.items.push(o), o);
+  const narrow = W < 150;
+  if (narrow && H < 150) {                                   // 2×2 tile: tap anywhere toggles the breezer
+    add({ t: "tile", r: { x: 0, y: 0, w: W, h: H } });
+    add({ t: "chip", r: { x: P, y: P, w: 44, h: 44 } });
+    add({ t: "value", r: { x: P, y: H - P - 30, w: W - 2 * P, h: 30 }, size: 21 });
+    return L;
+  }
+  if (narrow) {                                              // tall 2×N: fan on top, power on the bottom
+    add({ t: "chip", r: { x: (W - 44) / 2, y: P, w: 44, h: 44 } });
+    let bottom = H - P - 44;
+    add({ t: "power", r: { x: P, y: bottom, w: W - 2 * P, h: 44 } }); bottom -= GAP;
+    if (heater) { add({ t: "heat", r: { x: P, y: bottom - 44, w: W - 2 * P, h: 44 } }); bottom -= 52; }
+    if (H >= 400) { add({ t: "select", r: { x: P, y: bottom - 44, w: W - 2 * P, h: 44 }, compact: true }); bottom -= 52; }
+    const top = P + 44 + 12; let room = bottom - top;
+    const fitN = Math.max(0, Math.min(active().length, Math.floor((room - 120 - 4) / 52)));
+    if (fitN) {                                              // as many sensors as fit under the slider, in config order
+      active().slice(0, fitN).reverse().forEach((key, i) => add({ t: "sensor", key, r: { x: P, y: bottom - 44 - i * 52, w: W - 2 * P, h: 44 }, compact: true }));
+      bottom -= fitN * 52 + 4; room = bottom - top;
+    }
+    if (room >= 120) add({ t: "vslider", r: { x: P, y: top, w: W - 2 * P, h: room } });
+    else add({ t: "value", r: { x: P, y: top, w: W - 2 * P, h: room }, size: 28, center: true });   // too short to drag: show the number
+    return L;
+  }
+  if (H < 150) {                                             // short 4×2, 8×2
+    const lineH = Math.min(32, H - 2 * P - 44 - GAP);
+    add({ t: "glyph", r: { x: P - 4, y: P + lineH / 2 - 18, w: 36, h: 36 } });
+    add({ t: "line", r: { x: P + 36, y: P, w: W - 2 * P - 36, h: lineH }, sensors: W >= 400 });
+    const y = H - P - 44, n = heater ? 2 : 1, sw = W - 2 * P - n * (44 + GAP);
+    add({ t: "slider", r: { x: P, y, w: sw, h: 44 } });
+    if (heater) add({ t: "heat", r: { x: P + sw + GAP, y, w: 44, h: 44 } });
+    add({ t: "power", r: { x: W - P - 44, y, w: 44, h: 44 } });
+    return L;
+  }
+  // square and tall wide cards
+  add({ t: "chip", r: { x: P, y: P, w: 44, h: 44 } });
+  add({ t: "name", r: { x: P + 44 + 12, y: P, w: W - 2 * P - 44 - 12 - 44 - GAP, h: 44 } });
+  add({ t: "power", r: { x: W - P - 44, y: P, w: 44, h: 44 } });
+  const top = P + 44 + 12, avail = H - P - top, inner = W - 2 * P;
+  const blocks = [{ t: "slider", h: 44 }, { t: "modes", h: 44 }];
+  if (active().length) blocks.unshift({ t: "sensors", h: 44 });
+  const used = () => blocks.reduce((s, b) => s + b.h, 0) + GAP * (blocks.length - 1);
+  if (used() > avail && blocks[0].t === "sensors" && W >= 400) { blocks.shift(); blocks[0].sensorsBeside = true; }   // wide 8×4: sensors move beside the slider
+  else if (used() > avail && blocks[0].t === "sensors") { blocks.shift(); L.sensorsInStatus = true; }   // sensors give way first, CO₂ moves to the status line
+  while (used() > avail && blocks.length > 1) blocks.pop();
+  const left = () => avail - used();
+  if (left() >= 76 + GAP) blocks.unshift({ t: "hero", h: 76 });          // from 76 px: 4×6 and 8×6 keep the moving air on the firmware grid
+  const sens = blocks.find((b) => b.t === "sensors");
+  if (sens && left() >= 20) sens.h += 20;                                 // label + level line
+  for (const t of ["slider", "modes"]) { const b = blocks.find((x) => x.t === t); if (b) { const g = Math.min(12, Math.max(0, Math.floor(left() / 2))); b.h += g; } }
+  const hero = blocks[0].t === "hero"; L.hero = hero; L.headerWind = !hero && W >= 400;
+  if (hero) blocks[0].h += left();                                        // leftover height becomes moving air
+  let y = hero ? top : top + Math.max(0, Math.floor(left() / 2));
+  blocks.forEach((b, i) => {
+    if (i) y += GAP;
+    if (b.sensorsBeside) {                                                // slider and the sensors in one row
+      const keys = active(), sw = keys.length >= 3 ? 92 : 116, slw = inner - keys.length * (sw + GAP);
+      add({ ...b, r: { x: P, y, w: slw, h: b.h }, quiet: hero });
+      keys.forEach((key, i) => add({ t: "sensor", key, r: { x: P + slw + GAP + i * (sw + GAP), y, w: sw, h: b.h }, compact: true }));
+    } else add({ ...b, r: { x: P, y, w: inner, h: b.h }, quiet: hero && b.t === "slider" });
+    y += b.h;
+  });
+  return L;
+}
+// Cells of the presets row: three presets, then the heater after a wider gap.
+function modeCells(r, ctx) {
+  const heater = state.heater, n = PRESETS.length + (heater ? 1 : 0), extra = heater ? 4 : 0;
+  const bw = (r.w - (n - 1) * GAP - extra) / n, cells = [];
+  ctx.font = `14px ${FONT}`;
+  const widest = Math.max(...PRESETS.map((p) => ctx.measureText(p.ru).width));
+  const style = widest + 24 + 8 + 20 <= bw ? "both" : r.h >= 56 && widest + 16 <= bw ? "stack" : widest + 20 <= bw ? "text" : "icon";
+  PRESETS.forEach((p, i) => cells.push({ kind: "preset", p, x: r.x + i * (bw + GAP), y: r.y, w: bw, h: r.h, style }));
+  if (heater) cells.push({ kind: "heat", x: r.x + PRESETS.length * (bw + GAP) + extra, y: r.y, w: bw, h: r.h, style: style === "text" ? "icon" : style });
+  return cells;
+}
+
+/* ---------- drawing ---------- */
+function ellipsis(ctx, text, w) { if (ctx.measureText(text).width <= w) return text; while (text.length > 1 && ctx.measureText(text + "…").width > w) text = text.slice(0, -1); return text + "…"; }
+function statusText(L) {
+  if (state.offline) return "Нет связи";
+  if (!fan.on) return "Выключен";
+  let s = `${fan.pct} % · ${presetRu(fan.preset) || "ручной"}`;
+  if (heatOn()) s += " · обогрев";
+  if (L && L.sensorsInStatus && active().length) { const S = SENSORS[active()[0]]; s = `${fan.pct} % · ${S.label} ${S.value()}`; }
+  return s;
+}
+function drawHeatButton(ctx, r, now, pressed, style = "auto") {
+  const off = state.offline, hot = heatOn(), k = warmMix;
+  const breath = state.reduced ? 0.5 : 0.5 - 0.5 * Math.cos(now / 2600 * 2 * Math.PI);
+  rr(ctx, r.x, r.y, r.w, r.h, 12);
+  ctx.fillStyle = pressed ? T.outline : rgb(mix(mix(hex(T.raised), COLD, 0.06), mix(hex(T.surface), WARM, 0.22), k));
+  ctx.globalAlpha = off ? .4 : 1; ctx.fill();
+  if (k > 0.01 && !pressed) {                                   // warm glow from inside the button
+    ctx.save(); rr(ctx, r.x, r.y, r.w, r.h, 12); ctx.clip();
+    const cx = r.x + r.w / 2, cy = r.y + r.h / 2, g = ctx.createRadialGradient(cx, cy, 0, cx, cy, Math.max(r.w, r.h) * 0.7);
+    g.addColorStop(0, rgb(WARM, (0.22 + 0.12 * breath) * k)); g.addColorStop(1, rgb(WARM, 0));
+    ctx.fillStyle = g; ctx.fillRect(r.x, r.y, r.w, r.h); ctx.restore();
+    ctx.strokeStyle = rgb(WARM, 0.55 * k); ctx.lineWidth = 1.5; rr(ctx, r.x + .75, r.y + .75, r.w - 1.5, r.h - 1.5, 11.25); ctx.stroke();
+  }
+  const col = off ? T.subtle : qc(mix(COLD, WARM, k)), name = HEAT_ICONS[state.heatIcon]?.[1] || "radiator";
+  ctx.font = `14px ${FONT}`; const label = "Обогрев", tw = ctx.measureText(label).width;
+  const mode = style !== "auto" ? style : r.w >= tw + 24 + 8 + 28 ? "both" : "icon";
+  if (mode === "both") {
+    const gx = r.x + (r.w - (24 + 8 + tw)) / 2; icon(ctx, name, gx, r.y + (r.h - 24) / 2, 24, col);
+    ctx.textAlign = "left"; ctx.fillStyle = off ? T.subtle : hot ? T.text : T.muted; ctx.fillText(label, gx + 32, r.y + r.h / 2 + 1);
+  } else if (mode === "stack") {
+    icon(ctx, name, r.x + (r.w - 24) / 2, r.y + r.h / 2 - 22, 24, col);
+    ctx.textAlign = "center"; ctx.fillStyle = off ? T.subtle : hot ? T.text : T.muted; ctx.fillText(label, r.x + r.w / 2, r.y + r.h / 2 + 15);
+  } else icon(ctx, name, r.x + (r.w - 24) / 2, r.y + (r.h - 24) / 2, 24, col);
+  ctx.globalAlpha = 1;
+}
+// Icon, value and unit in one row: drops the unit, then shrinks the value, then drops the icon (level colour moves to a dot).
+function sensorRow(ctx, S, v, ic, off, x, cy, w, sizes) {
+  const ref = "8888";
+  const unitW = (ctx.font = `14px ${FONT}`, ctx.measureText(S.unit).width);
+  const tries = [];
+  for (const s of sizes) tries.push({ s, icon: true, unit: true }, { s, icon: true, unit: false });
+  for (const s of sizes) tries.push({ s, icon: false, unit: false });
+  for (const o of tries) {
+    ctx.font = `${o.s}px ${FONT}`; const vw = ctx.measureText(v).width, fw = Math.max(vw, ctx.measureText(ref).width);
+    const need = (o.icon ? 30 : 10) + vw + (o.unit ? 5 + unitW : 0), fitW = (o.icon ? 30 : 10) + fw + (o.unit ? 5 + ctx.measureText("мкг/м³").width : 0);
+    if (fitW > w && o !== tries[tries.length - 1]) continue;
+    let tx = x;
+    if (o.icon) { icon(ctx, S.icon, x, cy - 13, 24, ic); tx += 30; }
+    else { const dx = x; if (!off) { ctx.fillStyle = ic; ctx.beginPath(); ctx.arc(dx + 3.5, cy, 3.5, 0, 7); ctx.fill(); } tx = dx + 10; }
+    ctx.textAlign = "left"; ctx.fillStyle = off ? T.subtle : T.text; ctx.fillText(v, tx, cy);
+    if (o.unit) { ctx.font = `14px ${FONT}`; ctx.fillStyle = T.muted; ctx.fillText(S.unit, tx + vw + 5, cy + 1); }
+    return;
+  }
+}
+function drawSensor(ctx, r, key, compact) {
+  const S = SENSORS[key], off = state.offline, [lv, word] = S.level(), lc = LEVEL[lv], v = off ? "—" : `${S.value()}`;
+  rr(ctx, r.x, r.y, r.w, r.h, 12); ctx.fillStyle = lv === "bad" && !off ? rgb(mix(hex(T.raised), lc, 0.14)) : T.raised; ctx.globalAlpha = off ? .4 : 1; ctx.fill();
+  const ic = off ? T.subtle : rgb(lc);
+  if (r.h >= 60) {                                                  // label + level on top, value below
+    ctx.font = `14px ${FONT}`; ctx.textAlign = "left"; ctx.fillStyle = T.muted; ctx.fillText(S.label, r.x + 12, r.y + 18);
+    const lw = ctx.measureText(S.label).width, ww = ctx.measureText(word).width;
+    if (!off && lw + ww + 12 + 24 <= r.w) { ctx.textAlign = "right"; ctx.fillStyle = rgb(lc); ctx.fillText(word, r.x + r.w - 12, r.y + 18); }
+    sensorRow(ctx, S, v, ic, off, r.x + 10, r.y + r.h - 22, r.w - 20, [21, 18]);
+  } else sensorRow(ctx, S, v, ic, off, r.x + (compact ? 8 : 10), r.y + r.h / 2 + 1, r.w - (compact ? 16 : 20), [18, 14]);
+  ctx.globalAlpha = 1;
+}
+function drawCard(ctx, L, now, ox = 0, oy = 0) {
+  const th = theme(), off = state.offline, on = fan.on && !off, col = airColor();
+  ctx.save(); ctx.translate(ox, oy);
+  rr(ctx, 0, 0, L.W, L.H, 20); ctx.fillStyle = T.surface; ctx.fill();
+  if (on) { ctx.save(); rr(ctx, 0, 0, L.W, L.H, 20); ctx.clip(); const g = ctx.createRadialGradient(34, 34, 0, 34, 34, Math.max(L.W, L.H) * 0.9); g.addColorStop(0, rgb(col, (0.04 + 0.05 * warmMix) * Math.min(1, fan.spin * 2))); g.addColorStop(1, rgb(col, 0)); ctx.fillStyle = g; ctx.fillRect(0, 0, L.W, L.H); ctx.restore(); }
+  if (off) { ctx.strokeStyle = T.unavailable; ctx.lineWidth = 1; rr(ctx, .5, .5, L.W - 1, L.H - 1, 20); ctx.stroke(); }
+  ctx.textBaseline = "middle";
+  for (const it of L.items) {
+    const r = it.r;
+    if (it.t === "tile") { if (it.pressed) { rr(ctx, 0, 0, L.W, L.H, 20); ctx.fillStyle = "rgba(255,255,255,.05)"; ctx.fill(); } }
+    else if (it.t === "glyph") { ctx.save(); rr(ctx, r.x, r.y, r.w, r.h, 8); ctx.clip(); drawFan(ctx, r.x + r.w / 2, r.y + r.h / 2, 44, now); ctx.restore(); }
+    else if (it.t === "chip") {
+      rr(ctx, r.x, r.y, r.w, r.h, 12); ctx.fillStyle = on ? rgb(mix(hex(T.surface), col, 0.14 + 0.06 * warmMix)) : T.raised; ctx.fill();
+      ctx.save(); rr(ctx, r.x, r.y, r.w, r.h, 12); ctx.clip(); drawFan(ctx, r.x + r.w / 2, r.y + r.h / 2, r.w, now); ctx.restore();
+    } else if (it.t === "line") {
+      ctx.textAlign = "left"; ctx.font = `500 14px ${FONT}`; ctx.fillStyle = T.text; const nm = "Бризер"; ctx.fillText(nm, r.x, r.y + r.h / 2);
+      const nw = ctx.measureText(nm).width + 10; let right = r.x + r.w;
+      if (it.sensors && !off) {                                     // 8×2: sensor readings on the right of the line
+        ctx.font = `14px ${FONT}`;
+        for (const key of active().slice().reverse()) {
+          const S = SENSORS[key], txt = `${S.label} ${S.value()}`, tw = ctx.measureText(txt).width;
+          if (right - tw - 26 - r.x - nw < 110) break;                 // keep room for the status
+          ctx.textAlign = "right"; ctx.fillStyle = T.muted; ctx.fillText(txt, right, r.y + r.h / 2);
+          ctx.fillStyle = rgb(LEVEL[S.level()[0]]); ctx.beginPath(); ctx.arc(right - tw - 8, r.y + r.h / 2, 3.5, 0, 7); ctx.fill();
+          right -= tw + 8 + 3.5 + 14;
+        }
+      }
+      ctx.textAlign = "left"; ctx.font = `14px ${FONT}`; ctx.fillStyle = off ? T.error : T.muted; ctx.fillText(ellipsis(ctx, statusText(L), right - r.x - nw - 6), r.x + nw, r.y + r.h / 2);
+    } else if (it.t === "name") {
+      const st = L.hero && on ? (heatOn() ? "Включён · обогрев" : "Включён") : statusText(L);
+      if (L.headerWind) {                                               // 8×4: air blows between the name and the power button
+        ctx.font = `14px ${FONT}`; const tw = Math.max(ctx.measureText(st).width, 60);
+        drawStreams(ctx, r, now, r.x + tw + 24);
+      }
+      ctx.textAlign = "left"; ctx.font = `500 14px ${FONT}`; ctx.fillStyle = T.text; ctx.fillText(ellipsis(ctx, "Бризер", r.w), r.x, r.y + 13);
+      ctx.font = `14px ${FONT}`; ctx.fillStyle = off ? T.error : T.muted; ctx.fillText(ellipsis(ctx, st, r.w), r.x, r.y + 33);
+    } else if (it.t === "power") {
+      rr(ctx, r.x, r.y, r.w, r.h, 12); ctx.fillStyle = it.pressed ? T.outline : on ? th.surface : T.raised; ctx.globalAlpha = off ? .4 : 1; ctx.fill(); ctx.globalAlpha = 1;
+      icon(ctx, "power", r.x + (r.w - 24) / 2, r.y + (r.h - 24) / 2, 24, off ? T.subtle : on ? th.accent : T.muted);
+    } else if (it.t === "heat") drawHeatButton(ctx, r, now, it.pressed);
+    else if (it.t === "value") {
+      ctx.textAlign = it.center ? "center" : "left"; ctx.font = `${it.size || 21}px ${FONT}`; ctx.fillStyle = off ? T.subtle : T.text;
+      ctx.fillText(off ? "—" : on ? `${fan.pct} %` : "Выкл.", it.center ? r.x + r.w / 2 : r.x, r.y + r.h / 2);
+    } else if (it.t === "hero") {
+      drawStreams(ctx, r, now);
+      ctx.textAlign = "left"; ctx.fillStyle = on ? T.text : T.subtle; ctx.font = `64px ${FONT}`;
+      const v = off ? "—" : on ? `${fan.pct}` : "0", vw = ctx.measureText(v).width; ctx.fillText(v, r.x + 2, r.y + 36);
+      ctx.font = `28px ${FONT}`; ctx.fillStyle = T.muted; ctx.fillText("%", r.x + 8 + vw, r.y + 46);
+      ctx.font = `14px ${FONT}`; ctx.fillStyle = T.muted;
+      ctx.fillText(!on ? (off ? "Нет связи" : "Бризер выключен") : `Подача воздуха · ${fan.preset ? presetRu(fan.preset) : "ручной режим"}`, r.x + 2, r.y + Math.min(76, r.h - 8));
+    } else if (it.t === "sensors") {
+      const keys = active(), w = (r.w - GAP * (keys.length - 1)) / keys.length;
+      keys.forEach((key, i) => drawSensor(ctx, { x: r.x + i * (w + GAP), y: r.y, w, h: r.h }, key));
+    } else if (it.t === "sensor") drawSensor(ctx, r, it.key, it.compact);
+    else if (it.t === "slider") drawSlider(ctx, it, th, on, off);
+    else if (it.t === "vslider") drawVSlider(ctx, it, th, on, off);
+    else if (it.t === "modes") drawModes(ctx, it, th, on, off, now);
+    else if (it.t === "select") {
+      rr(ctx, r.x, r.y, r.w, r.h, 12); ctx.fillStyle = it.pressed ? T.outline : fan.preset && on ? th.surface : T.raised; ctx.globalAlpha = off ? .4 : 1; ctx.fill();
+      ctx.font = `14px ${FONT}`; ctx.fillStyle = T.text; ctx.textAlign = "center";
+      ctx.fillText(ellipsis(ctx, presetRu(fan.preset) || "Режимы", r.w - 16), r.x + r.w / 2, r.y + r.h / 2 + 1); ctx.globalAlpha = 1;
+    }
+  }
+  if (fan.sheet === L) drawSheet(ctx, L, th);
+  ctx.restore();
+}
+function drawSlider(ctx, it, th, on, off) {
+  const r = it.r, drag = fan.drag && fan.drag.it === it;
+  ctx.globalAlpha = off ? 0.4 : 1;
+  rr(ctx, r.x, r.y, r.w, r.h, r.h / 2); ctx.fillStyle = T.raised; ctx.fill();
+  const fw = Math.max(r.h, r.w * fan.pct / 100);
+  rr(ctx, r.x, r.y, fw, r.h, r.h / 2); ctx.fillStyle = on ? th.fill : rgb(mix(hex(T.surface), hex(T.subtle), 0.3)); ctx.fill();
+  const labeled = r.w >= 200;
+  ctx.fillStyle = T.text; ctx.textBaseline = "middle";
+  if (labeled) { ctx.textAlign = "left"; ctx.font = `14px ${FONT}`; ctx.fillText(fan.preset === "Auto" && on ? "Подача · авто" : "Подача", r.x + 18, r.y + r.h / 2 + 1); }
+  if (!it.quiet || drag) { const v = off ? "—" : `${fan.pct} %`; ctx.font = `${r.h >= 52 ? 21 : 18}px ${FONT}`;
+    ctx.textAlign = labeled ? "right" : "center"; ctx.fillText(v, labeled ? r.x + r.w - 18 : r.x + r.w / 2, r.y + r.h / 2 + 1); }
+  ctx.globalAlpha = 1;
+}
+function drawVSlider(ctx, it, th, on, off) {
+  const r = it.r, w = Math.min(64, r.w), x = r.x + (r.w - w) / 2;
+  ctx.globalAlpha = off ? 0.4 : 1;
+  rr(ctx, x, r.y, w, r.h, w / 2); ctx.fillStyle = T.raised; ctx.fill();
+  const fh = Math.max(w, r.h * fan.pct / 100);
+  rr(ctx, x, r.y + r.h - fh, w, fh, w / 2); ctx.fillStyle = on ? th.fill : rgb(mix(hex(T.surface), hex(T.subtle), 0.3)); ctx.fill();
+  ctx.textAlign = "center"; ctx.font = `18px ${FONT}`; ctx.fillStyle = T.text; ctx.fillText(off ? "—" : `${fan.pct}`, x + w / 2, r.y + 24);
+  ctx.font = `14px ${FONT}`; ctx.fillStyle = T.muted; ctx.fillText("%", x + w / 2, r.y + 44);
+  ctx.globalAlpha = 1;
+}
+function drawModes(ctx, it, th, on, off, now) {
+  const cells = modeCells(it.r, ctx); it.cells = cells;
+  cells.forEach((c, n) => {
+    if (c.kind === "heat") { drawHeatButton(ctx, c, now, it.pressed === n, c.style); return; }
+    const sel = on && fan.preset === c.p.id;
+    rr(ctx, c.x, c.y, c.w, c.h, 12); ctx.fillStyle = it.pressed === n ? T.outline : sel ? th.surface : T.raised; ctx.globalAlpha = off ? .4 : 1; ctx.fill();
+    if (sel) { ctx.strokeStyle = th.accent; ctx.lineWidth = 1.5; rr(ctx, c.x + .75, c.y + .75, c.w - 1.5, c.h - 1.5, 11.25); ctx.stroke(); }
+    const ic = sel ? th.accent : T.muted; ctx.font = `14px ${FONT}`; ctx.fillStyle = T.text;
+    if (c.style === "both") {
+      const tw = ctx.measureText(c.p.ru).width, gx = c.x + (c.w - (24 + 8 + tw)) / 2;
+      icon(ctx, c.p.icon, gx, c.y + (c.h - 24) / 2, 24, ic); ctx.textAlign = "left"; ctx.fillText(c.p.ru, gx + 32, c.y + c.h / 2 + 1);
+    } else if (c.style === "stack") {
+      icon(ctx, c.p.icon, c.x + (c.w - 24) / 2, c.y + c.h / 2 - 22, 24, ic); ctx.textAlign = "center"; ctx.fillText(c.p.ru, c.x + c.w / 2, c.y + c.h / 2 + 15);
+    } else if (c.style === "text") { ctx.textAlign = "center"; ctx.fillText(c.p.ru, c.x + c.w / 2, c.y + c.h / 2 + 1); }
+    else icon(ctx, c.p.icon, c.x + (c.w - 24) / 2, c.y + (c.h - 24) / 2, 24, sel ? th.accent : T.text);
+    ctx.globalAlpha = 1;
+  });
+}
+function sheetRect(L) { const y = L.W < 150 ? P : P + 44 + 12; return { x: 0, y: y - 4, w: L.W, h: L.H - y + 4 }; }
+function drawSheet(ctx, L, th) {
+  const s = sheetRect(L); ctx.save(); rr(ctx, 0, 0, L.W, L.H, 20); ctx.clip();
+  ctx.fillStyle = T.surface; ctx.fillRect(s.x, s.y, s.w, s.h);
+  const w = L.W - 2 * P; L.sheetRows = [];
+  let y = s.y + 4;
+  for (const p of PRESETS) {
+    const sel = fan.preset === p.id, hit = { x: P, y, w, h: 44 };
+    rr(ctx, P, y, w, 44, 12); ctx.fillStyle = sel ? th.surface : T.raised; ctx.fill();
+    if (sel) { ctx.strokeStyle = th.accent; ctx.lineWidth = 1.5; rr(ctx, P + .75, y + .75, w - 1.5, 42.5, 11.25); ctx.stroke(); }
+    ctx.textAlign = "center"; ctx.font = `14px ${FONT}`; ctx.fillStyle = T.text; ctx.fillText(p.ru, P + w / 2, y + 23);
+    L.sheetRows.push({ id: p.id, hit }); y += 52;
+  }
+  ctx.restore();
+}
+
+/* ---------- surfaces ---------- */
+const views = [];
+const cellPx = (n, axis = "x") => axis === "x" ? n * 59 - 8 : Math.floor(n * state.gridY) - 8;
+function makeCanvas(cv, cssW, cssH) {
+  const k = state.zoom && cv.id !== "screen" ? 2 : 1, dpr = Math.min(2, window.devicePixelRatio || 1) * k;
+  cv.width = Math.round(cssW * dpr); cv.height = Math.round(cssH * dpr);
+  if (cv.id !== "screen") cv.style.width = cssW * k + "px";
+  const ctx = cv.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); return ctx;
+}
+const io = new IntersectionObserver((es) => { for (const e of es) if (e.target._view) e.target._view.visible = e.isIntersecting; });
+function rebuild() {
+  views.length = 0; fan.sheet = null; fan.drag = null;
+  const scr = document.getElementById("screen"), [sw, sh] = state.screen.split("x").map(Number);
+  const SL = layout(cellPx(sw), cellPx(sh, "y"));
+  const sv = { canvas: scr, ctx: makeCanvas(scr, 480, 480), L: SL, ox: 8, oy: 8, screen: true, visible: true };
+  views.push(sv); attach(sv);
+  document.getElementById("screenCaption").textContent = `карточка ${sw}×${sh}`;
+  const tray = document.getElementById("tray"); tray.replaceChildren();
+  for (const [w, h] of SIZES) {
+    const L = layout(cellPx(w), cellPx(h, "y"));
+    const fig = document.createElement("figure"), cap = document.createElement("figcaption"), cv = document.createElement("canvas");
+    cap.innerHTML = `<b>${w}×${h}</b>`; cv.setAttribute("aria-label", `Карточка бризера ${w}×${h}`);
+    fig.append(cap, cv); tray.append(fig);
+    const v = { canvas: cv, ctx: makeCanvas(cv, L.W, L.H), L, ox: 0, oy: 0, visible: true }; views.push(v); io.observe(cv); attach(v);
+  }
+  document.getElementById("pitchOut").textContent = `8×8 = ${cellPx(8)} × ${cellPx(8, "y")} px`;
+  save();
+}
+
+/* ---------- pointer ---------- */
+const inside = (p, r) => r && p.x >= r.x && p.x < r.x + r.w && p.y >= r.y && p.y < r.y + r.h;
+function local(v, e) { const b = v.canvas.getBoundingClientRect(), cw = v.screen ? 480 : v.L.W, ch = v.screen ? 480 : v.L.H; return { x: (e.clientX - b.left) * cw / b.width - v.ox, y: (e.clientY - b.top) * ch / b.height - v.oy }; }
+function dragValue(it, p) {
+  const r = it.r;
+  if (it.t === "vslider") return Math.round((r.y + r.h - p.y) / r.h * 100);
+  return Math.round((p.x - r.x) / r.w * 100);
+}
+function attach(v) {
+  const cv = v.canvas; cv._view = v; if (cv._attached) return; cv._attached = true;
+  cv.addEventListener("pointerdown", (e) => {
+    const view = cv._view, L = view.L, p = local(view, e); if (state.offline) return;
+    cv.setPointerCapture(e.pointerId);
+    if (fan.sheet === L) { for (const row of L.sheetRows || []) if (inside(p, row.hit)) setPreset(row.id); fan.sheet = null; return; }
+    const it = [...L.items].reverse().find((i) => ["power", "heat", "slider", "vslider", "modes", "select", "tile"].includes(i.t) && inside(p, i.r));
+    if (!it) return;
+    view.active = it;
+    if (it.t === "slider" || it.t === "vslider") { fan.drag = { it }; setSpeed(dragValue(it, p)); return; }
+    if (it.t === "modes") { it.pressed = (it.cells || []).findIndex((c) => inside(p, c)); if (it.pressed < 0) it.pressed = null; return; }
+    it.pressed = true;
+  });
+  cv.addEventListener("pointermove", (e) => {
+    const view = cv._view; if (!fan.drag || view.active !== fan.drag.it) return;
+    setSpeed(dragValue(fan.drag.it, local(view, e)));
+  });
+  const end = (e, cancel) => {
+    const view = cv._view, it = view.active; view.active = null; if (!it) return;
+    const p = local(view, e), hit = !cancel && inside(p, it.r);
+    if (it.t === "slider" || it.t === "vslider") { fan.drag = null; return; }
+    if (hit) {
+      if (it.t === "power" || it.t === "tile") setOn(!fan.on);
+      else if (it.t === "heat") setHeat(!heatOn());
+      else if (it.t === "modes" && it.pressed != null) {
+        const c = it.cells[it.pressed];
+        if (inside(p, c)) { if (c.kind === "heat") setHeat(!heatOn()); else setPreset(c.p.id); }
+      }
+      else if (it.t === "select") fan.sheet = view.L;
+    }
+    it.pressed = it.t === "modes" ? null : false;
+  };
+  cv.addEventListener("pointerup", (e) => end(e, false));
+  cv.addEventListener("pointercancel", (e) => end(e, true));
+}
+
+/* ---------- loop ---------- */
+let last = 0, prev = performance.now(), haLast = 0;
+function frame(now) {
+  const dt = Math.min(0.1, (now - prev) / 1000); prev = now;
+  pump(dt, now);
+  const wt = heatOn() ? 1 : 0; warmMix = state.reduced ? wt : warmMix + (wt - warmMix) * Math.min(1, dt / 0.24 * 2.2);
+  if (now - last >= 1000 / FPS || fan.drag) {
+    last = now;
+    for (const v of views) {
+      if (!v.visible) continue;
+      if (v.screen) { v.ctx.fillStyle = T.bg; v.ctx.fillRect(0, 0, 480, 480); } else v.ctx.clearRect(0, 0, v.L.W, v.L.H);
+      drawCard(v.ctx, v.L, now, v.ox, v.oy);
+    }
+    syncKbd();
+  }
+  if (now - haLast > 500) { haLast = now; haReadout(); }
+  requestAnimationFrame(frame);
+}
+const HA_ID = { co2: "sensor.breezer_co2", pm: "sensor.breezer_pm25", tvoc: "sensor.breezer_tvoc" };
+function haReadout() {
+  const st = state.offline ? "unavailable" : fan.on ? "on" : "off";
+  document.getElementById("haOut").innerHTML =
+    `<b>fan.breezer</b> ${st} · percentage ${fan.on ? fan.pct : 0} · preset_mode ${fan.preset ?? "null"}` +
+    (state.heater ? ` &nbsp; <b>switch.breezer_heater</b> ${state.offline ? "unavailable" : fan.heat && fan.on ? "on" : "off"}` : "") +
+    active().map((k) => ` &nbsp; <b>${HA_ID[k]}</b> ${SENSORS[k].value()} ${SENSORS[k].unit}`).join("") + (active().length ? "" : " &nbsp; датчиков нет");
+}
+
+/* ---------- controls ---------- */
+function pressed(box, value) { for (const b of box.querySelectorAll("[data-v]")) b.setAttribute("aria-pressed", String(b.dataset.v === value)); }
+function syncKbd() {
+  const el = document.getElementById("kSpeed"); if (document.activeElement !== el) el.value = fan.pct;
+  const s = document.getElementById("kPreset"); if (document.activeElement !== s) s.value = fan.preset || "";
+  const h = document.getElementById("kHeat"); h.disabled = !state.heater; h.setAttribute("aria-pressed", String(heatOn()));
+}
+function controls() {
+  const airBox = document.getElementById("air");
+  airBox.addEventListener("click", (e) => { const v = e.target.dataset?.v; if (!v) return; state.air = v; air.co2 = AIR[v].co2; air.pm = AIR[v].pm; air.tvoc = AIR[v].tvoc; pressed(airBox, v); save(); });
+  if (!(state.air in AIR)) state.air = "fresh"; pressed(airBox, state.air);
+  const sb = document.getElementById("sensorsBox");
+  for (const k of SENSOR_KEYS) {
+    const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.textContent = SENSORS[k].label;
+    b.setAttribute("aria-pressed", String(state.sensors.includes(k)));
+    b.onclick = () => { state.sensors = state.sensors.includes(k) ? state.sensors.filter((x) => x !== k) : [...state.sensors, k]; b.setAttribute("aria-pressed", String(state.sensors.includes(k))); rebuild(); };
+    sb.append(b);
+  }
+  const hb = document.getElementById("heatIcon");
+  for (const [id, [label, mdi]] of Object.entries(HEAT_ICONS)) { const b = document.createElement("button"); b.type = "button"; b.dataset.v = id; b.textContent = label; b.title = `mdi:${mdi}`; b.onclick = () => { state.heatIcon = id; pressed(hb, id); save(); }; hb.append(b); }
+  if (!(state.heatIcon in HEAT_ICONS)) state.heatIcon = "radiator"; pressed(hb, state.heatIcon);
+  const heater = document.getElementById("heater"); heater.checked = state.heater; heater.addEventListener("change", () => { state.heater = heater.checked; if (!heater.checked) fan.heat = false; rebuild(); });
+  const sw = document.getElementById("swatches");
+  for (const [name, c] of ACCENTS) { const b = document.createElement("button"); b.type = "button"; b.className = "swatch"; b.style.background = c; b.dataset.v = c; b.title = name; b.setAttribute("aria-label", name); b.onclick = () => setAccent(c); sw.append(b); }
+  setAccent(state.accent);
+  const sizes = document.getElementById("sizes");
+  for (const [w, h] of SIZES) { const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.dataset.v = `${w}x${h}`; b.textContent = `${w}×${h}`; b.onclick = () => { state.screen = b.dataset.v; pressed(sizes, state.screen); rebuild(); }; sizes.append(b); }
+  pressed(sizes, state.screen);
+  const grid = document.getElementById("grid"); if (![59, 55.5, 53.5].includes(state.gridY)) state.gridY = 59;
+  grid.addEventListener("click", (e) => { const v = e.target.dataset?.v; if (!v) return; state.gridY = Number(v); pressed(grid, v); rebuild(); });
+  pressed(grid, String(state.gridY));
+  for (const id of ["offline", "reduced", "zoom"]) { const el = document.getElementById(id); el.checked = state[id]; el.addEventListener("change", () => { state[id] = el.checked; if (id === "zoom") rebuild(); save(); }); }
+  document.getElementById("kPower").onclick = () => setOn(!fan.on);
+  document.getElementById("kHeat").onclick = () => setHeat(!heatOn());
+  document.getElementById("kSpeed").oninput = (e) => setSpeed(Number(e.target.value));
+  const ks = document.getElementById("kPreset"); ks.add(new Option("Ручной", "")); for (const p of PRESETS) ks.add(new Option(p.ru, p.id));
+  ks.onchange = () => { if (ks.value) setPreset(ks.value); else { fan.preset = null; } };
+}
+function setAccent(c) { state.accent = c; document.documentElement.style.setProperty("--accent", c); pressed(document.getElementById("swatches"), c); save(); }
+controls();
+(document.fonts ? Promise.all([document.fonts.load(`14px "Noto Sans"`), document.fonts.load(`500 14px "Noto Sans"`), document.fonts.load(`64px "Noto Sans"`)]).catch(() => {}) : Promise.resolve()).finally(() => { rebuild(); requestAnimationFrame(frame); });
+</script>

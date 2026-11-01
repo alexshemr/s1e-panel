@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>S1E Panel — прошивка Home Assistant для Aqara S1E и сенсорная панель</title>
+<meta name="description" content="S1E Panel — кастомная прошивка, которая превращает Aqara Magic Switch S1E в быструю сенсорную панель Home Assistant: свет, шторы, климат, датчики, заставки и уведомления. Попробуйте демо в браузере.">
+<meta name="keywords" content="Aqara S1E Home Assistant, Aqara Magic Switch S1E, прошивка Aqara S1E, кастомная прошивка Aqara S1E, сенсорная панель Home Assistant, Aqara S1E custom UI">
+<link rel="canonical" href="https://alexshemr.github.io/s1e-panel/ru/">
+<link rel="alternate" hreflang="en" href="https://alexshemr.github.io/s1e-panel/">
+<link rel="alternate" hreflang="ru" href="https://alexshemr.github.io/s1e-panel/ru/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:title" content="S1E Panel — прошивка Home Assistant для Aqara S1E">
+<meta property="og:description" content="Превратите Aqara Magic Switch S1E в нативную сенсорную панель Home Assistant. Интерактивное демо — прямо в браузере.">
+<meta property="og:url" content="https://alexshemr.github.io/s1e-panel/ru/">
+<meta property="og:image" content="https://alexshemr.github.io/s1e-panel/assets/ru/hero.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0b0f14">
+<link rel="icon" href="../assets/icon.png">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"SoftwareApplication","name":"S1E Panel","applicationCategory":"HomeAutomation","operatingSystem":"Aqara S1E (NPD1121WSK01) Linux","inLanguage":"ru","description":"Кастомная прошивка, которая превращает Aqara Magic Switch S1E в нативную сенсорную панель Home Assistant.","license":"https://opensource.org/licenses/MIT","url":"https://github.com/alexshemr/s1e-panel","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+</script>
+<style>
+:root{--bg:#0b0f14;--panel:#141a22;--line:#232c38;--text:#e9eef4;--muted:#9aa7b6;--accent:#ffd966;--accent2:#dfb98a;color-scheme:dark}
+:root[data-theme="light"]{--bg:#f6f4ef;--panel:#ffffff;--line:#e3ded3;--text:#1b2028;--muted:#5d6672;--accent:#b8860b;--accent2:#9b6b2f;color-scheme:light}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f6f4ef;--panel:#ffffff;--line:#e3ded3;--text:#1b2028;--muted:#5d6672;--accent:#b8860b;--accent2:#9b6b2f;color-scheme:light}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans",sans-serif}
+a{color:var(--accent)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+nav{display:flex;align-items:center;gap:16px;padding:16px 0;flex-wrap:wrap}
+nav .brand{display:flex;align-items:center;gap:10px;font-weight:700;color:var(--text);text-decoration:none;margin-right:auto}
+nav .brand img{width:32px;height:32px;border-radius:8px}
+nav a{text-decoration:none;color:var(--muted);font-size:15px}
+nav a:hover{color:var(--text)}
+header{padding:40px 0 24px;text-align:center}
+h1{font-size:clamp(30px,5vw,52px);line-height:1.1;margin:0 0 16px;letter-spacing:-.02em}
+h1 span{color:var(--accent)}
+.lede{max-width:760px;margin:0 auto 28px;color:var(--muted);font-size:clamp(16px,2.2vw,19px)}
+.cta{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:36px}
+.btn{display:inline-block;padding:12px 22px;border-radius:999px;text-decoration:none;font-weight:600;border:1px solid var(--line);color:var(--text);background:var(--panel)}
+.btn.primary{background:var(--accent);color:#1b1608;border-color:var(--accent)}
+.hero img{width:100%;height:auto;display:block}
+h2{font-size:clamp(24px,3.4vw,34px);margin:64px 0 8px;letter-spacing:-.01em}
+.sub{color:var(--muted);margin:0 0 24px}
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:20px;text-decoration:none;color:var(--text);display:flex;flex-direction:column;gap:8px}
+a.card:hover{border-color:var(--accent2)}
+.card h3{margin:0;font-size:19px}
+.card p{margin:0;color:var(--muted);font-size:15px}
+.card .go{margin-top:auto;color:var(--accent);font-weight:600;font-size:15px}
+.shots{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.shots figure{margin:0}
+.shots img{width:100%;height:auto;border-radius:20px;display:block}
+.shots figcaption{color:var(--muted);font-size:14px;margin-top:8px}
+.steps{counter-reset:s;list-style:none;padding:0;display:grid;gap:12px}
+.steps li{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px 14px 56px;position:relative}
+.steps li::before{counter-increment:s;content:counter(s);position:absolute;left:16px;top:14px;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#1b1608;font-weight:700;display:grid;place-items:center;font-size:14px}
+.note{border-left:3px solid var(--accent2);padding:12px 16px;background:var(--panel);border-radius:0 12px 12px 0;color:var(--muted);font-size:15px}
+footer{margin:72px 0 32px;color:var(--muted);font-size:14px;border-top:1px solid var(--line);padding-top:24px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips span{border:1px solid var(--line);border-radius:999px;padding:4px 12px;font-size:14px;color:var(--muted);background:var(--panel)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav>
+  <a class="brand" href="./"><img src="../assets/icon.png" alt="">S1E Panel</a>
+  <a href="#demo">Демо</a>
+  <a href="../gallery.html?lang=ru">Карточки</a>
+  <a href="https://github.com/alexshemr/s1e-panel/blob/main/docs/ru/installation.md">Установка</a>
+  <a href="https://github.com/alexshemr/s1e-panel">GitHub</a>
+  <a href="../" hreflang="en" lang="en">English</a>
+</nav>
+
+<header>
+  <h1>Ваша <span>Aqara S1E</span> —<br>сенсорная панель Home Assistant</h1>
+  <p class="lede">S1E Panel — кастомная прошивка для <b>Aqara Magic Switch S1E</b>. Она заменяет заводской интерфейс быстрой нативной панелью Home Assistant: ваш свет, шторы, климатическая техника и датчики — не только Aqara — на отзывчивом сенсорном экране 480 × 480.</p>
+  <div class="cta">
+    <a class="btn primary" href="../demo/stands/home-stand.html?lang=ru&amp;mode=play">▶ Попробовать демо</a>
+    <a class="btn" href="https://github.com/alexshemr/s1e-panel/blob/main/docs/ru/installation.md">Установить на панель</a>
+    <a class="btn" href="https://github.com/alexshemr/s1e-panel">GitHub</a>
+  </div>
+  <div class="hero"><img src="../assets/ru/hero.png" width="1536" height="480" alt="Aqara S1E с S1E Panel: панель Home Assistant со светом, шторами, термостатом, микроклиматом и погодой; вторая страница с бризером, увлажнителем и 3D-принтером; анимированная погодная заставка"></div>
+</header>
+
+<section id="demo">
+  <h2>Попробуйте в браузере</h2>
+  <p class="sub">Ни панель, ни Home Assistant не нужны: устройства имитируются.</p>
+  <div class="grid">
+    <a class="card" href="../demo/stands/home-stand.html?lang=ru&amp;mode=play"><h3>Конструктор панели</h3><p>Целый экран панели из живых карточек. Включите свет, подвигайте яркость, выберите цвет, откройте шторы, настройте термостат — и переставьте всё по-своему.</p><span class="go">Открыть конструктор →</span></a>
+    <a class="card" href="../gallery.html?lang=ru"><h3>Галерея карточек</h3><p>Все типы карточек вживую, в настоящем размере на панели, с сущностями Home Assistant и настройками, которые они поддерживают.</p><span class="go">Смотреть карточки →</span></a>
+    <a class="card" href="../demo/editor/?demo&amp;lang=ru"><h3>Веб-редактор</h3><p>Настоящий редактор панели с демо-данными. Его предпросмотр — рендерер самой прошивки, скомпилированный в WebAssembly: ровно то, что рисует панель.</p><span class="go">Открыть редактор →</span></a>
+  </div>
+</section>
+
+<section>
+  <h2>Зачем S1E Panel</h2>
+  <p class="sub">Сделана для Home Assistant, задумана для стены.</p>
+  <div class="grid">
+    <div class="card"><h3>Настоящая панель Home Assistant</h3><p>Свет, шторы и рулонные шторы, термостаты, увлажнители, вентиляторы, бризеры, микроклимат, выключатели, сцены и скрипты, помощники, погода, медиаплеер и 3D-принтер.</p></div>
+    <div class="card"><h3>Плавно и живо</h3><p>Нативная отрисовка на LVGL и страницы, которые листаются свайпом. Лампа светится своим цветом, штора движется в окне с настоящим небом, вентилятор крутится с реальной скоростью.</p></div>
+    <div class="card"><h3>По-вашему</h3><p>Несколько страниц на сетке 8 × 8, карточки до 11 размеров, свои цвета, иконки, подписи и только нужные режимы устройств.</p></div>
+    <div class="card"><h3>Настройка из браузера</h3><p>Веб-редактор на самой панели с живым предпросмотром, а добавлять и переставлять карточки можно и прямо на экране.</p></div>
+    <div class="card"><h3>Заставки и сообщения</h3><p>Часы, живая погода, показатели дома или ваши фото — или всё по очереди. Home Assistant присылает сообщения с прогнозом или снимком с камеры у двери.</p></div>
+    <div class="card"><h3>Без токенов, с безопасными обновлениями</h3><p>Интеграция подключается одним касанием на панели. Обновления приходят по Wi-Fi, подписаны и откатываются автоматически.</p></div>
+  </div>
+</section>
+
+<section>
+  <h2>Экраны прошивки</h2>
+  <p class="sub">Отрисованы собственным рендерером S1E Panel в разрешении панели.</p>
+  <div class="shots">
+    <figure><img src="../assets/ru/saver-rain.gif" width="480" height="480" loading="lazy" alt="Заставка «Живая погода» с анимированным дождём"><figcaption>Заставка «Живая погода»</figcaption></figure>
+    <figure><img src="../assets/ru/screen-saver-pulse.png" width="480" height="480" loading="lazy" alt="Заставка «Пульс дома» с шестью показателями"><figcaption>«Пульс дома»</figcaption></figure>
+    <figure><img src="../assets/ru/screen-notification-photo.png" width="480" height="480" loading="lazy" alt="Уведомление о звонке в дверь со снимком камеры"><figcaption>Снимок с дверной камеры из Home Assistant</figcaption></figure>
+    <figure><img src="../assets/ru/screen-notification-weather.png" width="480" height="480" loading="lazy" alt="Сообщение «Спокойной ночи» с дождливой погодой на завтра"><figcaption>Погодное сообщение</figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <h2>Карточки</h2>
+  <p class="sub">Каждая карточка подстраивается под размер: на больших больше управления.</p>
+  <div class="chips">
+    <span>Свет</span><span>Шторы</span><span>Рулонная штора</span><span>Термостат</span><span>Увлажнитель</span><span>Вентилятор</span><span>Бризер</span><span>Микроклимат (CO₂, PM2.5, влажность…)</span><span>Выключатель</span><span>Реле</span><span>Сцена / скрипт</span><span>Время</span><span>Дата и время</span><span>Число</span><span>Выбор</span><span>Текст</span><span>Погода</span><span>3D-принтер</span><span>Медиаплеер</span><span>Показания</span>
+  </div>
+  <p><a href="../gallery.html?lang=ru">Открыть галерею карточек →</a></p>
+</section>
+
+<section>
+  <h2>Установка на Aqara S1E</h2>
+  <p class="sub">Один раз через сервисную консоль, дальше все обновления по Wi-Fi.</p>
+  <ol class="steps">
+    <li><b>Проверьте модель:</b> Aqara Magic Switch S1E, NPD1121WSK01.</li>
+    <li><b>Получите доступ к консоли</b> панели (UART) — способ <a href="https://github.com/oopuuu/AqaraS1E-Custom-GUI">oopuuu</a> и <a href="https://github.com/niceboygithub/AqaraSmartSwitchS1E">niceboygithub</a>.</li>
+    <li><b>Запустите установщик</b> с комплектом первой установки из <a href="https://github.com/alexshemr/s1e-panel/releases/latest">последнего выпуска</a>. Он запускает S1E Panel на пробу и только потом закрепляет установку.</li>
+    <li><b>Подключите Home Assistant</b> через <a href="https://github.com/alexshemr/ha-s1e-panel">интеграцию S1E Panel</a> (HACS) и добавьте первую карточку.</li>
+  </ol>
+  <p><a class="btn primary" href="https://github.com/alexshemr/s1e-panel/blob/main/docs/ru/installation.md">Читать руководство по установке</a></p>
+  <p class="note"><b>Независимый проект.</b> S1E Panel не создана, не одобрена и не поддерживается Aqara или Lumi United Technology. Установка требует вскрыть устройство, питающееся от электросети, и паять на его плате; это может лишить гарантии, а ошибки — повредить панель. Вы действуете на свой страх и риск — сначала прочитайте <a href="https://github.com/alexshemr/s1e-panel/blob/main/docs/ru/installation.md">предупреждение о безопасности</a>.</p>
+</section>
+
+<footer>
+  <p><a href="https://github.com/alexshemr/s1e-panel/blob/main/docs/ru/getting-started.md">Первые шаги</a> · <a href="https://github.com/alexshemr/s1e-panel/blob/main/docs/ru/configuration.md">Настройка</a> · <a href="https://github.com/alexshemr/s1e-panel/blob/main/docs/ru/architecture.md">Как это устроено</a> · <a href="https://github.com/alexshemr/s1e-panel/blob/main/docs/ru/troubleshooting.md">Решение проблем</a> · <a href="https://github.com/alexshemr/s1e-panel/blob/main/docs/ru/api.md">API</a> · <a href="https://github.com/alexshemr/s1e-panel/blob/main/docs/ru/credits.md">Благодарности и лицензии</a></p>
+  <p>S1E Panel — лицензия MIT. Доступ к консоли S1E первыми нашли oopuuu и niceboygithub. Aqara — товарный знак Lumi United Technology; проект с ней не связан.</p>
+</footer>
+</div>
+</body>
+</html>

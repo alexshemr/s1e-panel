@@ -1,0 +1,765 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Стенд микроклимата S1E</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&family=Noto+Sans+Display:wght@500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: same workbench as the light, curtain and breezer stands — sticky controls, the 480×480 panel screen beside every card size. */
+:root {
+  --page: #0b0e12;
+  --tray: #101317;
+  --raised: #171b21;
+  --line: #2a3039;
+  --text: #f3f0e9;
+  --muted: #9da2aa;
+  --accent: #dfb98a;
+  --display: "Noto Sans Display", "Noto Sans", system-ui, sans-serif;
+  --body: "Noto Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+  color-scheme: dark;
+  box-sizing: border-box; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+html, body { margin: 0; background: var(--page); color: var(--text); }
+body { font-family: var(--body); font-size: 14px; line-height: 1.5; }
+.wrap { max-width: 1480px; margin: 0 auto; padding-block: 20px 40px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); display: grid; gap: 18px; }
+header { display: grid; gap: 4px; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+h1 { font-family: var(--display); font-weight: 600; font-size: clamp(24px, 3vw, 32px); line-height: 1.15; margin: 0; text-wrap: balance; }
+.lede { color: var(--muted); max-width: 80ch; margin: 0; }
+.controls { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: color-mix(in srgb, var(--page) 92%, transparent); backdrop-filter: blur(8px); padding-block: 10px; border-bottom: 1px solid var(--line); display: grid; gap: 10px; }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--page); }
+.row { display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; }
+.group { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.label { font-size: 12px; color: var(--muted); margin-right: 2px; }
+.seg { display: inline-flex; flex-wrap: wrap; background: var(--raised); border: 1px solid var(--line); border-radius: 10px; padding: 2px; }
+.seg button { font: inherit; font-size: 13px; color: var(--muted); background: none; border: 0; border-radius: 8px; padding: 4px 12px; cursor: pointer; }
+.seg button[aria-pressed="true"] { background: #2c3037; color: var(--text); }
+.chip { font: inherit; font-size: 13px; color: var(--text); background: var(--raised); border: 1px solid var(--line); border-radius: 999px; padding: 5px 11px; cursor: pointer; font-variant-numeric: tabular-nums; }
+.chip[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #17130e; font-weight: 600; }
+.swatch { width: 26px; height: 26px; border-radius: 50%; border: 2px solid transparent; outline: 1px solid var(--line); cursor: pointer; padding: 0; }
+.swatch[aria-pressed="true"] { border-color: var(--text); }
+.switch { display: inline-flex; gap: 8px; align-items: center; font-size: 13px; cursor: pointer; }
+.switch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.switch span { width: 34px; height: 20px; border-radius: 999px; background: var(--line); position: relative; transition: background .15s; }
+.switch span::after { content: ""; position: absolute; left: 3px; top: 3px; width: 14px; height: 14px; border-radius: 50%; background: var(--text); transition: transform .15s; }
+.switch input:checked + span { background: var(--accent); }
+.switch input:checked + span::after { transform: translateX(14px); background: #17130e; }
+input[type=range] { accent-color: var(--accent); }
+.text { font: inherit; font-size: 13px; color: var(--text); background: var(--raised); border: 1px solid var(--line); border-radius: 10px; padding: 4px 10px; width: 180px; }
+.readout { font-family: var(--mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.ha { font-family: var(--mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.ha b { color: var(--text); font-weight: 500; }
+.chip:focus-visible, .seg button:focus-visible, .swatch:focus-visible, .switch input:focus-visible + span, .text:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.bench { display: grid; grid-template-columns: minmax(0, 520px) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 1100px) { .bench { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 700px) { .controls { position: static; backdrop-filter: none; } }
+.device { background: #05070a; border: 1px solid var(--line); border-radius: 22px; padding: 20px; display: grid; gap: 10px; justify-items: center; }
+.device canvas { width: 100%; max-width: 480px; aspect-ratio: 1; display: block; touch-action: none; }
+.caption { font-family: var(--mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; text-align: center; }
+.kbd { display: grid; grid-template-columns: auto 1fr auto; gap: 6px 10px; align-items: center; width: 100%; max-width: 440px; font-size: 12px; color: var(--muted); }
+.kbd input { width: 100%; }
+.kbd output { font-family: var(--mono); color: var(--text); min-width: 9ch; text-align: right; font-variant-numeric: tabular-nums; }
+.tray { background: var(--tray); border: 1px solid var(--line); border-radius: 18px; padding: 18px; display: flex; flex-wrap: wrap; gap: 22px 16px; align-items: flex-start; min-width: 0; }
+figure { margin: 0; display: grid; gap: 6px; min-width: 0; max-width: 100%; }
+figure canvas { display: block; max-width: 100%; height: auto; touch-action: none; }
+figcaption { font-family: var(--mono); font-size: 12px; color: var(--muted); display: flex; gap: 8px; font-variant-numeric: tabular-nums; }
+figcaption b { color: var(--text); font-weight: 500; }
+.note { color: var(--muted); font-size: 13px; max-width: 92ch; margin: 0; }
+.note strong { color: var(--text); font-weight: 500; }
+.norms { border-collapse: collapse; font-size: 13px; color: var(--muted); }
+.norms th, .norms td { text-align: left; padding: 4px 14px 4px 0; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.norms th { color: var(--text); font-weight: 500; }
+@media (prefers-reduced-motion: reduce) { .switch span, .switch span::after { transition: none; } }
+[hidden] { display: none !important; }
+</style>
+
+<div class="wrap">
+  <header>
+    <a class="eyebrow" href="index.html" style="color:inherit;text-decoration:none">← Все стенды</a>
+    <div class="eyebrow">Aqara S1E · микроклимат</div>
+    <h1>Микроклимат</h1>
+    <p class="lede">Датчики комнаты на одной карточке: температура, влажность, CO₂, PM2.5, PM1 и TVOC, у каждого цвет нормы. Зелёный — норма, жёлтый — на границе, красный — вне нормы, такая плитка мягко светится. Чем больше карточка, тем подробнее плитка: на крупных видна шкала с зонами и отметкой текущего значения. На маленьких касание датчика открывает подробную плитку поверх карточки. Значения можно менять ползунками под экраном.</p>
+  </header>
+
+  <section class="controls" aria-label="Параметры">
+    <div class="row">
+      <label class="group"><span class="label">Заголовок</span><input class="text" id="title" maxlength="40" placeholder="Без заголовка"></label>
+      <div class="group"><span class="label">Иконка</span><div class="seg" id="iconPick"></div></div>
+      <div class="group"><span class="label">Датчики</span><span class="group" id="sensorsBox"></span></div>
+    </div>
+    <div class="row">
+      <div class="group"><span class="label">Воздух</span><div class="seg" id="scene"></div></div>
+      <div class="group" role="group" aria-label="Акцент интерфейса"><span class="label">Акцент</span><span class="group" id="swatches"></span></div>
+    </div>
+    <span class="ha" id="haOut" hidden></span>
+    <div class="row">
+      <div class="group"><span class="label">На экране</span><span class="group" id="sizes"></span></div>
+      <div class="group" hidden><span class="label">Сетка</span><div class="seg" id="grid"><button type="button" data-v="59">Стенд 59 × 59</button><button type="button" data-v="55.5">План 59 × 55,5</button><button type="button" data-v="53.5">Прошивка 59 × 53,5</button></div><span class="readout" id="pitchOut"></span></div>
+      <label class="switch"><input type="checkbox" id="offline"><span></span>Нет связи</label>
+      <label class="switch"><input type="checkbox" id="reduced"><span></span>Меньше движения</label>
+      <label class="switch" hidden><input type="checkbox" id="zoom"><span></span>Увеличить ×2</label>
+    </div>
+  </section>
+
+  <main class="bench">
+    <div class="device">
+      <canvas id="screen" width="480" height="480" aria-label="Экран панели с карточкой микроклимата"></canvas>
+      <div class="caption" id="screenCaption"></div>
+      <div class="kbd" id="kbd" aria-label="Значения датчиков"></div>
+    </div>
+    <div class="tray" id="tray"></div>
+  </main>
+
+  <table class="norms" id="norms" aria-label="Нормы датчиков"></table>
+</div>
+
+<!-- embed-bridge -->
+<script>
+/* ---------- constructor bridge (tools/stand_bridge): lets home-stand.html host this stand as a widget ----------
+   Does nothing unless the page is opened as home-stand.html?embed=<id>&size=<WxH>&lang=<ru|en>.
+   Card mode shows only the card cut from the panel screen; settings mode shows the stand's own controls.
+   Settings are stored per widget (localStorage keys get "@<id>"), panel text is translated on the canvas.
+   A stand opened on its own with ?lang=en (the public demo) gets only the translation. */
+(() => {
+  const q = new URLSearchParams(location.search), id = q.get("embed"), solo = !id && q.get("lang") === "en";
+  if (!id && !solo) return;
+  const E = window.EMBED = { id, size: q.get("size") || "", lang: q.get("lang") === "en" ? "en" : "ru", mode: "card", solo };
+  const root = document.documentElement;
+  if (id) root.classList.add("embed", "embed-card");
+
+  /* each widget keeps its own settings */
+  if (id) try {
+    const S = Storage.prototype, gi = S.getItem, si = S.setItem;
+    S.getItem = function (k) { return gi.call(this, `${k}@${id}`); };
+    S.setItem = function (k, v) { return si.call(this, `${k}@${id}`, v); };
+  } catch (e) {}
+
+  /* panel language: Russian strings are translated where they are drawn */
+  const DICT = {"% · цвет":"% · color","(локально, без HA)":"(local, without HA)","(режим дома) и":"(home mode) and","(уставка бойлера, громкость),":"(water heater setpoint, volume),","+ температура":"+ temperature","+ цвет":"+ color",", фаза луны из":", moon phase from",", шаг":", step","1 вне нормы":"1 out of range","3 ступени":"3 steps","3D-принтер":"3D printer","4 ступени":"4 steps",": ошибка отрисовки":": render error",": текст «":": text «","CO₂ высокий":"CO₂ high","CO₂ повышен":"CO₂ elevated","HA подтвердил:":"HA confirmed:","HA подтвердил: print_status =":"HA confirmed: print_status =","HA подтвердил: печать прервана, принтер свободен":"HA confirmed: print cancelled, printer idle","HA подтвердил: цель":"HA confirmed: target","HA: время изменено извне →":"HA: time changed externally →","HA: дата изменена извне →":"HA: date changed externally →","PLA · 38 г":"PLA · 38 g","PM1 высокий":"PM1 high","PM1 превышен":"PM1 exceeded","PM2.5 высокий":"PM2.5 high","PM2.5 превышен":"PM2.5 exceeded","TVOC высокий":"TVOC high","TVOC повышен":"TVOC elevated","box: − и +":"box: − and +","sun.sun недоступен → запасной режим: день с 07:00 до 19:00 по часам панели.":"sun.sun unavailable → fallback: day from 07:00 to 19:00 by the panel clock.","«Время»":"«Time»","°   ·   Влажность 81 %":"°   ·   Humidity 81 %","° · азимут":"° · azimuth","° · восход":"° · sunrise","·  ещё":"·  more","· без HA":"· without HA","· высота":"· elevation","· ещё":"· more","· закат":"· sunset","· обогрев":"· heating","· по нажатию":"· on tap","· по расписанию":"· on schedule","· реле":"· relay","· сейчас":"· now","· сумерки":"· twilight","» выходит за":"» goes beyond","» выходит за карточку":"» goes beyond the card","Абажур":"Shade lamp","Авто":"Auto","Акцент":"Accent","Акцент интерфейса":"Interface accent","Без датчика":"No sensor","Без заголовка":"No title","Без названия":"Untitled","Без фото":"No photo","Белый PLA":"White PLA","Бирюза":"Teal","Бойлер":"Water heater","Бойлер 40…75 °C":"Water heater 40…75 °C","Бра":"Sconce","Бриз":"Breeze","Бризер":"Breezer","Бризер выключен":"Breezer off","Будильник":"Alarm","В комнате":"In the room","Вариантов":"Options","Вентилятор":"Fan","Вентилятор выключен":"Fan off","Весна":"Spring","Ветер и облака":"Wind and clouds","Ветрено":"Windy","Вечер":"Evening","Вид":"View","Вкл":"On","Вкл / выкл":"On / off","Включается…":"Turning on…","Включить":"Turn on","Включён":"On","Включён ·":"On ·","Включён · обогрев":"On · heating","Вкл…":"On…","Влажн.":"Hum.","Влажно":"Humid","Влажность":"Humidity","Влажность в комнате":"Room humidity","Влажность: влажно":"Humidity: humid","Влажность: очень сухо":"Humidity: very dry","Влажность: сухо":"Humidity: dry","Влажность: сыро":"Humidity: damp","Вода":"Water","Вода есть":"Water OK","Вода!":"Water!","Воздух":"Air","Воздух в комнате":"Room air","Волны":"Waves","Время":"Time","Время в HA":"Time in HA","Время по Москве":"Moscow time","Время суток":"Time of day","Все блоки скрыты: остались лампа и питание":"All blocks hidden: lamp and power remain","Все погоды":"All weathers","Все размеры":"All sizes","Всё в норме":"All normal","Вт":"W","Выберите датчики в веб-интерфейсе":"Select sensors in the web interface","Выбор":"Select","Выкл":"Off","Выкл · Обогрев":"Off · Heat","Выкл · Обогрев · Авто":"Off · Heat · Auto","Выкл.":"Off","Выключается…":"Turning off…","Выключатель":"Switch","Выключен":"Off","Выключить":"Turn off","Выкл…":"Off…","Выполняется…":"Running…","Высокий":"High","Гости":"Guests","Гости дома":"Guests home","Гостиная":"Living room","Готово":"Done","Град":"Hail","Греет":"Heating","Греет до":"Heating to","Гроза":"Thunderstorm","Гроза с дождём":"Thunderstorm, rain","Громкость":"Volume","Громкость 0…100 %, шаг 5":"Volume 0…100 %, step 5","Громкость оповещений":"Notification volume","Грязно":"Polluted","Дата":"Date","Дата в HA":"Date in HA","Дату и время":"Date and time","Датчик":"Sensor","Датчики":"Sensors","Датчики «Дома», до 4":"«Home» sensors, up to 4","Датчики на карточке":"Sensors on card","Датчики не выбраны":"No sensors selected","Датчики пульса, до 6":"Pulse sensors, up to 6","Дверь":"Door","Дверь открыта":"Door open","Действие":"Action","День":"Day","Держит":"Holding","Держите…":"Hold…","Дождь":"Rain","Долить воду":"Refill water","Дом":"Home","Дома":"Home","Дома всё в норме":"All normal at home","Душно":"Stuffy","Ед.":"Unit","Есть обогрев":"Has heater","Есть режимы":"Has effects","Жарко":"Hot","Ждёт":"Waiting","Ждёт · держит":"Waiting · holding","Живая погода":"Live weather","Заголовок":"Title","Задача":"Job","Зажмите и ведите":"Press and drag","Закрываются":"Closing","Закрыта":"Closed","Закрыто":"Closed","Закрыть":"Close","Замер мощности":"Power reading","Запуск":"Start","Запустить":"Run","Заставка":"Screensaver","Заставка:":"Screensaver:","Заставки":"Screensavers","Защита: удерживать":"Protection: hold","Зима":"Winter","Значение в Home Assistant":"Value in Home Assistant","Значения датчиков":"Sensor values","Зоны":"Zones","Идёт…":"Running…","Избранное":"Favorite","Иконка":"Icon","Иконка обогрева":"Heater icon","Какие сущности читает карточка":"Entities the card reads","Калибровка стола":"Bed leveling","Камера":"Camera","Камера недоступна":"Camera unavailable","Камин":"Fireplace","Картинка модели":"Model image","Карточка":"Card","Карточка света":"Light card","Карточка штор":"Curtain card","Качание":"Oscillation","Кельвины":"Kelvin","Кнопка":"Button","Кнопка HA":"HA button","Комфорт":"Comfort","Коралл":"Coral","Коснитесь, чтобы открыть дом":"Tap to open home","Котёл":"Boiler","Красный PETG":"Red PETG","Курьер приедет после 18:00 — позвоните в домофон 24, код подъезда 4512":"Courier arrives after 18:00 — ring intercom 24, entrance code 4512","Лампа":"Lamp","Лампа выключена":"Lamp off","Лампа умеет":"Lamp supports","Лампочка":"Bulb","Лето":"Summer","Ливень":"Pouring","Лист":"Leaf","Любимый момент":"Favorite moment","Люстра":"Chandelier","МСК":"MSK","Меньше движения":"Reduce motion","Микроклимат":"Climate","Модель":"Model","Мокрый снег":"Sleet","Мята":"Mint","Мятный PLA":"Mint PLA","На карточке":"On card","На экране":"On screen","Нагрев бойлера":"Water heater heating","Нагрев сопла":"Heating nozzle","Нагрев стола":"Heating bed","Название":"Name","Напольный вентилятор в кабинете":"Floor fan in the study","Направление":"Direction","Настольная":"Desk","Настольная лампа":"Desk lamp","Не греет":"Not heating","Не греет · держит":"Not heating · holding","Не дома":"Away","Не удалось запустить движок:":"Failed to start the engine:","Небо":"Sky","Нейтральный белый":"Neutral white","Нет":"No","Нет sun.sun":"No sun.sun","Нет воды":"No water","Нет воды — долейте":"No water — refill","Нет данных":"No data","Нет датчиков":"No sensors","Нет задачи":"No job","Нет связи":"Offline","Нет связи с HA":"No connection to HA","Норма":"Normal","Норма 20–24 °C":"Normal 20–24 °C","Норма 40–60 %":"Normal 40–60 %","Норма до 10 мкг/м³":"Normal up to 10 µg/m³","Норма до 15 мкг/м³":"Normal up to 15 µg/m³","Норма до 15 мкг/м³ (ВОЗ, за сутки)":"Normal up to 15 µg/m³ (WHO, daily)","Норма до 220 ppb":"Normal up to 220 ppb","Норма до 800 ppm":"Normal up to 800 ppm","Норма до 800 ppm, выше 1200 — проветрить":"Normal up to 800 ppm, above 1200 — ventilate","Норма ≤ 10":"Normal ≤ 10","Норма ≤ 15":"Normal ≤ 15","Норма ≤ 220":"Normal ≤ 220","Норма ≤ 800":"Normal ≤ 800","Нормы датчиков":"Sensor norms","Ночник":"Night light","Ночь":"Night","Облачно":"Cloudy","Обогрев":"Heating","Обратно":"Reverse","Обычный":"Normal","Огонь":"Fire","Одна карточка для всего, что включается одним касанием:":"One card for anything that switches with one tap:","Ожидание":"Idle","Оранжевый PLA":"Orange PLA","Органайзер для отвёрток":"Screwdriver organizer","Особые условия":"Exceptional","Останавливаем…":"Stopping…","Открываются":"Opening","Открыта":"Open","Открыто":"Open","Открыто на":"Open","Открыть":"Open","Отмена":"Cancel","Отменено":"Cancelled","Отопление":"Heating","Отопление, сухо":"Heating, dry","Отправка…":"Sending…","Отпуск":"Vacation","Оттенок":"Hue","Очень длинное название кнопки":"A very long button name","Очень длинное название комнаты":"A very long room name","Очень сухо":"Very dry","Оченьдлинноесловобезпробеловкотороенепомещаетсявстроку и ещё немного текста после него":"Averyverylongwordwithoutspacesthatdoesnotfitintheline and a bit more text after it","Очистка сопла":"Cleaning nozzle","Ошибка":"Error","Ошибка печати":"Print error","Ощущается как":"Feels like","Параметры":"Settings","Пауза":"Pause","Переменная облачность":"Partly cloudy","Песок":"Sand","Печать":"Printing","Печать идёт (×60)":"Printing (×60)","Плавно, %":"Smooth, %","План 59 × 55,5":"Plan 59 × 55.5","Пластик":"Filament","Плоское бра":"Flat sconce","Повышен":"Elevated","Погода":"Weather","Подача":"Airflow","Подача · авто":"Airflow · auto","Подача воздуха ·":"Airflow ·","Подготовка":"Preparing","Показывает значение":"Shows the value","Положение рулонной шторы, % открытия":"Roller blind position, % open","Положение шторы, % открытия":"Curtain position, % open","Потолочный":"Ceiling","Потолочный (контур)":"Ceiling (outline)","Потолочный свет":"Ceiling light","Правка времени: ведите вверх или вниз":"Edit time: drag up or down","Правка даты: ведите вверх или вниз":"Edit date: drag up or down","Превышен":"Exceeded","Пресет":"Preset","Пресеты (Комфорт, Эко, Не дома)":"Presets (Comfort, Eco, Away)","Пример":"Example","Принтер":"Printer","Приоткрыто":"Ajar","Прогресс":"Progress","Продолжаем…":"Resuming…","Продолжить":"Resume","Протечка":"Leak","Протечка!":"Leak!","Прохладно":"Cool","Прошивка 59 × 53,5":"Firmware 59 × 53.5","Прямо":"Forward","Пульс дома":"Home pulse","Пусто":"Empty","Радиатор":"Radiator","Радуга":"Rainbow","Размер":"Size","Рассвет":"Sunrise","Режим":"Mode","Режим «":"Mode «","Режим дома":"Home mode","Режимы":"Modes","Режимы (Авто, Сон, Турбо)":"Modes (Auto, Sleep, Turbo)","Режимы Бриз и Сон":"Breeze and Sleep modes","Реле":"Relay","Реле панели":"Panel relay","Рулонная штора":"Roller blind","Русский":"Russian","Ручной":"Manual","Ручной режим: небо не зависит от Home Assistant.":"Manual mode: the sky ignores Home Assistant.","Свежо":"Fresh","Свет":"Light","Свеча":"Candle","Свой цвет":"Custom color","Свой цвет акцента":"Custom accent color","Сейчас":"Now","Сейчас в комнате":"Now in the room","Серый PLA":"Grey PLA","Сетка":"Grid","Синий PLA":"Blue PLA","Скорости":"Speeds","Скорость":"Speed","Скорость, %":"Speed, %","Скрипт":"Script","Служебная карточка":"Helper card","Смог":"Smog","Смог за окном":"Smog outside","Снег":"Snow","Сон":"Sleep","Сообщение":"Message","Сохраняется…":"Saving…","Ставим на паузу…":"Pausing…","Стенд 59 × 59":"Stand 59 × 59","Стоп":"Stop","Суббота, 31 октября, ☁ 9°":"Saturday, 31 October, ☁ 9°","Сухо":"Dry","Сущность":"Entity","Сущность содержит":"Entity contains","Сцена":"Scene","Сыро":"Damp","Текст":"Text","Текст в HA":"Text in HA","Темп.":"Temp.","Температура":"Temperature","Температура: жарко":"Temperature: hot","Температура: прохладно":"Temperature: cool","Температура: тепло":"Temperature: warm","Температура: холодно":"Temperature: cold","Тепло":"Warm","Термостат":"Thermostat","Тип":"Type","Только «нет воды»":"Only «no water»","Только время":"Time only","Только дату":"Date only","Только чтение":"Read only","Торшер":"Floor lamp","Туман":"Fog","Турбо":"Turbo","Тёплый белый":"Warm white","Тёплый пол":"Floor heating","Увеличить ×2":"Zoom ×2","Увлажнитель":"Humidifier","Увлажнитель в детской спальне":"Humidifier in the nursery","Увлажняет":"Humidifying","Увлажняет до":"Humidifying to","Удерживайте":"Hold","Удерживайте «Стоп», чтобы прервать печать":"Hold «Stop» to cancel the print","Удерживайте, чтобы":"Hold to","Удерживайте, чтобы изменить":"Hold to change","Умеренно":"Moderate","Управление с клавиатуры":"Keyboard control","Уровень, %":"Level, %","Ушёл":"Away","Фиалка":"Violet","Флажок HA":"HA toggle","Фон":"Background","Фото":"Photo","Холодно":"Cold","Холодный белый":"Cool white","Цвет":"Color","Цвет пластика":"Filament color","Цвет шторы":"Curtain color","Цветной свет":"Colored light","Цель":"Target","Чайник":"Kettle","Чем греет":"Heat source","Число":"Number","Число, выбор, текст":"Number, select, text","Чисто":"Clean","Чтение":"Reading","Шаг":"Step","Штора":"Curtain","Шторы":"Curtains","Эко":"Eco","Язык панели":"Panel language","Яркость":"Brightness","Яркость лампы":"Lamp brightness","Ясная ночь":"Clear night","Ясно":"Clear","авг":"Aug","августа":"August","апр":"Apr","апреля":"April","бак долит":"tank refilled","в баке нет воды — увлажнитель остановился":"tank is empty — humidifier stopped","вес модели, г":"model weight, g","вне нормы":"out of range","воскресенье":"Sunday","вс":"Sun","всего слоёв":"total layers","всё в норме":"all normal","вт":"Tue","вторник":"Tuesday","вчера":"yesterday","выкл":"off","выключен":"off","выше цели на":"above target by","готово в":"done at","греет":"heating","датчики не выбраны":"no sensors selected","движок неба не запустился:":"sky engine failed to start:","дек":"Dec","декабря":"December","дн.":"d","до":"to","до цели":"to target","другие размеры недоступны":"other sizes unavailable","ещё":"more","ещё N":"N more","за":"in","за пределами карточки":"outside the card","завтра":"tomorrow","запустить":"run","засор сопла":"nozzle clog","заставка":"screensaver","и":"and","из":"of","изменено":"changed","изображение с камеры":"camera image","июл":"Jul","июля":"July","июн":"Jun","июня":"June","кВт":"kW","как задано":"as set","камера на весь экран: camera.":"camera full screen: camera.","камера недоступна":"camera unavailable","картинка модели из слайсера":"model image from the slicer","карточка":"card","качание":"oscillation","когда закончится":"when it ends","лампа не умеет:":"lamp can't do:","мар":"Mar","марта":"March","мая":"May","меньше 44 × 44 (":"smaller than 44 × 44 (","мин":"min","мин назад":"min ago","мин назад ·":"min ago ·","мкг/м³":"µg/m³","мс/кадр ·":"ms/frame ·","название модели (Task name)":"model name (Task name)","не больше":"at most","не греет":"not heating","нет воды":"no water","нет задачи":"no job","нет ответа от HA — состояние возвращено":"no reply from HA — state reverted","нет связи — цель не отправлена":"offline — target not sent","новый":"new","ноя":"Nov","ноября":"November","обратно":"reverse","окт":"Oct","октября":"October","осталось":"left","осталось, мин":"left, min","панели":"panel","пауза":"paused","переключить":"toggle","перекрываются":"overlap","плитку":"tile","плитку «Дома»":"the «Home» tile","пн":"Mon","подтвердил:":"confirmed:","понедельник":"Monday","прогресс, %":"progress, %","продолжить":"resume","пт":"Fri","пульс":"pulse","пятница":"Friday","реле":"relay","сб":"Sat","сб, 31 окт":"Sat, 31 Oct","сегодня":"today","сейчас":"now","сен":"Sep","сентября":"September","скрипт завершён":"script finished","слой":"layer","служебные карточки":"helper cards","сопло":"nozzle","сопло, °C (и nozzle_target_temperature)":"nozzle, °C (and nozzle_target_temperature)","ср":"Wed","среда":"Wednesday","стол":"bed","стол, °C (и bed_target_temperature)":"bed, °C (and bed_target_temperature)","стоп (на карточке — удержанием)":"stop (on the card — by holding)","суббота":"Saturday","суббота, 31 октября":"Saturday, 31 October","суббота, 31 октября 2026":"Saturday, 31 October 2026","сцен":"scenes","текущий слой":"current layer","у этого типа только эти размеры":"this type has only these sizes","фев":"Feb","февраля":"February","фон в браузере:":"background in browser:","цель":"target","ч":"h","через":"in","четверг":"Thursday","чт":"Thu","что делает принтер: idle, prepare, running, pause, finish, failed":"what the printer is doing: idle, prepare, running, pause, finish, failed","экран":"screen","этап: нагрев стола, калибровка, печать…":"stage: heating bed, leveling, printing…","янв":"Jan","января":"January","— ваше фото с часами, датой и погодой.":"— your photo with clock, date and weather.","← Все стенды":"← All stands"};
+  const CYR = /[А-Яа-яЁё]/, keys = Object.keys(DICT).sort((a, b) => b.length - a.length);
+  const lower = new Map(keys.map((k) => [k.toLowerCase(), DICT[k]]));
+  const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const RE = keys.length ? new RegExp(`(?<![А-Яа-яЁё])(?:${keys.map(esc).join("|")})(?![А-Яа-яЁё])`, "giu") : null;
+  const cap = (src, out) => {
+    if (!out) return src;
+    const up = src[0] !== src[0].toLowerCase(), outUp = out[0] !== out[0].toLowerCase();
+    return up && !outUp ? out[0].toUpperCase() + out.slice(1) : !up && outUp && src[0] !== src[0].toUpperCase() ? out[0].toLowerCase() + out.slice(1) : out;
+  };
+  const cache = new Map();
+  const tr = E.tr = (s) => {
+    if (E.lang !== "en" || typeof s !== "string" || !s) return s;
+    let v = cache.get(s);
+    if (v !== undefined) return v;
+    v = s;
+    if (CYR.test(v)) v = DICT[v] ?? (RE ? v.replace(RE, (m) => DICT[m] ?? cap(m, lower.get(m.toLowerCase()))) : v);
+    v = v.replace(/«/g, "“").replace(/»/g, "”").replace(/(\d),(\d)/g, "$1.$2");
+    if (cache.size > 5000) cache.clear();
+    cache.set(s, v);
+    return v;
+  };
+  for (const P of [window.CanvasRenderingContext2D, window.OffscreenCanvasRenderingContext2D]) {
+    if (!P) continue;
+    for (const m of ["fillText", "strokeText", "measureText"]) {
+      const o = P.prototype[m];
+      P.prototype[m] = function (t, ...a) { return o.call(this, tr(t), ...a); };
+    }
+  }
+
+  /* the stand's own controls (settings mode) in the panel language: text nodes and titles, originals kept */
+  const seen = new WeakMap();                                  // node → { o: original, w: what we wrote }
+  const ATTRS = ["title", "aria-label", "placeholder"];
+  const trText = (s) => { const m = /^(\s*)([\s\S]*?)(\s*)$/.exec(s); return m[1] + tr(m[2]) + m[3]; };
+  const SKIP = /^(SCRIPT|STYLE|TEXTAREA|NOSCRIPT)$/;
+  function domText(n) {
+    if (!n.parentNode || SKIP.test(n.parentNode.nodeName)) return;
+    let r = seen.get(n);
+    if (!r || n.nodeValue !== r.w) { if (!CYR.test(n.nodeValue)) { seen.delete(n); return; } r = { o: n.nodeValue }; seen.set(n, r); }
+    const v = E.lang === "en" ? trText(r.o) : r.o;
+    r.w = v;
+    if (n.nodeValue !== v) n.nodeValue = v;
+  }
+  function domAttrs(el) {
+    for (const a of ATTRS) {
+      if (!el.hasAttribute(a)) continue;
+      const k = "__tr_" + a, cur = el.getAttribute(a);
+      let r = el[k];
+      if (!r || cur !== r.w) { if (!CYR.test(cur)) continue; r = el[k] = { o: cur }; }
+      r.w = E.lang === "en" ? trText(r.o) : r.o;
+      if (cur !== r.w) el.setAttribute(a, r.w);
+    }
+  }
+  function domWalk(root0) {
+    if (!root0) return;
+    if (root0.nodeType === 3) return domText(root0);
+    if (root0.nodeType !== 1 || SKIP.test(root0.tagName)) return;
+    domAttrs(root0);
+    const it = document.createTreeWalker(root0, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT, { acceptNode: (n) => n.nodeType === 1 && SKIP.test(n.tagName) ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT });
+    for (let n = it.nextNode(); n; n = it.nextNode()) n.nodeType === 3 ? domText(n) : domAttrs(n);
+  }
+  const domAll = () => { domWalk(document.body); if (document.documentElement.lang) document.documentElement.lang = E.lang; };
+  new MutationObserver((list) => {
+    for (const m of list) {
+      if (m.type === "characterData") domText(m.target);
+      else if (m.type === "attributes") domAttrs(m.target);
+      else for (const n of m.addedNodes) domWalk(n);
+    }
+  }).observe(root, { subtree: true, childList: true, characterData: true, attributes: true, attributeFilter: ATTRS });
+
+  /* layout of the iframe */
+  const css = document.createElement("style");
+  css.textContent = `
+html.embed, html.embed body { background: transparent !important; margin: 0; }
+html.embed body::before { display: none !important; }
+html.embed .embed-hide, html.embed .tray, html.embed .kbd, html.embed .kbd2, html.embed .caption { display: none !important; }
+html.embed .device canvas { border-radius: 0 !important; }
+html.embed-card, html.embed-card body { overflow: hidden !important; width: 100%; height: 100%; }
+html.embed-card .wrap { display: block !important; padding: 0 !important; margin: 0 !important; max-width: none !important; }
+html.embed-card .wrap > :not(.bench) { display: none !important; }
+html.embed-card .bench { display: block !important; }
+html.embed-card .device { display: block !important; padding: 0 !important; border: 0 !important; border-radius: 0 !important; background: none !important; }
+html.embed-card .device > :not(canvas) { display: none !important; }
+html.embed-card .device canvas { position: fixed !important; left: var(--ex, 0px); top: var(--ey, 0px); width: var(--ew, 480px) !important; max-width: none !important; height: auto !important; aspect-ratio: auto !important; }
+html.embed-settings body { overflow: auto; }
+html.embed-settings .wrap { max-width: none !important; padding: 14px 18px 24px !important; gap: 14px !important; }
+html.embed-settings .wrap > :not(.controls):not(.bench) { display: none !important; }
+html.embed-settings .controls { position: static !important; backdrop-filter: none !important; background: none !important; padding-top: 0 !important; }
+html.embed-settings .bench { display: flex !important; justify-content: center; }
+html.embed-settings .device { width: fit-content; max-width: 100%; box-sizing: border-box; }
+html.embed-settings .device canvas { width: var(--sw, 480px) !important; max-width: 100% !important; height: auto !important; aspect-ratio: auto !important; }
+`;
+  (document.head || root).append(css);
+
+  const $ = (s) => document.querySelector(s);
+  const sizeBox = () => document.getElementById("sizes");
+  const canvas = () => $(".device canvas");
+  const fullScreen = (s) => s === "screen" || s === "saver";
+  function sizes() {
+    const box = sizeBox();
+    if (!box) return ["screen"];                               // the screensaver stand: whole panel
+    return [...box.querySelectorAll("[data-v]")].map((b) => b.dataset.v).filter((v) => /^\d+x\d+$/.test(v) || v === "saver");
+  }
+  function current() {
+    try { if (typeof state === "object" && state) return state.screen || state.size || "screen"; } catch (e) {}
+    return E.size;
+  }
+  function applySize(s) {
+    if (!s || s === current()) return;
+    const b = sizeBox() && [...sizeBox().querySelectorAll("[data-v]")].find((x) => x.dataset.v === s);
+    if (b) b.click();
+  }
+  function geometry() {
+    const cv = canvas(), s = current();
+    if (!cv) return;
+    const screenCanvas = cv.id === "screen";                   // card stands draw the card at (8, 8) on the 480 × 480 screen
+    root.style.setProperty("--ex", screenCanvas && !fullScreen(s) ? "-8px" : "0px");
+    root.style.setProperty("--ey", screenCanvas && !fullScreen(s) ? "-8px" : "0px");
+    const w = screenCanvas ? 480 : cv.width;
+    root.style.setProperty("--ew", w + "px");
+    root.style.setProperty("--sw", w + "px");
+  }
+  function applyLang() {
+    cache.clear();
+    domAll();
+    const box = document.getElementById("lang");                // weather stand: the text layers come in both languages
+    const b = box && box.querySelector(`[data-v="${E.lang}"]`);
+    if (b) { if (b.getAttribute("aria-pressed") !== "true") b.click(); return; }
+    try { if (typeof window.rebuild === "function") window.rebuild(); } catch (e) {}
+  }
+  function hideStandOnly() {
+    for (const id of ["sizes", "lang", "view", "zoom", "grid"]) {
+      const el = document.getElementById(id);
+      if (!el) continue;
+      const g = (el.classList.contains("group") ? el.parentElement : el).closest(".group, .switch");
+      (g || el).classList.add("embed-hide");
+    }
+  }
+  let sent = "";
+  function report(force) {
+    geometry();
+    const msg = { source: "s1e-embed", id, type: "info", sizes: sizes(), size: current() };
+    const sig = JSON.stringify(msg);
+    if (!force && sig === sent) return;
+    sent = sig;
+    parent.postMessage(msg, "*");
+  }
+  function setMode(m) {
+    E.mode = m;
+    root.classList.toggle("embed-card", m === "card");
+    root.classList.toggle("embed-settings", m === "settings");
+    if (m === "settings") scrollTo(0, 0);
+    geometry();
+  }
+
+  addEventListener("message", (e) => {
+    const d = e.data;
+    if (!d || d.target !== "s1e-embed") return;
+    if (d.type === "mode") setMode(d.mode);
+    if (d.type === "size") { E.size = d.size; applySize(d.size); }
+    if (d.type === "lang" && d.lang !== E.lang) { E.lang = d.lang === "en" ? "en" : "ru"; applyLang(); }
+    report(true);
+  });
+
+  let tries = 0;
+  function init() {
+    if (sizeBox() && !sizeBox().querySelector("[data-v]") && tries++ < 150) return void setTimeout(init, 100);   // controls built after an async boot
+    if (typeof window.ellipsis === "function") { const o = window.ellipsis; window.ellipsis = (ctx, t, w) => o(ctx, tr(t), w); }
+    if (solo) {
+      applyLang();
+      for (const p of document.querySelectorAll("p")) if (CYR.test(p.textContent)) p.hidden = true;   // prose without an English text yet
+      const h = document.querySelector("h1");
+      if (h) document.title = `${h.textContent.trim()} · S1E Panel demo`;
+      return;
+    }
+    hideStandOnly();
+    domAll();
+    if (E.lang === "en") applyLang();
+    applySize(E.size);
+    report(true);
+    setInterval(() => report(false), 400);
+  }
+  if (document.readyState === "loading") addEventListener("DOMContentLoaded", () => setTimeout(init, 0)); else setTimeout(init, 0);
+})();
+</script>
+<!-- /embed-bridge -->
+<script>
+const ICONS = {"thermometer":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGKLo6KIYAAAAAAAAAAAAAAAAAAAAAAAAqP////+oAAAAAAAAAAAAAAAAAAAAAAAA7v8+P//rAAAAAAAAAAAAAAAAAAAAAAAA//8AAP//AAAAAAAAAAAAAAAAAAAAAAAA//8AAP//AAAAAAAAAAAAAAAAAAAAAAAA//8AAP//AAAAAAAAAAAAAAAAAAAAAAAA////////AAAAAAAAAAAAAAAAAAAAAAAA////////AAAAAAAAAAAAAAAAAAAAAAAA////////AAAAAAAAAAAAAAAAAAAAAAAA////////AAAAAAAAAAAAAAAAAAAAAAAA////////AAAAAAAAAAAAAAAAAAAAAAB2////////dQAAAAAAAAAAAAAAAAAAAE7//////////0kAAAAAAAAAAAAAAAAAALD//////////6sAAAAAAAAAAAAAAAAAAPT///////////AAAAAAAAAAAAAAAAAAAO3//////////+gAAAAAAAAAAAAAAAAAALj//////////7MAAAAAAAAAAAAAAAAAADH8/////////DAAAAAAAAAAAAAAAAAAAABf+f/////5XAAAAAAAAAAAAAAAAAAAAAAAL6bm4aYtAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","water-percent":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABHRAAAAAAAAAAAAAAAAAAAAAAAAAAAAC318ycAAAAAAAAAAAAAAAAAAAAAAAAACd3//9QEAAAAAAAAAAAAAAAAAAAAAAAAjv////9/AAAAAAAAAAAAAAAAAAAAAAA6/f/////4LAAAAAAAAAAAAAAAAAAAAA7j////////2QcAAAAAAAAAAAAAAAAAAIH//////////2sAAAAAAAAAAAAAAAAADO/EFFb//9874OAEAAAAAAAAAAAAAAAAZv+YABj/3Bsb3P9NAAAAAAAAAAAAAAAAwv/wlMLcGxvc//+oAAAAAAAAAAAAAAAA7f///+AbG+D////lAAAAAAAAAAAAAAAA8///3Bsb3MKU8P/lAAAAAAAAAAAAAAAAy//fGxvf/xgAmP+zAAAAAAAAAAAAAAAAZf/dOtz//1UUw/9KAAAAAAAAAAAAAAAABM7//////////64AAAAAAAAAAAAAAAAAAB/Z////////uhYAAAAAAAAAAAAAAAAAAAAJcuL/5K9cAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","molecule-co2":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAVNj///8AVNj//9hUAAAAAAAAAAAAAAAA1P////8A1f/////VAAAAAAAAAAAAAAAA//8AAAAA//8AAP//AAAAAAAAAAAAAAAA//8AAAAA//8AAP//AICAgEgAAAAAAAAA//8AAAAA//8AAP//AP////9QAAAAAAAA//8AAAAA//8AAP//AAAAAP+AAAAAAAAA//8AAAAA//8AAP//ABVygP92AAAAAAAA//8AAAAA//8AAP//AND//+QsAAAAAAAA1P////8A1f/////VAP+AAAAAAAAAAAAAVNv///8AVNv//9hUAP/AgIBAAAAAAAAAAAAAAAAAAAAAAAAAAP////+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","molecule":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHMjIHAAAAAAAAAAAAAAAAAAAAAAAAAAAb///bgAAAAAAAAAAAAAAAAAAAAAAAAAAt//fJgAAAAAAAAAAcuRxAAAAAAAAAABM//YYAEhIAAAAAAAA7f/0BABJ/////////4gAUP//UAAAAAAAffn/agXZ/////////84Bgf//XgAAAAAAAFP/637/2AQAAAAF2f986/95AgAAAAAAAADD////RQAAAAAAS////8MAAAAAAAAAAAAp/P+0AAAAAAAAALr//ikAAAAAAAAAAAAAkf+0AAAAAAAAALb//ioAAAAAAAAAAAAADe7/RQAAAAAASv///8EAAAAAAAAAAAAAAGX/2wMAAAAF2/957v9QAAAAAAAAAAAAAAHN/////////84Bbv/4dAAAAAAAAAAAAACK/////////4gABfr/6wAAAAAAAAAAABn2/0cAAABJ//UVAJjzlQAAAAAAAAAAKOL/sQAAAAAAuP/gJQAAAAAAAAAAAAAAcf//cAAAAAAAcf//agAAAAAAAAAAAAAALebkLAAAAAAALebkLAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","blur":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKCgAACgoAAAAAAAAAAAAAAAAAAAAAAAAODgAADg4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADBvwAAwb8AAMG/AADBvwAAAAAAAAAAAADAuwAAwLsAAMC7AADAuwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASEgAAEhIAAAAAAAAAAAAAAAoKADBvgBQ//9QUP//UADBvgAoKAAAAAA4OADAuwBZ//9YWf//WADAuwA4OAAAAAAAAAAAAAAKZmQKCmZkCgAAAAAAAAAAAAAAAAAAAAAASEgAAEhIAAAAAAAAAAAAAAAoKADBvgBQ//9QUP//UADBvgAoKAAAAAA4OADAuwBZ//9YWf//WADAuwA4OAAAAAAAAAAAAAALZmQKC2ZkCgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADBvwAAwb8AAMG/AADBvwAAAAAAAAAAAADAuwAAwLsAAMC7AADAuwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAKCgAACgoAAAAAAAAAAAAAAAAAAAAAAAAODgAADg4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","scent":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAoAAAAAAAAAAAAAAAAAAAAAAAAAiwkAAGomAAAAAAAAAAAAAAAAAAAAAAAAmGcAAFawAAAAAAAAAAAAAAAAAAAAAAAC250AAHf9EgAAAAAAAAAAAAAAAAAAAABe/6EAALz/PwCOBAAAAAAAAAAAAAAAABzy/2YAQ///PACjYwAAAAAAAAAAAAAABsr/0QgT5P/8EgDEwwAAAAAAAAAAAAAAmP/yIgK7//+uABT28gAAAAAAAAAAAABH//9LAIT///ciAJH/8AAAAAAAAAAAAADG/3EAVv///1MAR///wgAAAAAAAAAAAAD2xAAo+P//bQAe7v//YgAAAAAAAAAAAADgXAC1//+IAAfN///MAQAAAAAAAAAAAACSORf//7wCAKT//+ceAAAAAAAAAAAAAAAKLED//yQAb///8jAAAAAAAAAAAAAAAAAAAED/sQAQ8///QQAAAAAAAAAAAAAAAAAAABL9cQBi//+OAAAAAAAAAAAAAAAAAAAAAACwUwCO/+YJAAAAAAAAAAAAAAAAAAAAAAAnaACN/2gAAAAAAAAAAAAAAAAAAAAAAAAAAABe/yYAAAAAAAAAAAAAAAAAAAAAAAAAAAAN8AUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAbSIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQMAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","home-thermometer-outline":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACPiwEAAAAAAAAAAAAAAAAAAAAAAAAABar//6cEAAAAAAAAAAAAAAAAAAAAAAAMu//39v+4CQAAAAAAAAAAAAAAAAAAABXP//A5M+j/yRAAAAAAAAAAAAAAAAAAId7/4ygAAB3T3hUAAAAAAAAAAAAAAAAx6v/VHAAAAAAMLgBP19ZUAAAAAAAAAETz/8UQAAAAAAAAAADoKi/UAAAAAAAAWvv//wgAAAAAAAAAAAD/AAD/AAAAAABp/////wAAAAAAAAAAAAD/////AAAAAAAAAAD//wAAAAAAAAAAAAD/////AAAAAAAAAAD//wAAAAAAAAAAAAD/////AAAAAAAAAAD//wAAAAAAAAAAAAD/////AAAAAAAAAAD//wAAAAAAAAAAAAD/////AAAAAAAAAAD//wAAAAAAAAAAAAX/////BQAAAAAAAAD//wAAAAAAAAAAAIf/////hQAAAAAAAAD///////////8KAOT/////4wAAAAAAAAD///////////8MAOj/////5gAAAAAAAAAAAAAAAAAAAAAAAIf/////ggAAAAAAAAAAAAAAAAAAAAAAAAF76uR1AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","air-filter":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABU2P/////////////YVAAAAAAAAAAAAADV////////////////1QAAAAAAAAAAAAD//wAAAAAAAAAAAAD//wAAAAAAAAAAAAD//wAAAAAAAAAAAAD//wAAAAAAAADB/+P//wAAAAAAACSa7////6RiBAAAAAC//////wAAAChAyP//////////tgAAAAAAABr//wAA//////+zQRAAB0fVxQAAAAAAAAD//wAA///urUQAAAAAAAAAAAAAAADB/+P//wAAAAAAACSa7//x0q9vBwAAAAC//////wAAAChAyP//////////wgAAAAAAABr//wAA//////+zQRAAB0fVxAAAAAAAAAD//wAA///urUQAAAAAAAAAAAAAAADA/+P//wAAAAAAACSa7//x0q9vBwAAAAC//////wAAAChAyP//////////wgAAAAAAABr//wAA//////+zQRAAB0fVxAAAAAAAAAD//wAA///urUQAAAAAAAAAAAAAAAAAAAD//wAAAAAAAAAAAAD/zgAAAAAAAAAAAAD//wAAAAAAAAAAAAD//wAAAAAAAAAAAADV////////////////1QAAAAAAAAAAAABU2//////////////YVAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","leaf":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABWgAAAAAAAAAAAAAAAAAAAAAAAAAQOH7coAAAAAAAAAAAAAAAAAAmZIyvzvD/////YAAAAAAAAAAAA1Cc0PL/////////////FwAAAAAAAABG3P/////////////////AAAAAAAAAAGn+////////1Il7tdf///9mAAAAAAAAX////////7tJS8v///////QNAAAAAAAh9//////LLx3E/////////4wAAAAAAACL/////6gFTfH/////////9RcAAAAAAADe////oAFM/f//////////eQAAAAAAAAD4///AAjX4///////////VBAAAAAAAAADR//IYEOD///////////svAAAAAAAAAAB+/2QAn////////////2kAAAAAAAAAAAAO1gsp/v//////////gwAAAAAAAAAAAAAACwCm//////////9wAAAAAAAAAAAAAAAAAB3+////////3kwAAAAAAAAAAAAAAAAAAIf/6/vvy5NGAQAAAAAAAAAAAAAAAAAAAur/VgAAAAAAAAAAAAAAAAAAAAAAAAAACoTOBAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA","weather-partly-cloudy":"AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAETAAAAAAAAAAAAAAAAAAcYAAAAAAABUtGVAAAAAAAAAAAAAAAAAB3/1kkAAAAANbniAAAAAAAAAAAAAAAAACbfQQAAAAAAAABKFwAAAAAAAAAAAAAAAB0XABqq4PbHiRUAAAAAAAAAAAAAAAAAAAAAQfD//////+9BAAAAAAAAAAAAAAAAAAAR5/+pQQgbuP/rFwAAAAAAAAAAAAAAAACP/6kBAAAAAqr/ggAzbQEAAAAAAAAvCwDc/yUAAAAAAD7/0AAM/6UAAAAAACHoAwD0/wQBcrbq/+P/6AAA6SMAAAAAAKD/EgDf/zex////////9A4JLwAAAAAAAAFqNgCY//T/tDsQEDu1/60AAAAAAAAAAAAAAAAb8/+zAAAAAAAAtf9wAAAAAAAAAAAAT8Xw//84AAAAAAAAOP/cAAAAAAAAAABM//////8MAAAAAAAAEv/zAAAAAAAAAADE/6oqAAAAAAAAAAAAAP//4uiiGAAAAADu/ygAAAAAAAAAAAAAAP//////qAAAAADs/ygAAAAAAAAAAAAAAAAAAD//6wAAAADF/6soAAAAAAAAAAAAAAAAAEP/6wAAAABM////////////////////////pwAAAAAATMbx/////////////////+ihFwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"};
+const T = { bg: "#101317", surface: "#20242a", raised: "#2c3037", outline: "#3a3f47", text: "#f3f0e9", muted: "#b3b5b9", subtle: "#818792", unavailable: "#92979e", error: "#ff9991", ink: "#17191d" };
+const ACCENTS = [["Песок", "#dfb98a"], ["Небо", "#82bdf5"], ["Коралл", "#e6a18d"], ["Бирюза", "#75cfc7"], ["Фиалка", "#b5a0e8"], ["Мята", "#9bcba8"]];
+const SIZES = [[2,2],[2,4],[2,6],[2,8],[4,2],[4,4],[4,6],[8,2],[8,4],[8,6],[8,8]];
+const LEVEL = { good: [155, 203, 168], mid: [232, 195, 106], bad: [255, 132, 120] };
+const RANK = { good: 0, mid: 1, bad: 2 };
+const FONT = '"Noto Sans", system-ui, sans-serif', FPS = 30, P = 12, GAP = 8;
+const CARD_ICONS = { home: ["Дом", "home-thermometer-outline"], air: ["Воздух", "air-filter"], leaf: ["Лист", "leaf"], sky: ["Погода", "weather-partly-cloudy"] };
+
+/* ---------- sensor registry: one entry per sensor type ----------
+   zones go up the scale: value < to → that level. Two-sided sensors (temperature, humidity) have bad/mid on both ends. */
+const SENSORS = {
+  temp: { label: "Температура", short: "Темп.", unit: "°C", icon: "thermometer", dec: 1, ha: "sensor.room_temperature", cls: "temperature",
+    scale: [14, 30], zones: [[16, "bad", "Холодно"], [20, "mid", "Прохладно"], [24, "good", "Комфорт"], [26, "mid", "Тепло"], [Infinity, "bad", "Жарко"]],
+    norm: "Норма 20–24 °C", range: [12, 32], step: 0.1 },
+  hum: { label: "Влажность", short: "Влажн.", unit: "%", icon: "water-percent", dec: 0, ha: "sensor.room_humidity", cls: "humidity",
+    scale: [10, 90], zones: [[25, "bad", "Очень сухо"], [40, "mid", "Сухо"], [60, "good", "Норма"], [70, "mid", "Влажно"], [Infinity, "bad", "Сыро"]],
+    norm: "Норма 40–60 %", range: [5, 95], step: 1 },
+  co2: { label: "CO₂", short: "CO₂", unit: "ppm", icon: "molecule-co2", dec: 0, round: 10, ha: "sensor.room_co2", cls: "carbon_dioxide",
+    scale: [400, 2000], zones: [[800, "good", "Норма"], [1200, "mid", "Повышен"], [Infinity, "bad", "Высокий"]],
+    norm: ["Норма до 800 ppm, выше 1200 — проветрить", "Норма до 800 ppm", "Норма ≤ 800"], range: [400, 2500], step: 10 },
+  pm25: { label: "PM2.5", short: "PM2.5", unit: "мкг/м³", icon: "molecule", dec: 0, ha: "sensor.room_pm25", cls: "pm25",
+    scale: [0, 75], zones: [[15, "good", "Чисто"], [35, "mid", "Умеренно"], [Infinity, "bad", "Грязно"]],
+    norm: ["Норма до 15 мкг/м³ (ВОЗ, за сутки)", "Норма до 15 мкг/м³", "Норма ≤ 15"], range: [0, 150], step: 1 },
+  pm1: { label: "PM1", short: "PM1", unit: "мкг/м³", icon: "blur", dec: 0, ha: "sensor.room_pm1", cls: "pm1",
+    scale: [0, 50], zones: [[10, "good", "Чисто"], [25, "mid", "Умеренно"], [Infinity, "bad", "Грязно"]],
+    norm: ["Норма до 10 мкг/м³", "Норма ≤ 10"], range: [0, 100], step: 1 },
+  tvoc: { label: "TVOC", short: "TVOC", unit: "ppb", icon: "scent", dec: 0, round: 10, ha: "sensor.room_tvoc", cls: "volatile_organic_compounds_parts",
+    scale: [0, 1500], zones: [[220, "good", "Норма"], [660, "mid", "Повышен"], [Infinity, "bad", "Высокий"]],
+    norm: ["Норма до 220 ppb", "Норма ≤ 220"], range: [0, 2000], step: 10 },
+};
+const ORDER = Object.keys(SENSORS);
+const refOf = (k) => { const S = SENSORS[k]; return S.dec ? "88,8" : "8".repeat(String(S.range[1]).length); };
+let cardRef = "8888";
+const SCENES = {
+  ok:     { ru: "Норма",          v: { temp: 22.4, hum: 47, co2: 640,  pm25: 7,  pm1: 4,  tvoc: 140 } },
+  stuffy: { ru: "Душно",          v: { temp: 25.1, hum: 58, co2: 1240, pm25: 11, pm1: 6,  tvoc: 520 } },
+  smog:   { ru: "Смог",           v: { temp: 21.6, hum: 44, co2: 720,  pm25: 52, pm1: 31, tvoc: 260 } },
+  dry:    { ru: "Отопление",      v: { temp: 26.8, hum: 22, co2: 880,  pm25: 9,  pm1: 5,  tvoc: 180 } },
+};
+
+const state = { title: "Микроклимат", cardIcon: "home", sensors: ["temp", "hum", "co2", "pm25", "pm1"], scene: "ok", accent: "#dfb98a", screen: "8x8", gridY: 59, offline: false, reduced: false, zoom: false };
+if (matchMedia("(prefers-reduced-motion: reduce)").matches) state.reduced = true;
+try { Object.assign(state, JSON.parse(localStorage.getItem("climate-stand") || "{}")); } catch (e) {}
+state.gridY = 53.5; state.zoom = false;
+if (!Array.isArray(state.sensors)) state.sensors = ["temp", "hum", "co2", "pm25", "pm1"];
+const save = () => { try { localStorage.setItem("climate-stand", JSON.stringify(state)); } catch (e) {} };
+const active = () => ORDER.filter((k) => state.sensors.includes(k));
+
+/* ---------- values: target per scene, readings drift a little so the card feels live ---------- */
+const val = {}, target = {};
+function setScene(id) { const s = SCENES[id] || SCENES.ok; for (const k of ORDER) { target[k] = s.v[k]; val[k] = s.v[k]; } }
+setScene(state.scene);
+let noiseT = 0;
+function pump(dt, now) {
+  if (now - noiseT < 2500) return; noiseT = now;
+  for (const k of ORDER) {
+    const S = SENSORS[k], span = S.scale[1] - S.scale[0], jitter = (Math.random() - 0.5) * span * 0.006;
+    val[k] = val[k] + (target[k] - val[k]) * 0.5 + jitter;
+  }
+}
+function reading(k) { const S = SENSORS[k], v = val[k]; return S.round ? Math.round(v / S.round) * S.round : +v.toFixed(S.dec); }
+function fmt(k) { const S = SENSORS[k], v = reading(k); return S.dec ? v.toFixed(S.dec).replace(".", ",") : String(v); }
+function level(k) { const v = reading(k); for (const [to, lv, word] of SENSORS[k].zones) if (v < to) return { lv, word }; return { lv: "good", word: "" }; }
+function worst(keys) { let w = null; for (const k of keys) { const l = level(k); if (!w || RANK[l.lv] > RANK[w.l.lv]) w = { k, l }; } return w; }
+
+/* ---------- colour ---------- */
+const hex = (c) => [1, 3, 5].map((i) => parseInt(c.slice(i, i + 2), 16));
+const rgb = (a, al = 1) => `rgba(${a.map((v) => Math.round(Math.max(0, Math.min(255, v)))).join(",")},${al})`;
+const mix = (a, b, t) => a.map((v, i) => v + (b[i] - v) * t);
+function theme() { const a = hex(state.accent), s = hex(T.surface); return { accent: state.accent, a, fill: rgb(mix(s, a, 0.5)), surface: rgb(mix(s, a, 0.14)) }; }
+
+/* ---------- icons ---------- */
+const maskCache = new Map();
+function icon(ctx, name, x, y, size, color) {
+  const key = name + color;
+  if (!maskCache.has(key)) {
+    const bytes = Uint8Array.from(atob(ICONS[name]), (c) => c.charCodeAt(0)), c = document.createElement("canvas"); c.width = c.height = 24;
+    const g = c.getContext("2d"), img = g.createImageData(24, 24), col = color.startsWith("#") ? hex(color) : color.match(/[\d.]+/g).slice(0, 3).map(Number);
+    for (let i = 0; i < 576; i++) img.data.set([col[0], col[1], col[2], bytes[i]], i * 4);
+    g.putImageData(img, 0, 0); maskCache.set(key, c);
+  }
+  ctx.drawImage(maskCache.get(key), x, y, size, size);
+}
+function rr(ctx, x, y, w, h, r) { ctx.beginPath(); ctx.roundRect(x, y, w, h, Math.min(r, w / 2, h / 2)); }
+function ellipsis(ctx, text, w) { if (ctx.measureText(text).width <= w) return text; while (text.length > 1 && ctx.measureText(text + "…").width > w) text = text.slice(0, -1); return text + "…"; }
+
+/* ---------- which sensors are shown when not all fit: out-of-norm first, then registry order ---------- */
+function pick(keys, n) {
+  if (n >= keys.length) return { shown: keys, hidden: [] };
+  const ranked = keys.map((k, i) => ({ k, i, r: RANK[level(k).lv] })).sort((a, b) => b.r - a.r || a.i - b.i);
+  const keep = new Set(ranked.slice(0, Math.max(0, n)).map((x) => x.k));
+  return { shown: keys.filter((k) => keep.has(k)), hidden: keys.filter((k) => !keep.has(k)) };
+}
+// Tile style from its size. detailed: scale + norm; medium: label + value; compact: icon + value.
+const styleFor = (w, h) => h >= 116 && w >= 136 ? "detailed" : h >= 60 && w >= 84 ? "medium" : "compact";
+const STYLE_RANK = { compact: 0, medium: 1, detailed: 2 };
+// Best grid for n tiles in a box: richest tile style first, then the roomiest (wide tiles read better than tall ones).
+function grid(n, w, h, maxCols = 6) {
+  let best = null;
+  for (let cols = 1; cols <= Math.min(n, maxCols); cols++) {
+    const rows = Math.ceil(n / cols), tw = (w - (cols - 1) * GAP) / cols, th = (h - (rows - 1) * GAP) / rows;
+    if (tw < 84 || th < 44) continue;
+    const st = styleFor(tw, th), score = STYLE_RANK[st] * 1e4 + Math.min(tw / 1.6, th) - (rows * cols - n) * 2;
+    if (!best || score > best.score) best = { cols, rows, tw, th, st, score };
+  }
+  return best;
+}
+// Lays tiles out in rows; a short last row stretches to full width. If not all fit, the last slot says "ещё N".
+function placeTiles(L, keys, box) {
+  let n = keys.length, g = null;
+  while (n > 0 && !(g = grid(n, box.w, box.h))) n--;
+  if (!g) { L.hidden = keys; return; }
+  const more = n < keys.length, { shown, hidden } = pick(keys, more ? n - 1 : n);
+  L.hidden = hidden;
+  const cells = [...shown.map((k) => ({ t: "tile", key: k })), ...(more ? [{ t: "more" }] : [])];
+  for (let i = 0, ri = 0; i < cells.length; i += g.cols, ri++) {
+    const row = cells.slice(i, i + g.cols), tw = (box.w - (row.length - 1) * GAP) / row.length, y = box.y + ri * (g.th + GAP);
+    row.forEach((c, ci) => L.items.push({ ...c, r: { x: box.x + ci * (tw + GAP), y, w: tw, h: g.th }, st: styleFor(tw, g.th) }));
+  }
+}
+
+/* ---------- layout ---------- */
+function layout(W, H) {
+  const L = { W, H, items: [], hidden: [] }, add = (o) => (L.items.push(o), o), keys = active(), titled = !!state.title.trim();
+  const narrow = W < 150;
+  if (narrow && H < 150) {                                   // 2×2: two rows, no header
+    const n = Math.min(keys.length, 2), { shown, hidden } = pick(keys, n); L.hidden = hidden;
+    if (!shown.length) { add({ t: "chip", r: { x: P, y: P, w: 44, h: 44 } }); add({ t: "empty", r: { x: P, y: H - P - 30, w: W - 2 * P, h: 30 } }); return L; }
+    const h = n === 1 ? H - 2 * P : (H - 2 * P - GAP) / 2;
+    shown.forEach((k, i) => add({ t: "tile", key: k, r: { x: P, y: P + i * (h + GAP), w: W - 2 * P, h }, st: n === 1 ? "medium" : "compact", bare: true }));
+    return L;
+  }
+  if (narrow) {                                              // tall 2×N: icon on top, tiles stacked
+    add({ t: "chip", r: { x: (W - 44) / 2, y: P, w: 44, h: 44 } });
+    const box = { x: P, y: P + 44 + 12, w: W - 2 * P, h: H - 2 * P - 44 - 12 };
+    if (!keys.length) { add({ t: "empty", r: box, center: true }); return L; }
+    const fit = Math.max(1, Math.min(keys.length, Math.floor((box.h + GAP) / (44 + GAP))));
+    const more = fit < keys.length, n = more ? Math.max(1, fit - 1) : fit;
+    const { shown, hidden } = pick(keys, n); L.hidden = hidden;
+    const slots = shown.length + (more ? 1 : 0), th = Math.min(84, (box.h - (slots - 1) * GAP) / slots);
+    shown.forEach((k, i) => add({ t: "tile", key: k, r: { x: box.x, y: box.y + i * (th + GAP), w: box.w, h: th }, st: styleFor(box.w, th) }));
+    if (more) add({ t: "more", r: { x: box.x, y: box.y + shown.length * (th + GAP), w: box.w, h: Math.min(44, th) } });
+    return L;
+  }
+  if (H < 150) {                                             // short 4×2, 8×2: header line + one row of compact tiles
+    const lineH = Math.min(32, H - 2 * P - 44 - GAP);
+    add({ t: "glyph", r: { x: P - 4, y: P + lineH / 2 - 18, w: 36, h: 36 } });
+    const box = { x: P, y: H - P - 44, w: W - 2 * P, h: 44 };
+    const fit = Math.max(0, Math.floor((box.w + GAP) / (88 + GAP))), n = Math.min(keys.length, fit);
+    const { shown, hidden } = pick(keys, n); L.hidden = hidden;
+    add({ t: "line", r: { x: P + 36, y: P, w: W - 2 * P - 36, h: lineH } });
+    if (!shown.length) { add({ t: "empty", r: box }); return L; }
+    const tw = (box.w - (shown.length - 1) * GAP) / shown.length;
+    shown.forEach((k, i) => add({ t: "tile", key: k, r: { x: box.x + i * (tw + GAP), y: box.y, w: tw, h: 44 }, st: "compact" }));
+    return L;
+  }
+  // square and tall wide cards: header + tile grid
+  add({ t: "chip", r: { x: P, y: P, w: 44, h: 44 } });
+  add({ t: "name", r: { x: P + 44 + 12, y: P, w: W - 2 * P - 56, h: 44 }, titled });
+  const box = { x: P, y: P + 44 + 12, w: W - 2 * P, h: H - P - (P + 44 + 12) };
+  if (!keys.length) { add({ t: "empty", r: box, center: true }); return L; }
+  placeTiles(L, keys, box);
+  return L;
+}
+
+/* ---------- drawing ---------- */
+function summary(L) {
+  if (state.offline) return { text: "Нет связи", lv: null };
+  const keys = active(); if (!keys.length) return { text: "Датчики не выбраны", lv: null };
+  const bad = keys.filter((k) => level(k).lv !== "good").sort((a, b) => RANK[level(b).lv] - RANK[level(a).lv]);
+  const more = L.hidden.length ? ` · ещё ${L.hidden.length}` : "";
+  if (!bad.length) return { text: "Всё в норме" + more, lv: "good" };
+  const w = bad[0], l = level(w);
+  return { text: `${SENSORS[w].short}: ${l.word.toLowerCase()}${bad.length > 1 ? ` · +${bad.length - 1}` : ""}${more}`, lv: l.lv };
+}
+function overall() { const w = worst(active()); return w ? w.l.lv : "good"; }
+// Value row: icon, value and unit; drops the unit, then shrinks the value, then swaps the icon for a level dot.
+function valueRow(ctx, k, x, cy, w, sizes, col, off) {
+  const S = SENSORS[k], v = off ? "—" : fmt(k);
+  ctx.font = `14px ${FONT}`; const unitW = ctx.measureText(S.unit).width;
+  const tries = []; for (const s of sizes) tries.push([s, true, true], [s, true, false]); for (const s of sizes) tries.push([s, false, false]);
+  for (let i = 0; i < tries.length; i++) {
+    const [s, ic, un] = tries[i]; ctx.font = `${s}px ${FONT}`;
+    const vw = ctx.measureText(v).width, ref = Math.max(vw, ctx.measureText(cardRef).width);
+    if ((ic ? 28 : 12) + ref + (un ? 5 + unitW : 0) > w && i < tries.length - 1) continue;
+    let tx = x;
+    if (ic) { icon(ctx, S.icon, x, cy - 12, 24, col); tx += 28; }
+    else { if (!off) { ctx.fillStyle = col; ctx.beginPath(); ctx.arc(x + 3.5, cy, 3.5, 0, 7); ctx.fill(); } tx += 12; }
+    ctx.textAlign = "left"; ctx.fillStyle = off ? T.subtle : T.text; ctx.fillText(v, tx, cy + 1);
+    if (un) { ctx.font = `14px ${FONT}`; ctx.fillStyle = T.muted; ctx.fillText(S.unit, tx + vw + 5, cy + 2); }
+    return;
+  }
+}
+function drawScale(ctx, k, x, y, w, h, off) {
+  const S = SENSORS[k], [lo, hi] = S.scale, X = (v) => x + Math.max(0, Math.min(1, (v - lo) / (hi - lo))) * w;
+  ctx.save(); rr(ctx, x, y, w, h, h / 2); ctx.clip();
+  let from = lo;
+  for (const [to, lv] of S.zones) {
+    const a = X(from), b = X(Math.min(to, hi)); if (b > a) { ctx.fillStyle = rgb(LEVEL[lv], off ? 0.25 : lv === "good" ? 0.7 : 0.55); ctx.fillRect(a, y, b - a, h); }
+    from = to; if (from >= hi) break;
+  }
+  ctx.restore();
+  for (const [to] of S.zones) if (to > lo && to < hi) { ctx.fillStyle = T.surface; ctx.fillRect(X(to) - 1, y, 2, h); }   // zone seams
+  if (!off) {
+    const mx = X(reading(k));
+    ctx.fillStyle = "rgba(0,0,0,.35)"; rr(ctx, mx - 3.5, y - 5, 7, h + 10, 3.5); ctx.fill();
+    ctx.fillStyle = "#fbfaf7"; rr(ctx, mx - 2.5, y - 4, 5, h + 8, 2.5); ctx.fill();
+  }
+}
+function drawTile(ctx, it, now, forceStyle) {
+  const r = it.r, k = it.key, S = SENSORS[k], off = state.offline, l = level(k), lc = LEVEL[l.lv], col = off ? T.subtle : rgb(lc), st = forceStyle || it.st;
+  const breath = state.reduced ? 0.5 : 0.5 - 0.5 * Math.cos(now / 2800 * 2 * Math.PI);
+  ctx.globalAlpha = off ? 0.4 : 1;
+  rr(ctx, r.x, r.y, r.w, r.h, 12);
+  ctx.fillStyle = it.pressed ? T.outline : !off && l.lv === "bad" ? rgb(mix(hex(T.raised), lc, 0.16)) : !off && l.lv === "mid" ? rgb(mix(hex(T.raised), lc, 0.06)) : T.raised;
+  ctx.fill();
+  if (!off && l.lv === "bad" && !it.pressed) {                         // out of norm: the tile glows and breathes
+    ctx.save(); rr(ctx, r.x, r.y, r.w, r.h, 12); ctx.clip();
+    const g = ctx.createRadialGradient(r.x + 22, r.y + r.h / 2, 0, r.x + 22, r.y + r.h / 2, Math.max(r.w, r.h) * 0.9);
+    g.addColorStop(0, rgb(lc, 0.2 + 0.14 * breath)); g.addColorStop(1, rgb(lc, 0));
+    ctx.fillStyle = g; ctx.fillRect(r.x, r.y, r.w, r.h); ctx.restore();
+    ctx.strokeStyle = rgb(lc, 0.45 + 0.3 * breath); ctx.lineWidth = 1.5; rr(ctx, r.x + .75, r.y + .75, r.w - 1.5, r.h - 1.5, 11.25); ctx.stroke();
+  }
+  ctx.textBaseline = "middle";
+  const pad = r.w < 100 ? 8 : 12;
+  if (st === "compact") valueRow(ctx, k, r.x + pad - 2, r.y + r.h / 2, r.w - 2 * pad + 2, [18, 14], col, off);
+  else {
+    ctx.font = `14px ${FONT}`; ctx.textAlign = "left"; ctx.fillStyle = T.muted;
+    const ww = off ? 0 : ctx.measureText(l.word).width, room = r.w - 2 * pad;
+    const showWord = !off && ctx.measureText(S.label).width + 10 + ww <= room;
+    ctx.fillText(ellipsis(ctx, r.w < 110 ? S.short : S.label, showWord ? room - ww - 10 : room), r.x + pad, r.y + 18);
+    if (showWord) { ctx.textAlign = "right"; ctx.fillStyle = col; ctx.fillText(l.word, r.x + r.w - pad, r.y + 18); }
+    if (st === "medium") {
+      const bar = r.h >= 84 && r.w >= 120;
+      valueRow(ctx, k, r.x + pad - 2, bar ? r.y + 46 : r.y + r.h - 22, room + 2, [21, 18], col, off);
+      if (bar) drawScale(ctx, k, r.x + pad, r.y + r.h - 16, room, 4, off);
+    } else {                                                       // detailed
+      const vy = r.y + Math.min(56, 18 + (r.h - 70) * 0.42);
+      icon(ctx, S.icon, r.x + pad, vy - 12, 24, col);
+      ctx.textAlign = "left"; ctx.font = `28px ${FONT}`; ctx.fillStyle = off ? T.subtle : T.text; const v = off ? "—" : fmt(k);
+      ctx.fillText(v, r.x + pad + 32, vy + 1); const vw = ctx.measureText(v).width;
+      ctx.font = `14px ${FONT}`; ctx.fillStyle = T.muted; if (pad + 32 + vw + 6 + ctx.measureText(S.unit).width <= r.w - pad) ctx.fillText(S.unit, r.x + pad + 32 + vw + 6, vy + 4);
+      if (!showWord && !off) { ctx.fillStyle = col; ctx.fillText(ellipsis(ctx, l.word, room - 32), r.x + pad + 32, vy + 24); }
+      drawScale(ctx, k, r.x + pad, r.y + r.h - 40, room, 6, off);
+      ctx.font = `14px ${FONT}`; ctx.fillStyle = T.muted; ctx.textAlign = "left";
+      const norms = [].concat(S.norm), nt = norms.find((n) => ctx.measureText(n).width <= room) || norms[norms.length - 1];
+      ctx.fillText(ellipsis(ctx, nt, room), r.x + pad, r.y + r.h - 16);
+    }
+  }
+  ctx.globalAlpha = 1;
+}
+function drawCard(ctx, L, now, ox = 0, oy = 0) {
+  cardRef = L.items.filter((i) => i.t === "tile").map((i) => refOf(i.key)).reduce((a, b) => (b.length > a.length ? b : a), "88");
+  const th = theme(), off = state.offline, ov = off ? null : overall(), oc = ov ? LEVEL[ov] : null;
+  ctx.save(); ctx.translate(ox, oy);
+  rr(ctx, 0, 0, L.W, L.H, 20); ctx.fillStyle = T.surface; ctx.fill();
+  if (off) { ctx.strokeStyle = T.unavailable; ctx.lineWidth = 1; rr(ctx, .5, .5, L.W - 1, L.H - 1, 20); ctx.stroke(); }
+  ctx.textBaseline = "middle";
+  const cardIcon = CARD_ICONS[state.cardIcon]?.[1] || "home-thermometer-outline";
+  for (const it of L.items) {
+    const r = it.r;
+    if (it.t === "chip") {
+      rr(ctx, r.x, r.y, r.w, r.h, 12); ctx.fillStyle = off ? T.raised : ov === "good" ? th.surface : rgb(mix(hex(T.surface), oc, 0.2)); ctx.fill();
+      icon(ctx, cardIcon, r.x + 10, r.y + 10, 24, off ? T.subtle : ov === "good" ? th.accent : rgb(oc));
+    } else if (it.t === "glyph") icon(ctx, cardIcon, r.x + 6, r.y + 6, 24, off ? T.subtle : ov === "good" ? th.accent : rgb(oc));
+    else if (it.t === "name") {
+      const s = summary(L), sc = off ? T.error : s.lv && s.lv !== "good" ? rgb(LEVEL[s.lv]) : T.muted;
+      ctx.textAlign = "left";
+      if (it.titled) {
+        ctx.font = `500 14px ${FONT}`; ctx.fillStyle = T.text; ctx.fillText(ellipsis(ctx, state.title.trim(), r.w), r.x, r.y + 13);
+        ctx.font = `14px ${FONT}`; ctx.fillStyle = sc; ctx.fillText(ellipsis(ctx, s.text, r.w), r.x, r.y + 33);
+      } else { ctx.font = `500 14px ${FONT}`; ctx.fillStyle = off ? T.error : s.lv && s.lv !== "good" ? sc : T.text; ctx.fillText(ellipsis(ctx, s.text, r.w), r.x, r.y + r.h / 2); }
+    } else if (it.t === "line") {
+      const s = summary(L), title = state.title.trim(); let x = r.x;
+      ctx.textAlign = "left";
+      if (title) { ctx.font = `500 14px ${FONT}`; ctx.fillStyle = T.text; const t = ellipsis(ctx, title, r.w * 0.6); ctx.fillText(t, x, r.y + r.h / 2); x += ctx.measureText(t).width + 10; }
+      ctx.font = `14px ${FONT}`; ctx.fillStyle = off ? T.error : s.lv && s.lv !== "good" ? rgb(LEVEL[s.lv]) : T.muted; ctx.fillText(ellipsis(ctx, s.text, r.x + r.w - x), x, r.y + r.h / 2);
+    } else if (it.t === "tile") drawTile(ctx, it, now);
+    else if (it.t === "more") {
+      rr(ctx, r.x, r.y, r.w, r.h, 12); ctx.fillStyle = it.pressed ? T.outline : T.raised; ctx.globalAlpha = off ? .4 : 1; ctx.fill();
+      const hb = L.hidden.filter((k) => level(k).lv !== "good").length;
+      ctx.font = `14px ${FONT}`; ctx.textAlign = "center"; ctx.fillStyle = T.muted; ctx.fillText(`ещё ${L.hidden.length}`, r.x + r.w / 2, r.y + r.h / 2 + 1);
+      if (hb && !off) { ctx.fillStyle = rgb(LEVEL.mid); ctx.beginPath(); ctx.arc(r.x + r.w - 12, r.y + 12, 3.5, 0, 7); ctx.fill(); }
+      ctx.globalAlpha = 1;
+    } else if (it.t === "empty") {
+      ctx.font = `14px ${FONT}`; ctx.fillStyle = T.muted; ctx.textAlign = it.center ? "center" : "left";
+      ctx.fillText("Нет датчиков", it.center ? r.x + r.w / 2 : r.x, r.y + (it.center ? r.h / 2 : r.h / 2));
+    }
+  }
+  if (ui.detail && ui.detail.L === L) drawDetail(ctx, L, now);
+  ctx.restore();
+}
+// Tap on a small tile: the detailed tile opens over the card, tap again closes.
+const ui = { detail: null };
+function detailRect(L) { return { x: P, y: P, w: L.W - 2 * P, h: L.H - 2 * P }; }
+function drawDetail(ctx, L, now) {
+  ctx.save(); rr(ctx, 0, 0, L.W, L.H, 20); ctx.clip(); ctx.fillStyle = "rgba(16,19,23,.82)"; ctx.fillRect(0, 0, L.W, L.H);
+  const r = detailRect(L), st = styleFor(r.w, r.h); cardRef = refOf(ui.detail.key);
+  drawTile(ctx, { r, key: ui.detail.key }, now, st === "compact" ? "compact" : st);
+  ctx.restore();
+}
+
+/* ---------- surfaces ---------- */
+const views = [];
+const cellPx = (n, axis = "x") => axis === "x" ? n * 59 - 8 : Math.floor(n * state.gridY) - 8;
+function makeCanvas(cv, cssW, cssH) {
+  const k = state.zoom && cv.id !== "screen" ? 2 : 1, dpr = Math.min(2, window.devicePixelRatio || 1) * k;
+  cv.width = Math.round(cssW * dpr); cv.height = Math.round(cssH * dpr);
+  if (cv.id !== "screen") cv.style.width = cssW * k + "px";
+  const ctx = cv.getContext("2d"); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); return ctx;
+}
+const io = new IntersectionObserver((es) => { for (const e of es) if (e.target._view) e.target._view.visible = e.isIntersecting; });
+function relayout() { for (const v of views) { const [w, h] = v.size; v.L = layout(cellPx(w), cellPx(h, "y")); } }
+function rebuild() {
+  views.length = 0; ui.detail = null;
+  const scr = document.getElementById("screen"), [sw, sh] = state.screen.split("x").map(Number);
+  const SL = layout(cellPx(sw), cellPx(sh, "y"));
+  const sv = { canvas: scr, ctx: makeCanvas(scr, 480, 480), L: SL, size: [sw, sh], ox: 8, oy: 8, screen: true, visible: true };
+  views.push(sv); attach(sv);
+  document.getElementById("screenCaption").textContent = `карточка ${sw}×${sh}`;
+  const tray = document.getElementById("tray"); tray.replaceChildren();
+  for (const [w, h] of SIZES) {
+    const L = layout(cellPx(w), cellPx(h, "y"));
+    const fig = document.createElement("figure"), cap = document.createElement("figcaption"), cv = document.createElement("canvas");
+    cap.innerHTML = `<b>${w}×${h}</b>`; cv.setAttribute("aria-label", `Карточка микроклимата ${w}×${h}`);
+    fig.append(cap, cv); tray.append(fig);
+    const v = { canvas: cv, ctx: makeCanvas(cv, L.W, L.H), L, size: [w, h], ox: 0, oy: 0, visible: true }; views.push(v); io.observe(cv); attach(v);
+  }
+  document.getElementById("pitchOut").textContent = `8×8 = ${cellPx(8)} × ${cellPx(8, "y")} px`;
+  save();
+}
+
+/* ---------- pointer ---------- */
+const inside = (p, r) => r && p.x >= r.x && p.x < r.x + r.w && p.y >= r.y && p.y < r.y + r.h;
+function local(v, e) { const b = v.canvas.getBoundingClientRect(), cw = v.screen ? 480 : v.L.W, ch = v.screen ? 480 : v.L.H; return { x: (e.clientX - b.left) * cw / b.width - v.ox, y: (e.clientY - b.top) * ch / b.height - v.oy }; }
+function attach(v) {
+  const cv = v.canvas; cv._view = v; if (cv._attached) return; cv._attached = true;
+  cv.addEventListener("pointerdown", (e) => {
+    const view = cv._view, L = view.L, p = local(view, e); if (state.offline) return;
+    if (ui.detail && ui.detail.L === L) { ui.detail = null; return; }
+    const it = [...L.items].reverse().find((i) => (i.t === "tile" || i.t === "more") && inside(p, i.r));
+    if (!it) return; it.pressed = true; view.active = it; cv.setPointerCapture(e.pointerId);
+  });
+  const end = (e, cancel) => {
+    const view = cv._view, it = view.active; view.active = null; if (!it) return; it.pressed = false;
+    if (cancel || !inside(local(view, e), it.r)) return;
+    if (it.t === "tile" && it.st !== "detailed") ui.detail = { L: view.L, key: it.key };
+    else if (it.t === "more" && view.L.hidden.length) ui.detail = { L: view.L, key: worst(view.L.hidden).k };
+  };
+  cv.addEventListener("pointerup", (e) => end(e, false));
+  cv.addEventListener("pointercancel", (e) => end(e, true));
+}
+
+/* ---------- loop ---------- */
+let last = 0, prev = performance.now(), haLast = 0, layoutSig = "";
+function frame(now) {
+  const dt = Math.min(0.1, (now - prev) / 1000); prev = now; pump(dt, now);
+  const sig = active().map((k) => level(k).lv).join();          // levels decide which tiles win when space is short
+  if (sig !== layoutSig) { layoutSig = sig; if (views.length) relayout(); }
+  if (now - last >= 1000 / FPS) {
+    last = now;
+    for (const v of views) {
+      if (!v.visible) continue;
+      if (v.screen) { v.ctx.fillStyle = T.bg; v.ctx.fillRect(0, 0, 480, 480); } else v.ctx.clearRect(0, 0, v.L.W, v.L.H);
+      drawCard(v.ctx, v.L, now, v.ox, v.oy);
+    }
+  }
+  if (now - haLast > 500) { haLast = now; haReadout(); syncKbd(); }
+  requestAnimationFrame(frame);
+}
+function haReadout() {
+  const keys = active();
+  document.getElementById("haOut").innerHTML = (keys.length ? keys.map((k) => `<b>${SENSORS[k].ha}</b> ${state.offline ? "unavailable" : fmt(k).replace(",", ".") + " " + SENSORS[k].unit}`).join(" &nbsp; ") : "датчики не выбраны") +
+    ` &nbsp; · заголовок «${state.title.trim() || "—"}»`;
+}
+
+/* ---------- controls ---------- */
+function pressed(box, value) { for (const b of box.querySelectorAll("[data-v]")) b.setAttribute("aria-pressed", String(b.dataset.v === value)); }
+function buildKbd() {
+  const box = document.getElementById("kbd"); box.replaceChildren();
+  for (const k of ORDER) {
+    const S = SENSORS[k], lab = document.createElement("label"), inp = document.createElement("input"), out = document.createElement("output");
+    lab.textContent = S.label; lab.htmlFor = "k_" + k;
+    inp.type = "range"; inp.id = "k_" + k; inp.min = S.range[0]; inp.max = S.range[1]; inp.step = S.step; inp.value = target[k];
+    inp.oninput = () => { target[k] = Number(inp.value); val[k] = target[k]; noiseT = performance.now(); syncKbd(); };
+    out.id = "o_" + k; box.append(lab, inp, out);
+  }
+}
+function syncKbd() {
+  for (const k of ORDER) {
+    const inp = document.getElementById("k_" + k), out = document.getElementById("o_" + k); if (!inp) continue;
+    if (document.activeElement !== inp) inp.value = target[k];
+    const l = level(k); out.textContent = `${fmt(k)} ${SENSORS[k].unit}`; out.style.color = rgb(LEVEL[l.lv]);
+    inp.disabled = !state.sensors.includes(k); inp.style.opacity = inp.disabled ? .4 : 1;
+  }
+}
+function buildNorms() {
+  const t = document.getElementById("norms");
+  const rows = ORDER.map((k) => {
+    const S = SENSORS[k]; let from = "";
+    const z = S.zones.map(([to, lv, word], i) => { const prev = i ? S.zones[i - 1][0] : null; const span = prev == null ? `< ${to}` : to === Infinity ? `≥ ${prev}` : `${prev}–${to}`; return `<span style="color:${rgb(LEVEL[lv])}">${word} ${span}</span>`; }).join(" · ");
+    return `<tr><th>${S.label}</th><td>${S.unit}</td><td>${z}</td><td><code>${S.cls}</code></td></tr>`;
+  }).join("");
+  t.innerHTML = `<tr><th>Датчик</th><th>Ед.</th><th>Зоны</th><th>device_class</th></tr>` + rows;
+}
+function controls() {
+  const title = document.getElementById("title"); title.value = state.title;
+  title.addEventListener("input", () => { state.title = title.value; rebuild(); });
+  const ib = document.getElementById("iconPick");
+  for (const [id, [label, mdi]] of Object.entries(CARD_ICONS)) { const b = document.createElement("button"); b.type = "button"; b.dataset.v = id; b.textContent = label; b.title = `mdi:${mdi}`; b.onclick = () => { state.cardIcon = id; pressed(ib, id); save(); }; ib.append(b); }
+  if (!(state.cardIcon in CARD_ICONS)) state.cardIcon = "home"; pressed(ib, state.cardIcon);
+  const sb = document.getElementById("sensorsBox");
+  for (const k of ORDER) {
+    const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.textContent = SENSORS[k].label;
+    b.setAttribute("aria-pressed", String(state.sensors.includes(k)));
+    b.onclick = () => { state.sensors = state.sensors.includes(k) ? state.sensors.filter((x) => x !== k) : [...state.sensors, k]; b.setAttribute("aria-pressed", String(state.sensors.includes(k))); rebuild(); };
+    sb.append(b);
+  }
+  const sc = document.getElementById("scene");
+  for (const [id, s] of Object.entries(SCENES)) { const b = document.createElement("button"); b.type = "button"; b.dataset.v = id; b.textContent = s.ru; b.onclick = () => { state.scene = id; setScene(id); pressed(sc, id); buildKbd(); save(); }; sc.append(b); }
+  if (!(state.scene in SCENES)) state.scene = "ok"; pressed(sc, state.scene);
+  const sw = document.getElementById("swatches");
+  for (const [name, c] of ACCENTS) { const b = document.createElement("button"); b.type = "button"; b.className = "swatch"; b.style.background = c; b.dataset.v = c; b.title = name; b.setAttribute("aria-label", name); b.onclick = () => setAccent(c); sw.append(b); }
+  setAccent(state.accent);
+  const sizes = document.getElementById("sizes");
+  for (const [w, h] of SIZES) { const b = document.createElement("button"); b.type = "button"; b.className = "chip"; b.dataset.v = `${w}x${h}`; b.textContent = `${w}×${h}`; b.onclick = () => { state.screen = b.dataset.v; pressed(sizes, state.screen); rebuild(); }; sizes.append(b); }
+  pressed(sizes, state.screen);
+  const grid = document.getElementById("grid"); if (![59, 55.5, 53.5].includes(state.gridY)) state.gridY = 59;
+  grid.addEventListener("click", (e) => { const v = e.target.dataset?.v; if (!v) return; state.gridY = Number(v); pressed(grid, v); rebuild(); });
+  pressed(grid, String(state.gridY));
+  for (const id of ["offline", "reduced", "zoom"]) { const el = document.getElementById(id); el.checked = state[id]; el.addEventListener("change", () => { state[id] = el.checked; if (id === "zoom") rebuild(); save(); }); }
+  buildKbd(); buildNorms();
+}
+function setAccent(c) { state.accent = c; document.documentElement.style.setProperty("--accent", c); pressed(document.getElementById("swatches"), c); save(); }
+controls();
+(document.fonts ? Promise.all([document.fonts.load(`14px "Noto Sans"`), document.fonts.load(`500 14px "Noto Sans"`), document.fonts.load(`28px "Noto Sans"`)]).catch(() => {}) : Promise.resolve()).finally(() => { rebuild(); requestAnimationFrame(frame); });
+</script>
