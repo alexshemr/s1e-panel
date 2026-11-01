@@ -4,17 +4,12 @@
 
 ## Access to the Aqara S1E
 
-S1E Panel could only be built because others first found a way into the panel.
+S1E Panel could only be built because others first found a way into the panel. Two community projects published how to reach the S1E's service console; S1E Panel's installer relies on that access, and the [installation guide](installation.md) sends you to both. Equal thanks to both authors.
 
-### oopuuu — AqaraS1E-Custom-GUI
+- **oopuuu** — [AqaraS1E-Custom-GUI](https://github.com/oopuuu/AqaraS1E-Custom-GUI), a custom GUI and Home Assistant integration for the Aqara S1E. Its guide describes the UART wiring, stopping the U-Boot bootloader and booting the stock kernel into a root shell with `init=/bin/sh`. The README states the MIT license.
+- **niceboygithub** — [AqaraSmartSwitchS1E](https://github.com/niceboygithub/AqaraSmartSwitchS1E), resources for the Aqara S1E and a Home Assistant integration for its stock firmware. Its notes describe opening the panel, the UART pads (with a pinout photo), stopping U-Boot, including on panels made after July 2023, and booting with `init=/bin/sh`. Apache-2.0.
 
-**[github.com/oopuuu/AqaraS1E-Custom-GUI](https://github.com/oopuuu/AqaraS1E-Custom-GUI)** — a custom native GUI and Home Assistant integration for the Aqara S1E by **oopuuu**.
-
-Its guide documents the complete route into the S1E's system: wiring the service console (UART), stopping the U-Boot bootloader and booting the stock kernel into a root shell by replacing `init=/linuxrc` with `init=/bin/sh`. S1E Panel's installer uses exactly this console access to install itself, and the [installation guide](installation.md) sends you to oopuuu's instructions for it. The project's README states the MIT license; S1E Panel does not copy its code, photos or texts — it links to them.
-
-### Also thanks to
-
-- **niceboygithub** — [AqaraSmartSwitchS1E](https://github.com/niceboygithub/AqaraSmartSwitchS1E) (Apache-2.0), a collection of Aqara S1E resources. The installation guide links to its UART pinout photo and bootloader notes.
+S1E Panel does not copy their code, photos or texts; it links to them.
 
 ## Software in the firmware
 
@@ -50,9 +45,10 @@ Not shipped, but S1E Panel is built with [Zig](https://ziglang.org) (cross-compi
 
 The [S1E Panel integration](https://github.com/alexshemr/ha-s1e-panel) (MIT) is installed with [HACS](https://hacs.xyz) and runs inside [Home Assistant](https://www.home-assistant.io). The 3D printer card works with printers added to Home Assistant by [ha-bambulab](https://github.com/greghesp/ha-bambulab).
 
-## Assets
+## Assets and references
 
 - The weather background (`courtyard`) is an original image generated for this project; weather particles, sky and day/night tinting are drawn by S1E Panel.
+- [flutter_weather_bg](https://github.com/xiaweizi/flutter_weather_bg) by **xiaweizi** (MIT), animated weather backgrounds for Flutter, served as a visual reference for S1E Panel's weather scenes. Its code is not included: the scenes are drawn natively with LVGL.
 - Card pictures in this documentation are rendered by S1E Panel's own renderer.
 
 ## S1E Panel

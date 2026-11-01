@@ -60,8 +60,10 @@ S1E Panel поддерживает одну модель: **Aqara Magic Switch S
 
 Путь в систему S1E сообщество нашло ещё до появления S1E Panel, и этот проект опирается на ту работу:
 
-- **[oopuuu/AqaraS1E-Custom-GUI](https://github.com/oopuuu/AqaraS1E-Custom-GUI)**, автор — **oopuuu**, описывает весь путь в систему S1E: подключение сервисной консоли (UART), остановку загрузчика U-Boot и загрузку заводского ядра в root-оболочку заменой `init=/linuxrc` на `init=/bin/sh`. Именно этот доступ использует установщик S1E Panel.
-- **[niceboygithub/AqaraSmartSwitchS1E](https://github.com/niceboygithub/AqaraSmartSwitchS1E)**, автор — **niceboygithub**, — собрание материалов по S1E, в том числе фото с распиновкой UART и заметки о загрузчике, на которые ссылается это руководство.
+- **[oopuuu/AqaraS1E-Custom-GUI](https://github.com/oopuuu/AqaraS1E-Custom-GUI)**, автор — **oopuuu**: руководство описывает подключение UART, остановку загрузчика U-Boot и загрузку заводского ядра в root-оболочку заменой `init=/linuxrc` на `init=/bin/sh`.
+- **[niceboygithub/AqaraSmartSwitchS1E](https://github.com/niceboygithub/AqaraSmartSwitchS1E)**, автор — **niceboygithub**: заметки описывают вскрытие панели, площадки UART с фото распиновки, остановку U-Boot (в том числе на панелях после июля 2023 года) и ту же загрузку через `init=/bin/sh`.
+
+Именно этот доступ к консоли использует установщик S1E Panel.
 
 Прочитайте их инструкции — [README oopuuu](https://github.com/oopuuu/AqaraS1E-Custom-GUI#readme) (на китайском) и [заметки niceboygithub «Enable Telnet»](https://github.com/niceboygithub/AqaraSmartSwitchS1E/blob/master/homeassistant/telnet.md) (на английском), — прежде чем вскрывать панель. Их фотографии и тексты принадлежат авторам; это руководство ссылается на них, а не копирует.
 

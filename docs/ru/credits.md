@@ -4,17 +4,12 @@
 
 ## Доступ к Aqara S1E
 
-S1E Panel удалось сделать только потому, что другие сначала нашли путь внутрь панели.
+S1E Panel удалось сделать только потому, что другие сначала нашли путь внутрь панели. Два проекта сообщества описали, как добраться до сервисной консоли S1E; установщик S1E Panel опирается на этот доступ, а [руководство по установке](installation.md) отправляет вас к обоим. Одинаковое спасибо обоим авторам.
 
-### oopuuu — AqaraS1E-Custom-GUI
+- **oopuuu** — [AqaraS1E-Custom-GUI](https://github.com/oopuuu/AqaraS1E-Custom-GUI), собственный интерфейс и интеграция Home Assistant для Aqara S1E. Его руководство описывает подключение UART, остановку загрузчика U-Boot и загрузку заводского ядра в root-оболочку через `init=/bin/sh`. В README указана лицензия MIT.
+- **niceboygithub** — [AqaraSmartSwitchS1E](https://github.com/niceboygithub/AqaraSmartSwitchS1E), материалы по Aqara S1E и интеграция Home Assistant для её заводской прошивки. Его заметки описывают вскрытие панели, площадки UART (с фото распиновки), остановку U-Boot, в том числе на панелях, выпущенных после июля 2023 года, и загрузку через `init=/bin/sh`. Apache-2.0.
 
-**[github.com/oopuuu/AqaraS1E-Custom-GUI](https://github.com/oopuuu/AqaraS1E-Custom-GUI)** — собственный нативный интерфейс и интеграция Home Assistant для Aqara S1E, автор **oopuuu**.
-
-Его руководство описывает весь путь в систему S1E: подключение сервисной консоли (UART), остановку загрузчика U-Boot и загрузку заводского ядра в root-оболочку заменой `init=/linuxrc` на `init=/bin/sh`. Установщик S1E Panel использует именно этот доступ к консоли, а [руководство по установке](installation.md) отправляет вас к инструкциям oopuuu. В README проекта указана лицензия MIT; S1E Panel не копирует его код, фотографии и тексты — только ссылается на них.
-
-### Также спасибо
-
-- **niceboygithub** — [AqaraSmartSwitchS1E](https://github.com/niceboygithub/AqaraSmartSwitchS1E) (Apache-2.0), собрание материалов по Aqara S1E. Руководство по установке ссылается на его фото с распиновкой UART и заметки о загрузчике.
+S1E Panel не копирует их код, фотографии и тексты — только ссылается на них.
 
 ## Программы в прошивке
 
@@ -50,9 +45,10 @@ S1E Panel удалось сделать только потому, что дру
 
 [Интеграция S1E Panel](https://github.com/alexshemr/ha-s1e-panel) (MIT) устанавливается через [HACS](https://hacs.xyz) и работает внутри [Home Assistant](https://www.home-assistant.io). Карточка 3D-принтера работает с принтерами, добавленными в Home Assistant через [ha-bambulab](https://github.com/greghesp/ha-bambulab).
 
-## Изображения
+## Изображения и ориентиры
 
 - Фон погоды (`courtyard`) — оригинальное изображение, созданное для этого проекта; частицы погоды, небо и смену дня и ночи рисует S1E Panel.
+- [flutter_weather_bg](https://github.com/xiaweizi/flutter_weather_bg), автор **xiaweizi** (MIT), — анимированные погодные фоны для Flutter, визуальный ориентир для погодных сцен S1E Panel. Его код не используется: сцены нарисованы нативно на LVGL.
 - Изображения карточек в этой документации отрисованы собственным рендерером S1E Panel.
 
 ## S1E Panel
