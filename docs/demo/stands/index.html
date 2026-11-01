@@ -141,6 +141,48 @@ code { font-family: var(--mono); font-size: 12px; }
       <span class="meta"><span class="tag">11 размеров</span></span>
     </a>
   </section>
+  <p class="note"><a id="lang" href="?lang=en" style="color:var(--accent)">English</a></p>
 </div>
+<script>
+/* ?lang=en: the same page in English (the public demo); stands open in English too. */
+(() => {
+  const en = new URLSearchParams(location.search).get("lang") === "en";
+  const switcher = document.getElementById("lang");
+  if (!en) return;
+  switcher.textContent = "Русский"; switcher.href = "index.html";
+  const TILES = {
+    "home-stand.html": ["Constructor", "Any widgets from the stands on one panel screen: arranged on the grid, several pages. Each widget keeps its own settings; only the language is shared — English or Russian.", ["new", "14 sets"]],
+    "cover-stand.html": ["Curtains", "A window with the city behind it and a curtain in the card's colour. The sky follows the sun and moon: it gets dark early in winter, the sun stands high in summer.", ["11 sizes"]],
+    "roller-stand.html": ["Roller blind", "The same window and sky; the fabric comes down from a box at the top, and the roll at the box ends is thicker when the blind is up.", ["11 sizes"]],
+    "light-stand.html": ["Light", "Brightness, colour temperature, colour and lamp modes, quick presets. The lamp glows in its own colour, its rays gently “breathe”.", ["11 sizes"]],
+    "breezer-stand.html": ["Breezer", "Airflow, Auto, Sleep and Favorite modes, heating and up to three sensors (CO₂, PM2.5, TVOC) coloured by level.", ["11 sizes"]],
+    "climate-stand.html": ["Climate", "The room's sensors on one card: temperature, humidity, CO₂, PM2.5 and more. Colour shows the norm; tiles out of norm softly glow.", ["11 sizes"]],
+    "time-stand.html": ["Time", "Date and time from Home Assistant: an alarm, a reminder, a deadline. Change it by holding and scrolling drums, like on an iPhone.", ["4 sizes"]],
+    "button-stand.html": ["Button", "A switch, a panel relay or an action (scene, script): the whole card is the button. On 2×4 it is a wall rocker with hold protection.", ["3 sizes"]],
+    "thermostat-stand.html": ["Thermostat", "Target temperature with − and +, heating visible at once. A thermometer on narrow cards, a half-circle gauge on large ones.", ["11 sizes"]],
+    "humidifier-stand.html": ["Humidifier", "Target humidity with − and +, mist while it works, Auto, Sleep and Turbo modes and the water level in the tank.", ["11 sizes"]],
+    "fan-stand.html": ["Fan", "Speed in steps or smoothly, oscillation and direction. The impeller spins at the real speed.", ["11 sizes"]],
+    "inputs-stand.html": ["Number, select, text", "Home Assistant helpers: a number with buttons or a slider, a choice from a list, a text message.", ["5 sizes"]],
+    "printer-stand.html": ["3D printer", "The current Bambu Lab print: what the printer is doing, the model, progress and time left, the camera. Larger cards add the model picture, layers, temperatures, Pause and Stop.", ["9 sizes"]],
+    "saver-stand.html": ["Screensavers", "Just the time, Home essentials, Living weather and A favorite moment: the clock, the weather and home sensors in their norm colours.", ["4 screensavers"]],
+    "weather-stand.html": ["Weather", "Every Home Assistant weather state on the screensaver and cards: an animated sky by day and night, captions in English and Russian.", ["11 sizes"]],
+  };
+  document.documentElement.lang = "en";
+  document.title = "Aqara S1E card demos";
+  document.querySelector("h1").textContent = "Card demos";
+  document.querySelector(".lede").textContent = "Live demos of the panel's cards and screensavers. Every card can be touched: switch it on, drag the sliders, change modes and see it in all its sizes at once.";
+  document.querySelector(".grid").setAttribute("aria-label", "Stands");
+  for (const a of document.querySelectorAll(".grid a.card")) {
+    const page = a.getAttribute("href"), T = TILES[page];
+    a.href = page + (page === "home-stand.html" ? "?lang=en&mode=play" : "?lang=en");
+    if (!T) continue;
+    a.querySelector(".name").textContent = T[0];
+    a.querySelector(".desc").textContent = T[1];
+    const tags = a.querySelectorAll(".tag");
+    T[2].forEach((text, i) => { if (tags[i]) tags[i].textContent = text; });
+    for (let i = T[2].length; i < tags.length; i++) tags[i].remove();
+  }
+})();
+</script>
 </body>
 </html>

@@ -229,6 +229,7 @@ function applyUi() {
   document.documentElement.lang = S.lang;
   document.title = t("doc");
   for (const el of document.querySelectorAll("[data-i18n]")) el.textContent = t(el.dataset.i18n);
+  for (const el of document.querySelectorAll('a[href^="index.html"]')) el.href = S.lang === "en" ? "index.html?lang=en" : "index.html";
   for (const el of document.querySelectorAll("[data-i18n-aria]")) el.setAttribute("aria-label", t(el.dataset.i18nAria));
   for (const el of document.querySelectorAll("[data-i18n-html]")) el.innerHTML = t(el.dataset.i18nHtml);
   renderCatalog();

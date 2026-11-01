@@ -306,6 +306,7 @@ html.embed-settings .device canvas { width: var(--sw, 480px) !important; max-wid
     if (typeof window.ellipsis === "function") { const o = window.ellipsis; window.ellipsis = (ctx, t, w) => o(ctx, tr(t), w); }
     if (solo) {
       applyLang();
+      for (const a of document.querySelectorAll('a[href="index.html"]')) a.href = "index.html?lang=en";   // the list of stands in English too
       for (const p of document.querySelectorAll("p")) if (CYR.test(p.textContent)) p.hidden = true;   // prose without an English text yet
       const h = document.querySelector("h1");
       if (h) document.title = `${h.textContent.trim()} · S1E Panel demo`;
