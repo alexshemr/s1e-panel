@@ -12,11 +12,9 @@ S1E Panel could only be built because others first found a way into the panel.
 
 Its guide documents the complete route into the S1E's system: wiring the service console (UART), stopping the U-Boot bootloader and booting the stock kernel into a root shell by replacing `init=/linuxrc` with `init=/bin/sh`. S1E Panel's installer uses exactly this console access to install itself, and the [installation guide](installation.md) sends you to oopuuu's instructions for it. The project's README states the MIT license; S1E Panel does not copy its code, photos or texts — it links to them.
 
-### niceboygithub — AqaraSmartSwitchS1E
+### Also thanks to
 
-**[github.com/niceboygithub/AqaraSmartSwitchS1E](https://github.com/niceboygithub/AqaraSmartSwitchS1E)** by **niceboygithub** (Apache-2.0) — the original teardown of the S1E, the UART pinout photo, the bootloader method (including the one for panels made after July 2023) and an MQTT integration of the stock firmware with Home Assistant. oopuuu credits this work as the basis of their hardware access; S1E Panel's guide links to its photo and notes.
-
-Thank you both.
+- **niceboygithub** — [AqaraSmartSwitchS1E](https://github.com/niceboygithub/AqaraSmartSwitchS1E) (Apache-2.0), a collection of Aqara S1E resources. The installation guide links to its UART pinout photo and bootloader notes.
 
 ## Software in the firmware
 

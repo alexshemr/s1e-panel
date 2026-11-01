@@ -71,7 +71,7 @@ S1E Panel заменяет заводской интерфейс настенн�
 > С S1E Panel панелью управляет Home Assistant; заводское ПО Aqara и приложение Aqara Home ею больше не управляют. Заводская система сохраняется, и её можно вернуть.
 
 1. **Проверьте панель:** Aqara Magic Switch S1E, модель **NPD1121WSK01**.
-2. **Получите доступ к консоли** — подключение и доступ к загрузчику разработали [oopuuu](https://github.com/oopuuu/AqaraS1E-Custom-GUI) и [niceboygithub](https://github.com/niceboygithub/AqaraSmartSwitchS1E).
+2. **Получите доступ к консоли** — подключение и доступ к загрузчику, как описано у [oopuuu](https://github.com/oopuuu/AqaraS1E-Custom-GUI).
 3. **Запустите установщик** [`installer/s1e_install.py`](installer/s1e_install.py) с комплектом `s1e-panel-first-install.tar.gz` из [последнего выпуска](https://github.com/alexshemr/s1e-panel/releases/latest). Он проверяет панель, ставит S1E Panel рядом с заводской системой, делает пробный запуск и только потом закрепляет установку.
 4. **Подключите Home Assistant** через [интеграцию S1E Panel](https://github.com/alexshemr/ha-s1e-panel) (HACS) и добавьте первую карточку.
 
@@ -103,7 +103,7 @@ S1E Panel — независимый неофициальный проект, н
 
 ## Благодарности
 
-Первая установка опирается на доступ к консоли, описанный в **[oopuuu/AqaraS1E-Custom-GUI](https://github.com/oopuuu/AqaraS1E-Custom-GUI)**, а также на разбор устройства и распиновку UART из **[niceboygithub/AqaraSmartSwitchS1E](https://github.com/niceboygithub/AqaraSmartSwitchS1E)**. S1E Panel построен на LVGL, libwebsockets, Mbed TLS, nlohmann/json, YAJL, React, Noto Sans и Material Design Icons. Полный список с лицензиями: [docs/ru/credits.md](docs/ru/credits.md).
+Первая установка опирается на доступ к консоли, описанный в **[oopuuu/AqaraS1E-Custom-GUI](https://github.com/oopuuu/AqaraS1E-Custom-GUI)**; спасибо также [niceboygithub](https://github.com/niceboygithub/AqaraSmartSwitchS1E) за материалы по S1E, на которые ссылается руководство. S1E Panel построен на LVGL, libwebsockets, Mbed TLS, nlohmann/json, YAJL, React, Noto Sans и Material Design Icons. Полный список с лицензиями: [docs/ru/credits.md](docs/ru/credits.md).
 
 ## Лицензия
 

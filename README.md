@@ -71,7 +71,7 @@ Pictures of every card in every size, rendered by the firmware: **[docs/cards.md
 > With S1E Panel installed, the panel is controlled by Home Assistant; the factory Aqara software and the Aqara Home app no longer drive it. The factory system is kept and can be restored.
 
 1. **Check your panel:** Aqara Magic Switch S1E, model **NPD1121WSK01**.
-2. **Get console access** — the wiring and bootloader access were worked out by [oopuuu](https://github.com/oopuuu/AqaraS1E-Custom-GUI) and [niceboygithub](https://github.com/niceboygithub/AqaraSmartSwitchS1E).
+2. **Get console access** — the wiring and bootloader access as documented by [oopuuu](https://github.com/oopuuu/AqaraS1E-Custom-GUI).
 3. **Run the installer** [`installer/s1e_install.py`](installer/s1e_install.py) with the `s1e-panel-first-install.tar.gz` bundle from the [latest release](https://github.com/alexshemr/s1e-panel/releases/latest). It checks the panel, installs S1E Panel next to the factory system, test-starts it and only then makes it permanent.
 4. **Connect Home Assistant** with the [S1E Panel integration](https://github.com/alexshemr/ha-s1e-panel) (HACS) and add your first card.
 
@@ -103,7 +103,7 @@ S1E Panel is an independent, unofficial project, not affiliated with Aqara or Lu
 
 ## Credits
 
-The first installation relies on the console access documented by **[oopuuu/AqaraS1E-Custom-GUI](https://github.com/oopuuu/AqaraS1E-Custom-GUI)** and the teardown and UART pinout by **[niceboygithub/AqaraSmartSwitchS1E](https://github.com/niceboygithub/AqaraSmartSwitchS1E)**. S1E Panel is built with LVGL, libwebsockets, Mbed TLS, nlohmann/json, YAJL, React, Noto Sans and Material Design Icons. Full list with licenses: [docs/credits.md](docs/credits.md).
+The first installation relies on the console access documented by **[oopuuu/AqaraS1E-Custom-GUI](https://github.com/oopuuu/AqaraS1E-Custom-GUI)**; thanks also to [niceboygithub](https://github.com/niceboygithub/AqaraSmartSwitchS1E) for the S1E materials the guide links to. S1E Panel is built with LVGL, libwebsockets, Mbed TLS, nlohmann/json, YAJL, React, Noto Sans and Material Design Icons. Full list with licenses: [docs/credits.md](docs/credits.md).
 
 ## License
 

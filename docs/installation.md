@@ -61,7 +61,7 @@ The installer checks the rest before it writes anything: the flash layout, the s
 Getting into the S1E's system was worked out by the community before S1E Panel existed, and this project builds on that work:
 
 - **[oopuuu/AqaraS1E-Custom-GUI](https://github.com/oopuuu/AqaraS1E-Custom-GUI)** by **oopuuu** documents the whole route into the S1E: the UART wiring, stopping the U-Boot bootloader and booting the stock kernel into a root shell by replacing `init=/linuxrc` with `init=/bin/sh`. This is exactly the access S1E Panel's installer uses.
-- **[niceboygithub/AqaraSmartSwitchS1E](https://github.com/niceboygithub/AqaraSmartSwitchS1E)** by **niceboygithub** (credited by oopuuu for it) did the original teardown, found the UART pads and the bootloader method, and published the photo with the pinout.
+- **[niceboygithub/AqaraSmartSwitchS1E](https://github.com/niceboygithub/AqaraSmartSwitchS1E)** by **niceboygithub** — a collection of S1E resources, including the UART pinout photo and the bootloader notes used below.
 
 Please read their guides — [oopuuu's README](https://github.com/oopuuu/AqaraS1E-Custom-GUI#readme) and [niceboygithub's "Enable Telnet" notes](https://github.com/niceboygithub/AqaraSmartSwitchS1E/blob/master/homeassistant/telnet.md) — before you open the panel. Their photos and instructions are theirs; this guide links to them instead of copying them.
 
