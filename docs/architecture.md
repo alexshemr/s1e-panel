@@ -44,7 +44,7 @@ The processes talk over local sockets. Graphics are separated from the network: 
 
 ## Start-up
 
-1. The bootloader starts the factory kernel with S1E Panel's boot arguments: they mount the data volume and run S1E Panel's start script. If that script cannot run, the factory system starts instead.
+1. The bootloader shows the start-up picture for a moment (the S1E Panel logo after installation) and starts the factory kernel with S1E Panel's boot arguments: they mount the data volume and run S1E Panel's start script. If that script cannot run, the factory system starts instead.
 2. The start script loads the factory display and Wi-Fi drivers, joins Wi-Fi and starts the updater.
 3. The updater starts the application from the active slot (A or B).
 

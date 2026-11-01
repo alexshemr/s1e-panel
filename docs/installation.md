@@ -4,7 +4,7 @@
 
 This guide takes a factory Aqara Magic Switch S1E to a working S1E Panel. The first installation goes through the panel's service console (UART) and is done once; every later update arrives over Wi-Fi.
 
-**Time:** about an hour, most of it opening the panel and soldering. **Difficulty:** you should be comfortable with a soldering iron and a command line.
+**Time:** about 1.5 hours: opening the panel and soldering, then about 30 minutes while the installer sends S1E Panel over the console. **Difficulty:** you should be comfortable with a soldering iron and a command line.
 
 > [!CAUTION]
 > **Read before you start.**
@@ -23,13 +23,15 @@ flowchart LR
   B --> C[Installer stops<br/>the bootloader]
   C --> D[Service shell,<br/>checks]
   D --> E[S1E Panel copied<br/>to /data/s1e-panel]
-  E --> F[Test start,<br/>nothing saved]
-  F -->|healthy| G[Boot setting saved]
+  E --> L[S1E Panel logo<br/>at power-on]
+  L --> F[Test start,<br/>nothing saved]
+  F -->|healthy| G[Boot settings saved]
   F -->|not healthy| H[Power cycle:<br/>factory firmware]
 ```
 
 - The factory root file system, kernel, partitions and bootloader are **not modified**. S1E Panel lives in its own folder on the panel's existing data volume.
-- Only one bootloader setting changes: the boot arguments now mount the data volume and start S1E Panel; if it cannot start, the factory system starts instead. The factory value is kept on the panel as `s1e_factory_bootargs`, and the installer can put it back.
+- Two bootloader settings change: the boot arguments now mount the data volume and start S1E Panel (if it cannot start, the factory system starts instead), and `bootdelay` becomes 2 seconds, so the bootloader can be stopped for recovery. The factory values are kept on the panel as `s1e_factory_bootargs` and `s1e_factory_bootdelay`, and the installer can put both back.
+- The picture the bootloader shows for a moment at power-on — the Aqara logo — is replaced by the S1E Panel logo. The original stays on the panel (`aqara.jpg.s1e-original`) and is copied to your computer; `--keep-boot-logo` keeps the Aqara picture.
 - Nothing is saved until S1E Panel has started once and reported healthy. Until then a power cycle returns the panel to the factory firmware.
 - While S1E Panel is installed, the factory Aqara software does not run: the panel is no longer controlled by the Aqara Home app or Aqara's cloud services. It is controlled by Home Assistant instead.
 
@@ -53,7 +55,7 @@ The installer checks the rest before it writes anything: the flash layout, the s
 | **Soldering** | Fine-tipped soldering iron, thin solder, flux. Soldering to the pads is the reliable option recommended by niceboygithub; the connection must hold for the whole installation |
 | **Tools** | Thin plastic pry tool or guitar pick, small screwdriver, tweezers, multimeter (recommended), magnifier |
 | **Computer** | Windows, macOS or Linux with [Python 3.9+](https://www.python.org/downloads/) and `pyserial` |
-| **Files** | From the [latest release](https://github.com/alexshemr/s1e-panel/releases/latest): `s1e-panel-first-install.tar.gz` and `SHA256SUMS.txt`; and the installer [`installer/s1e_install.py`](../installer/s1e_install.py) |
+| **Files** | All four from the same [latest release](https://github.com/alexshemr/s1e-panel/releases/latest): `s1e_install.py` (the installer), `boot-logo.jpg`, `s1e-panel-first-install.tar.gz` and `SHA256SUMS.txt` |
 | **Network** | Your Wi-Fi name and password (WPA2, 8–63 characters) and a Home Assistant 2026.10.1+ with HACS |
 
 ## Stage 2. Access to the panel's console
@@ -86,6 +88,8 @@ Please read their guides — [oopuuu's README](https://github.com/oopuuu/AqaraS1
 
    Leave the adapter's 3.3 V / 5 V pin unconnected. Settings, if you check with a terminal program: **115200 baud, 8N1**, no flow control.
 6. **Power.** The console works only while the panel is powered, so plan how it will be powered with the wires attached — **never with an open panel on mains**. niceboygithub's photo also marks **pin 1 = 5 V** and **pin 2 = GND** of the board's power header; supplying the board from a separate 5 V source there keeps mains out of your setup. If you are not sure how to do this safely, stop here and ask someone experienced.
+
+   **Power the board separately from the USB-UART adapter.** The adapter stays plugged into the computer the whole time; when the installer asks, switch only the board's 5 V supply off and on. If the adapter also powers the board, its port (`COM5`…) disappears on every power cycle and the installer loses the connection.
 7. **Plug the adapter into the computer** and note its port: `COM3`, `COM5`… on Windows (Device Manager → Ports), `/dev/ttyUSB0` on Linux, `/dev/tty.usbserial-…` on macOS.
 
 > [!TIP]
@@ -101,13 +105,13 @@ Put the downloaded files into one folder, open a terminal there and install `pys
 python -m pip install pyserial
 ```
 
-### 4.2 Check the panel (optional, writes nothing)
+### 4.2 Check the panel (optional, installs nothing)
 
 ```bash
 python s1e_install.py --port COM5 --check
 ```
 
-Replace `COM5` with your port. When it says *Waiting for the bootloader*, power the panel on. The installer stops the bootloader, boots the stock kernel once into a service shell, checks the panel and reboots it into the factory firmware. Nothing is written.
+Replace `COM5` with your port. When it says *Waiting for the bootloader*, switch the panel's power on. The installer stops the bootloader, boots the stock kernel once into a service shell, checks the panel and reboots it into the factory firmware. It installs nothing and does not change the boot settings; the data volume is mounted read-only to measure its free space.
 
 ### 4.3 Install
 
@@ -115,20 +119,21 @@ Replace `COM5` with your port. When it says *Waiting for the bootloader*, power 
 python s1e_install.py --port COM5 --bundle s1e-panel-first-install.tar.gz --sums SHA256SUMS.txt --wifi-ssid "Your Wi-Fi"
 ```
 
-`--wifi-ssid` is optional: the installer asks for the password (it is not shown and not written to the log) and the panel joins the network on its first start. Without it, connect the panel to Wi-Fi on its screen afterwards.
+`--wifi-ssid` is optional: the installer asks for the password (it is not shown and not written to the log) and the panel joins the network on its first start. Without it, connect the panel to Wi-Fi on its screen afterwards. For unattended runs, `--wifi-password-file secret.txt` reads the password from a file instead of asking.
 
-Power the panel on when asked. The installer then works through six steps:
+Switch the panel's power on when asked (keep the adapter connected). The installer then works through seven steps:
 
 | Step | What happens |
 | --- | --- |
-| 1/6 | Stops the bootloader and saves the factory boot arguments to `s1e-install-logs/<time>/boot-environment.json` on your computer |
-| 2/6 | Boots the stock kernel once into a service shell (temporary; nothing saved) |
-| 3/6 | Checks the kernel, drivers, flash layout and free space on the data volume |
-| 4/6 | Sends the bundle over the console, checks its SHA-256, unpacks it into `/data/s1e-panel` and verifies the signed application inside |
-| 5/6 | Restarts the panel with the new boot arguments — still not saved — and waits until S1E Panel reports that its interface is running |
-| 6/6 | Saves the boot arguments (keeping the factory value as `s1e_factory_bootargs`) and starts S1E Panel |
+| 1/7 | Stops the bootloader and saves the factory boot settings to `s1e-install-logs/<time>/boot-environment.json` on your computer |
+| 2/7 | Boots the stock kernel once into a service shell (temporary; nothing saved) |
+| 3/7 | Checks the kernel, drivers, flash layout and free space on the data volume |
+| 4/7 | Sends the bundle over the console, checks its SHA-256, unpacks it into `/data/s1e-panel`, verifies the signed application and creates the panel's identity and HTTPS certificate |
+| 5/7 | Replaces the Aqara start-up picture with the S1E Panel logo, keeping the original |
+| 6/7 | Restarts the panel with the new boot arguments — still not saved — and waits until S1E Panel reports that its interface is running |
+| 7/7 | Saves the boot settings (keeping the factory values) and starts S1E Panel |
 
-Sending the bundle takes a few minutes; the installer raises the console speed when the adapter allows it and shows the progress. Keep the wires steady until it prints **Done**.
+Sending the bundle takes **about 25–30 minutes**: the console runs at 115200 baud, the speed that works reliably on every panel. The installer shows the progress and the time left. Keep the wires still and the power on until it prints **Done**.
 
 > [!NOTE]
 > **Panels that do not stop at the bootloader.** On some S1E panels made after July 2023, pressing Enter (which is what the installer does) does not stop U-Boot. If the installer keeps saying *The bootloader was not stopped in time*, see niceboygithub's notes on stopping U-Boot on those units. Their method shorts pins of the flash chip during boot and **can brick the panel**; use it only if you understand the circuit.
@@ -142,7 +147,7 @@ Done. S1E Panel now starts by itself.
 Panel address: 192.168.1.50  ->  editor: https://192.168.1.50:8443
 ```
 
-The panel shows a short start-up animation and then an empty page. A new installation starts in Russian (*Нет карточек — Нажмите +, чтобы добавить устройства*); to switch to English, pull down from the top edge, tap **Настройки** (the gear) and choose **Language (Язык) → English**. You can now remove the wires (or leave them, insulated, if you expect to need the console again) and reassemble the panel. Keep the pads accessible if possible: the console is the recovery path if the panel ever loses both its network and its system files.
+At power-on the bootloader shows the start-up picture for a moment (now the S1E Panel logo); then S1E Panel plays its own short start-up animation and shows an empty page: *No cards — Tap + to add your devices.* The interface is in English; Russian is in **Settings → Language (Язык)**. You can now remove the wires (or leave them, insulated, if you expect to need the console again) and reassemble the panel. Keep the pads accessible if possible: the console is the recovery path if the panel ever loses both its network and its system files.
 
 Continue with **[Getting started](getting-started.md)**.
 
@@ -151,11 +156,15 @@ Continue with **[Getting started](getting-started.md)**.
 | Message | What to do |
 | --- | --- |
 | *No bootloader on the console* | Check TX↔RX crossing, GND and the port name. Power-cycle the panel while the installer waits. |
+| *The panel is already starting up* | The power was switched on before the installer was listening. Wait until it says *Waiting for the bootloader*, then switch the power off and on. |
 | *The bootloader was not stopped in time* | Power the panel off and on again; it retries. For panels made after July 2023 see the note above. |
 | *Unexpected flash layout* / *Unexpected kernel* / *Stock drivers missing* | Your panel is not the supported model or runs a system S1E Panel has not been tested with. Nothing was changed. |
+| *Cannot open COM5* | The port name is wrong or another program (a terminal, an earlier installer) holds it. The message lists the ports it sees. |
+| *Lost the connection to the USB-UART adapter* | The adapter was unplugged or lost power — usually because it powers the board too. Power the board separately, then run the installer again (with `--replace-incomplete` if it had reached step 4/7). |
+| *The start-up picture cannot be changed on this panel* | Nothing was installed. Run again with `--keep-boot-logo`. |
 | *SHA-256 does not match* | Download the bundle and `SHA256SUMS.txt` again from the same release. |
 | *The bundle arrived damaged* | A noisy connection. Shorten the wires, check the joints and run the installer again. |
-| *… already exists from an earlier, unfinished installation* | A previous run stopped half-way. Run again with `--replace-incomplete`. |
+| *… already exists from an earlier, unfinished installation* | A previous run stopped half-way. Run again with `--replace-incomplete`: it removes the earlier files (with their settings) and installs again. |
 | *S1E Panel did not report a healthy start* | Nothing was saved: power-cycle the panel and it starts the factory firmware. Open an issue with the folder `s1e-install-logs/<time>`. |
 | *S1E Panel already starts on this panel* | It is installed. Update it from **Settings → Panel update** instead. |
 
@@ -167,7 +176,7 @@ Every run keeps a full console log in `s1e-install-logs/<time>/console.log` (wit
 python s1e_install.py --port COM5 --restore-factory-boot
 ```
 
-This puts the saved factory boot arguments back, so the panel starts the factory firmware again. S1E Panel's files stay in `/data/s1e-panel` on the data volume and are not used.
+Switch the panel's power on when asked. This puts the factory boot arguments and `bootdelay` back, then boots once more into the service shell to put the original Aqara start-up picture back, and starts the factory firmware. S1E Panel's files stay in `/data/s1e-panel` on the data volume and are not used.
 
 ## After the installation
 

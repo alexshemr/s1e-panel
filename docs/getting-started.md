@@ -14,7 +14,7 @@ From a freshly installed S1E Panel to your first working card. If S1E Panel is n
 | Hold a card for 3 seconds | Edit mode: move, resize or remove cards right on the panel |
 | Hold the screensaver for 3 seconds | Choose another screensaver |
 
-A new installation starts in Russian. To switch to English: pull down from the top edge → **Настройки** → **Language (Язык)** → **English**.
+The interface is in English; for Russian open **Settings → Language (Язык)**.
 
 ## 1. Connect the panel to Wi-Fi
 

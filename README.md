@@ -72,7 +72,7 @@ Pictures of every card in every size, rendered by the firmware: **[docs/cards.md
 
 1. **Check your panel:** Aqara Magic Switch S1E, model **NPD1121WSK01**.
 2. **Get console access** — the wiring and bootloader access as documented by [oopuuu](https://github.com/oopuuu/AqaraS1E-Custom-GUI) and [niceboygithub](https://github.com/niceboygithub/AqaraSmartSwitchS1E).
-3. **Run the installer** [`installer/s1e_install.py`](installer/s1e_install.py) with the `s1e-panel-first-install.tar.gz` bundle from the [latest release](https://github.com/alexshemr/s1e-panel/releases/latest). It checks the panel, installs S1E Panel next to the factory system, test-starts it and only then makes it permanent.
+3. **Run the installer** `s1e_install.py` with the `s1e-panel-first-install.tar.gz` bundle — both from the [latest release](https://github.com/alexshemr/s1e-panel/releases/latest). It checks the panel, installs S1E Panel next to the factory system, puts the S1E Panel logo on the start-up screen, test-starts the panel and only then makes the installation permanent.
 4. **Connect Home Assistant** with the [S1E Panel integration](https://github.com/alexshemr/ha-s1e-panel) (HACS) and add your first card.
 
 Step by step: **[Installation guide](docs/installation.md)** → **[Getting started](docs/getting-started.md)**.

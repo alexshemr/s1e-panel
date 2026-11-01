@@ -72,7 +72,7 @@ S1E Panel заменяет заводской интерфейс настенн�
 
 1. **Проверьте панель:** Aqara Magic Switch S1E, модель **NPD1121WSK01**.
 2. **Получите доступ к консоли** — подключение и доступ к загрузчику, как описано у [oopuuu](https://github.com/oopuuu/AqaraS1E-Custom-GUI) и [niceboygithub](https://github.com/niceboygithub/AqaraSmartSwitchS1E).
-3. **Запустите установщик** [`installer/s1e_install.py`](installer/s1e_install.py) с комплектом `s1e-panel-first-install.tar.gz` из [последнего выпуска](https://github.com/alexshemr/s1e-panel/releases/latest). Он проверяет панель, ставит S1E Panel рядом с заводской системой, делает пробный запуск и только потом закрепляет установку.
+3. **Запустите установщик** `s1e_install.py` с комплектом `s1e-panel-first-install.tar.gz` — оба из [последнего выпуска](https://github.com/alexshemr/s1e-panel/releases/latest). Он проверяет панель, ставит S1E Panel рядом с заводской системой, ставит логотип S1E Panel на экран включения, запускает панель на пробу и только потом закрепляет установку.
 4. **Подключите Home Assistant** через [интеграцию S1E Panel](https://github.com/alexshemr/ha-s1e-panel) (HACS) и добавьте первую карточку.
 
 Пошагово: **[руководство по установке](docs/ru/installation.md)** → **[первые шаги](docs/ru/getting-started.md)**.
