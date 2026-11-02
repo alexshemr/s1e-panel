@@ -14,6 +14,7 @@ Every card type in the current release, with the Home Assistant entities it acce
 | [Curtains](#curtains-and-roller-blind) | `cover` | 11 |
 | [Roller blind](#curtains-and-roller-blind) | `cover` | 11 |
 | [Thermostat](#thermostat) | `climate` | 11 |
+| [Air conditioner](#air-conditioner) | `climate` | 9: 2×2 … 8×6 |
 | [Humidifier](#humidifier) | `humidifier` | 11 |
 | [Fan](#fan) | `fan` | 11 |
 | [Breezer](#breezer) | `fan` + air sensors | 11 |
@@ -78,6 +79,17 @@ Target temperature of a Home Assistant `climate` entity with − and + (hold to 
 - **Controls:** −/+, on / off, HVAC modes and presets from the entity (you choose which, in which order, with which icon and caption).
 - **States:** heating, idle, off, unavailable.
 - **Try it:** [thermostat demo](https://alexshemr.github.io/s1e-panel/demo/stands/thermostat-stand.html?lang=en)
+
+## Air conditioner
+
+<img src="assets/en/card-ac.png" alt="Air conditioner card: 2×4, 4×4 with the vent air, 8×4 with a large target" width="100%">
+
+A Home Assistant `climate` entity that cools: cool, heat, dry, fan and auto. The card takes the colour of the mode (cold blue, warm orange, teal for drying) and air flows from the vent while the unit works — faster on a higher fan speed, sideways while the vanes swing.
+
+- **Layout:** the target between − and + over the vent air; on 8×4 a large target on the left, the rows on the right.
+- **Controls:** −/+ (hold to repeat), on / off, the HVAC modes as a row of icons, fan speed (`fan_modes`) and swing (`swing_modes`) when the entity has them. A row that does not fit becomes one button that steps through it.
+- **States:** cooling, heating, drying, ventilating, holding the temperature, off, unavailable.
+- **Try it:** [air conditioner demo](https://alexshemr.github.io/s1e-panel/demo/stands/ac-stand.html?lang=en)
 
 ## Humidifier
 

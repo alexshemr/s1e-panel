@@ -452,12 +452,12 @@ function addRow(add, row, r) {
 function hero(add, r) {
   add({ t: "vent", r });
   // the largest figure that fits between − and + ("22,5°" is about 2.4 em wide) and the height left
-  const room = r.w - 88 - 2 * GAP, big = [64, 44, 28].find((z) => z * 2.4 <= room && z + 6 + 26 <= r.h) || 28, vh = big + 6;
-  const block = vh + 26, y = r.y + Math.max(0, (r.h - block) / 2);
-  add({ t: "minus", r: { x: r.x, y: y + (vh - 44) / 2, w: 44, h: 44 }, act: "repeat" });
-  add({ t: "plus", r: { x: r.x + r.w - 44, y: y + (vh - 44) / 2, w: 44, h: 44 }, act: "repeat" });
-  add({ t: "target", r: { x: r.x + 44 + GAP, y, w: r.w - 88 - 2 * GAP, h: vh }, size: big });
-  add({ t: "curLine", r: { x: r.x, y: y + vh + 4, w: r.w, h: 20 }, center: true });
+  const room = r.w - 88 - 2 * GAP, big = [64, 44, 28].find((z) => z * 2.4 <= room && Math.max(z + 6, 44) + 26 <= r.h) || 28, vh = big + 6;
+  const row = Math.max(vh, 44), block = row + 26, y = r.y + Math.max(0, (r.h - block) / 2);   // the room line goes under the taller of figure and buttons
+  add({ t: "minus", r: { x: r.x, y: y + (row - 44) / 2, w: 44, h: 44 }, act: "repeat" });
+  add({ t: "plus", r: { x: r.x + r.w - 44, y: y + (row - 44) / 2, w: 44, h: 44 }, act: "repeat" });
+  add({ t: "target", r: { x: r.x + 44 + GAP, y: y + (row - vh) / 2, w: r.w - 88 - 2 * GAP, h: vh }, size: big });
+  add({ t: "curLine", r: { x: r.x, y: y + row + 4, w: r.w, h: 20 }, center: true });
 }
 M.layout = (W, H) => {
   const L = { W, H, items: [] }, add = (o) => (L.items.push(o), o), inner = W - 2 * P;

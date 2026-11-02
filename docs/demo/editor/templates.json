@@ -1303,6 +1303,60 @@
   },
   {
     "components": [
+      "ac"
+    ],
+    "composite": false,
+    "domains": [
+      "climate"
+    ],
+    "hidden": false,
+    "icon": "mdi:air-conditioner",
+    "id": "ac",
+    "name": {
+      "en": "Air conditioner",
+      "ru": "Кондиционер"
+    },
+    "sizes": [
+      [
+        2,
+        2
+      ],
+      [
+        2,
+        4
+      ],
+      [
+        2,
+        6
+      ],
+      [
+        4,
+        2
+      ],
+      [
+        4,
+        4
+      ],
+      [
+        4,
+        6
+      ],
+      [
+        8,
+        2
+      ],
+      [
+        8,
+        4
+      ],
+      [
+        8,
+        6
+      ]
+    ]
+  },
+  {
+    "components": [
       "printer"
     ],
     "composite": false,
