@@ -48,7 +48,7 @@ S1E Panel заменяет заводской интерфейс настенн�
 <p align="center">
   <img src="docs/assets/ru/saver-rain.gif" alt="Заставка «Живая погода»: анимированный дождь над часами, прогнозом и показателями дома" width="320">
   &nbsp;
-  <img src="docs/assets/ru/screen-notification-photo.png" alt="Уведомление о звонке в дверь со снимком камеры из Home Assistant" width="320">
+  <img src="docs/assets/ru/screen-notification-photo.png" alt="Уведомление о движении со снимком дверной камеры из Home Assistant" width="320">
 </p>
 
 ## Карточки

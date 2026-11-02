@@ -48,7 +48,7 @@ More about the demos and their limits: [docs/cards.md](docs/cards.md#interactive
 <p align="center">
   <img src="docs/assets/en/saver-rain.gif" alt="Living weather screensaver: animated rain over the clock, the forecast and the home readings" width="320">
   &nbsp;
-  <img src="docs/assets/en/screen-notification-photo.png" alt="Doorbell notification with a camera photo from Home Assistant" width="320">
+  <img src="docs/assets/en/screen-notification-photo.png" alt="Motion notification with a door camera photo from Home Assistant" width="320">
 </p>
 
 ## Supported cards
