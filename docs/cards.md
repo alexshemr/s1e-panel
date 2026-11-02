@@ -22,14 +22,12 @@ Every card type in the current release, with the Home Assistant entities it acce
 | [Relay](#switch-relay-and-action) | the panel's own relays | 2×2, 2×4, 4×2 |
 | [Action](#switch-relay-and-action) | `scene`, `script`, `button`, `input_button` | 2×2, 2×4, 4×2 |
 | [Time](#time-and-date-and-time) | `input_datetime` | 2×4, 4×2, 4×4, 8×2 |
-| [Date and time](#time-and-date-and-time) | `input_datetime` | 10 |
 | [Number](#number-select-and-text) | `number`, `input_number` | 2×2, 2×4, 4×2, 4×4, 8×2 |
 | [Select](#number-select-and-text) | `select`, `input_select` | 2×2, 2×4, 4×2, 4×4, 8×2 |
 | [Text](#number-select-and-text) | `text`, `input_text` | 4×2, 4×4, 8×2, 8×4 |
 | [Weather](#weather) | `weather` | 11 |
 | [3D printer](#3d-printer) | Bambu Lab printer sensors | 9 |
-| [Media](#media) | `media_player` | 10 |
-| [Reading, Readings, Binary sensor](#reading-readings-and-binary-sensor) | `sensor`, `binary_sensor` | 10 |
+| [Reading, Binary sensor](#reading-readings-and-binary-sensor) | `sensor`, `binary_sensor` | 10 |
 
 "11" means all sizes: 2×2, 2×4, 2×6, 2×8, 4×2, 4×4, 4×6, 8×2, 8×4, 8×6, 8×8. "10" is the same without 8×4.
 
@@ -136,7 +134,6 @@ One-touch cards: the whole card is the button.
 For `input_datetime` helpers such as an alarm, a reminder or a deadline.
 
 - **Time:** clock and date variants for 2×4, 4×2, 4×4 and 8×2. Hold the hours, minutes or the date to open scroll drums; **Done** saves the new value to Home Assistant, **Cancel** (or 10 seconds without a touch) closes them.
-- **Date and time:** a simpler card for the same helpers, in more sizes.
 - **Try it:** [time demo](https://alexshemr.github.io/s1e-panel/demo/stands/time-stand.html?lang=en)
 
 ## Number, select and text
@@ -169,17 +166,11 @@ The current print of a Bambu Lab printer connected to Home Assistant with [ha-ba
 - **States:** preparing, printing, paused, finished, failed, idle, off.
 - **Try it:** [3D printer demo](https://alexshemr.github.io/s1e-panel/demo/stands/printer-stand.html?lang=en)
 
-## Media
-
-<img src="assets/en/card-media.png" alt="Media card in 4×2 and 4×4 sizes" width="50%">
-
-A `media_player`: on / off and the volume on the card, play / pause in its control sheet. On 2×2 it becomes a simple on / off tile.
-
 ## Reading, Readings and Binary sensor
 
 <img src="assets/en/card-sensors.png" alt="Reading card with a temperature and Readings card with four sensors" width="50%">
 
-Simple value tiles for `sensor` and `binary_sensor` entities: **Reading** and **Binary sensor** show one value, **Readings** several. The icon comes from the entity (set it in Home Assistant) or the card. For room readings with norms and colours, use the [Climate](#climate) card.
+Simple value tiles for `sensor` and `binary_sensor` entities: **Reading** shows the value, **Binary sensor** its state in a word (*Open*, *Closed*, *Leak*, *Motion*…). The icon comes from the entity, the card or, without either, the kind of reading. For room readings with norms and colours, use the [Climate](#climate) card.
 
 ---
 
@@ -187,8 +178,8 @@ Simple value tiles for `sensor` and `binary_sensor` entities: **Reading** and **
 
 Not cards, but part of the screen: see [Configuration → Screensavers](configuration.md#screensavers).
 
-| Just the time | Home essentials | Living weather | A favorite moment |
-| --- | --- | --- | --- |
-| <img src="assets/en/screen-saver-clock.png" alt="Just the time screensaver" width="200"> | <img src="assets/en/screen-saver-pulse.png" alt="Home essentials screensaver with six readings" width="200"> | <img src="assets/en/screen-saver-weather.png" alt="Living weather screensaver" width="200"> | <img src="assets/en/screen-saver-photo.png" alt="A favorite moment screensaver over a photo" width="200"> |
+| Just the time | Home essentials | Living weather | A favorite moment | The Moon |
+| --- | --- | --- | --- | --- |
+| <img src="assets/en/screen-saver-clock.png" alt="Just the time screensaver" width="200"> | <img src="assets/en/screen-saver-pulse.png" alt="Home essentials screensaver with six readings" width="200"> | <img src="assets/en/screen-saver-weather.png" alt="Living weather screensaver" width="200"> | <img src="assets/en/screen-saver-photo.png" alt="A favorite moment screensaver over a photo" width="200"> | <img src="assets/en/screen-saver-moon.png" alt="The Moon screensaver: a NASA photo of the first quarter" width="200"> |
 
 [Try the screensavers](https://alexshemr.github.io/s1e-panel/demo/stands/saver-stand.html?lang=en)

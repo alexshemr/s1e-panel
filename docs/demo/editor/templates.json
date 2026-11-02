@@ -348,7 +348,7 @@
     "domains": [
       "media_player"
     ],
-    "hidden": false,
+    "hidden": true,
     "icon": "mdi:music",
     "id": "media",
     "name": {
@@ -552,7 +552,7 @@
     "domains": [
       "input_datetime"
     ],
-    "hidden": false,
+    "hidden": true,
     "icon": "mdi:calendar-clock",
     "id": "datetime",
     "name": {
@@ -1123,7 +1123,7 @@
       "sensor",
       "binary_sensor"
     ],
-    "hidden": false,
+    "hidden": true,
     "icon": "mdi:view-dashboard-outline",
     "id": "sensors",
     "name": {

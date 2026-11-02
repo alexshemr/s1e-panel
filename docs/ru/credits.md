@@ -27,6 +27,7 @@ S1E Panel не копирует их код, фотографии и текст�
 | [Material Design Icons](https://github.com/Templarian/MaterialDesign) 7.4.47 от Pictogrammers | Иконки на карточках и в редакторе | Pictogrammers Free License (иконки и шрифт: Apache-2.0) |
 | Набор корневых сертификатов [certifi](https://github.com/certifi/python-certifi) | Доверенные сертификаты для загрузки обновлений с GitHub | MPL-2.0 |
 | [База часовых поясов tz](https://www.iana.org/time-zones) (через Python [tzdata](https://github.com/python/tzdata)) | Часовые пояса | Общественное достояние |
+| [Moon Phase and Libration, 2026](https://svs.gsfc.nasa.gov/5587), NASA Scientific Visualization Studio | Заставка «Луна»: 24 снимка одного лунного цикла | Общественное достояние (снимки NASA) |
 | Анимация запуска [Andy Fitzsimon](https://codepen.io/andyfitz/pen/LzgJPq) | Анимация домика после запуска, перерисованная нативно на LVGL | MIT |
 
 ## Веб-редактор

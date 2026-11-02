@@ -28,8 +28,8 @@ S1E Panel replaces the factory interface of the Aqara S1E wall panel with its ow
 - **A real Home Assistant panel.** Lights, curtains and roller blinds, thermostats, humidifiers, fans, breezers, room climate, scenes and scripts, switches, number / select / text helpers, dates and times, weather, media and a 3D printer — straight from your Home Assistant entities.
 - **Smooth and responsive.** Native drawing, swipeable pages, animated cards: the lamp glows in its own colour, the curtain moves in a window with a real sky, the fan spins at its real speed.
 - **Yours to arrange.** Several pages on an 8 × 8 grid, cards in up to 11 sizes, your colours, icons, captions and the device modes you actually use.
-- **Edit from any browser.** A web editor on the panel itself, with a live preview rendered by the same code as the screen. Cards can also be added and moved right on the panel.
-- **Screensavers and notifications.** A clock, live weather, your home's vital readings or your photos — or a shuffle of them. Home Assistant can send messages with a weather forecast or a doorbell camera photo.
+- **Edit from any browser.** A web editor on the panel itself shows all your pages side by side, rendered by the same code as the screen: drag a widget of the size you want onto any page, then pick its device. Cards can also be added and moved right on the panel.
+- **Screensavers and notifications.** A clock, live weather, your home's vital readings, your photos or tonight's Moon (NASA photos) — or a shuffle of them, turned with a swipe. Home Assistant wakes the panel on the screensaver and can send messages with a forecast for the morning, day and evening, or a doorbell camera photo.
 - **No tokens to copy.** A companion integration connects the panel to Home Assistant: it is discovered on your network and you approve it on the panel's screen.
 - **Safe updates over Wi-Fi.** Signed packages, two application slots and an automatic rollback if a new version does not start cleanly.
 

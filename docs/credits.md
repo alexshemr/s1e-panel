@@ -27,6 +27,7 @@ Components compiled into or shipped with S1E Panel. Their license texts are incl
 | [Material Design Icons](https://github.com/Templarian/MaterialDesign) 7.4.47 by Pictogrammers | Icons on cards and in the editor | Pictogrammers Free License (icons and font: Apache-2.0) |
 | [certifi](https://github.com/certifi/python-certifi) CA bundle | Trusted certificates for downloading updates from GitHub | MPL-2.0 |
 | [tz database](https://www.iana.org/time-zones) (via Python [tzdata](https://github.com/python/tzdata)) | Time zones | Public domain |
+| [Moon Phase and Libration, 2026](https://svs.gsfc.nasa.gov/5587), NASA's Scientific Visualization Studio | The Moon screensaver: 24 photos of one lunation | Public domain (NASA imagery) |
 | Start-up animation by [Andy Fitzsimon](https://codepen.io/andyfitz/pen/LzgJPq) | The house animation after start, redrawn natively in LVGL | MIT |
 
 ## Web editor

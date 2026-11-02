@@ -38,7 +38,7 @@ S1E Panel gets your devices and their states from Home Assistant through the **S
 The panel is now online: it shows the time from Home Assistant, and its devices appear in Home Assistant (screen, relays, screensaver, diagnostics).
 
 > [!TIP]
-> **Not discovered?** Discovery uses mDNS on the local network. If Home Assistant and the panel are in different VLANs or mDNS is blocked, add the integration manually: **Settings → Devices & services → Add integration → S1E Panel**, enter `https://<panel-ip>:8443`, then on the panel open **Settings → Pair a device** and confirm. See [Troubleshooting](troubleshooting.md#home-assistant-does-not-find-the-panel).
+> **Not discovered?** Discovery uses mDNS on the local network. If Home Assistant and the panel are in different VLANs or mDNS is blocked, add the integration manually: **Settings → Devices & services → Add integration → S1E Panel**, enter `https://<panel-ip>:8443`, then tap **Allow** on the panel: it lights up with the request. See [Troubleshooting](troubleshooting.md#home-assistant-does-not-find-the-panel).
 
 Requirements: Home Assistant **2026.10.1** or newer. Details of the integration, its entities and actions: [ha-s1e-panel](https://github.com/alexshemr/ha-s1e-panel#readme).
 
@@ -48,8 +48,8 @@ The editor runs on the panel itself; use any browser on the same network.
 
 1. Open `https://<panel-ip>:8443` (the address is shown in **Settings → Wi-Fi** and **Settings → Pair a device**).
 2. The browser warns that the connection is not private: the panel uses its own self-signed certificate. Continue to the site (in Chrome: **Advanced → Proceed**).
-3. The editor asks for a code. On the panel open **Settings → Pair a device**: it shows a six-digit code. Type it into the browser.
-4. Confirm the new browser on the panel's screen.
+3. Click **Request access**. The panel lights up with the request and a four-digit number; the browser shows the same number.
+4. Tap **Allow** on the panel.
 
 The browser stays paired. You can pair several browsers and phones and revoke them later from the editor.
 
@@ -59,11 +59,11 @@ The browser stays paired. You can pair several browsers and phones and revoke th
 
 **In the editor:**
 
-1. Open **Pages**. The preview in the middle is drawn by the same code as the panel.
-2. In the page settings on the right click **Add devices**.
-3. Find an entity by name or `entity_id` (filters: spaces, types), tick it and click **Add**. Readings that belong together (temperature, humidity, CO₂…) can be ticked together and added as one card.
-4. The card appears on the first free place of the page (or on a new page when the page is full). Click it in the preview to open **Card settings**: choose the card type (**Template**), the **Size**, the colour, the icon and which controls and modes the card shows.
-5. Drag the card in the preview to move it.
+1. Open **Pages**. All pages are shown side by side, drawn by the same code as the panel.
+2. In **Widgets** on the left open a card type: its sizes are shown as small previews with sample data.
+3. Drag a size onto any place of any page (a click puts it on the first free place of the current page). Cards in the way move aside; those without room go to the next page, which opens when needed.
+4. In **Card settings** next to the pages click **Choose a device**. The search shows only the devices this card can use. The card's other fields (sensors, water tank, heater…) open the same search with their own filters.
+5. Drag cards to move them, also between pages; drag a page by its header to change the order of pages.
 6. Click **Save**. The editor reports *Changes are live on your panel* — the panel shows the card right away.
 
 **Or on the panel:** pull down from the top edge, tap **Add**, choose a device and how it should look. Hold a card for 3 seconds to move or resize it.

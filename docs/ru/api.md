@@ -11,7 +11,7 @@
 | Запрос | Тело / ответ |
 | --- | --- |
 | `GET /api/v1/info` | Открыто: `device_id`, `certificate_sha256`, `language`, `bridge_supported`. Без данных о доме. |
-| `POST /api/v1/pair` | `{"code":"123456","name":"Мой скрипт","kind":"browser"}` — код из **Настройки → Сопряжение**. Возвращает `id` запроса. |
+| `POST /api/v1/pair` | `{"name":"Мой скрипт","kind":"browser"}`. Панель включает экран с запросом; ответ — `id` запроса и четырёхзначное `match`, которое показывает и панель. Необязательный `"code"` — шестизначный код из **Настройки → Сопряжение**. |
 | `GET /api/v1/pair/{id}` | Опрашивайте, пока панель не подтвердит; одноразовый ответ содержит ключ клиента. |
 | `GET /api/v1/clients` | Сопряжённые клиенты, без секретов |
 | `POST /api/v1/clients/revoke` | `{"id":"..."}` |
@@ -25,7 +25,7 @@
 | `GET /api/v1/status` | Версия, связь с Home Assistant, экран, сущности на панели, метрики |
 | `POST /api/v1/commands` | `{"entity_id":"light.kitchen","action":"turn_on","data":{"brightness":128}}`. `local.relay1`–`local.relay3` переключают реле панели. |
 | `PUT /api/v1/screen` | `{"on":true,"brightness":60}` — яркость 1–100 |
-| `GET` / `PUT /api/v1/screensaver` | `{"selected":"weather","options":["clock","sensors","weather","photo","shuffle"]}`; PUT принимает `{"selected":"sensors"}` |
+| `GET` / `PUT /api/v1/screensaver` | `{"selected":"weather","options":["clock","sensors","weather","photo","moon","shuffle"]}`; PUT принимает `{"selected":"sensors"}` |
 | `WS /api/v1/events` | Изменения статуса, конфигурации и состояний |
 
 ## Уведомления
@@ -39,7 +39,7 @@
 - `type`: `info`, `success`, `warning`, `error`. `priority: "high"` прерывает текущий экран; обычное сообщение ждёт заставки.
 - `duration` — сколько сообщение висит на экране (1–3600 с), `ttl` — сколько остаётся актуальным (1–86400 с).
 - `id` (1–128 символов `A-Z a-z 0-9 _ . : -`) заменяет прежнее сообщение с тем же `id`.
-- `weather` (элемент прогноза Home Assistant) и `background` (`auto`, `weather`, `plain`) рисуют погодное сообщение.
+- `weather` (элемент прогноза Home Assistant) и `background` (`auto`, `weather`, `plain`) рисуют погодное сообщение. `weather.parts` — до четырёх `{"label","condition","temperature","precipitation_probability","night"}` — добавляет ряд, например утро, день и вечер.
 - `image: {"jpeg": "<base64>"}` добавляет фото: baseline JPEG до 480 × 360 и 512 КБ. Действие интеграции `s1e_panel.show_message` заполняет его снимком с камеры само.
 
 `DELETE /api/v1/notifications/{id}` убирает одно сообщение; `DELETE /api/v1/notifications` — все.

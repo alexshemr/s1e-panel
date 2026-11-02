@@ -30,13 +30,14 @@ The screensaver appears after the **idle timeout** and goes away on a touch.
 | --- | --- | --- |
 | **Just the time** | A large clock and the date with today's weather | Weather source, background photo |
 | **Home essentials** | The clock and up to six home readings coloured by their norms (doors and leaks too), with a short verdict | Sensors and their order |
-| **Living weather** | The clock over an animated sky of the current weather, with a "At home" tile of four readings | Weather source, sensors |
+| **Living weather** | The clock over an animated sky of the current weather, with an "At home" tile of up to five readings: an icon, the value and its state in a word ("Dry", "Cool"); a reading out of its norm is underlined in its colour | Weather source, sensors |
 | **A favorite moment** | Your photos as a slide show with the clock and the weather | Photos, slide interval |
-| **Shuffle** | Takes turns between the screensavers you choose, in turn or at random | Which ones, every 1 min … 3 h |
+| **The Moon** | The clock over a NASA photo of the Moon in tonight's phase, with the phase name and how much is lit | — |
+| **Shuffle** | Takes turns between the screensavers you choose, in turn or at random; swipe left or right to turn them by hand, tap to open the cards | Which ones, every 1 min … 3 h |
 
 - **Photos** are uploaded in the editor's screensaver settings (**Upload photo**) and stored on the panel (up to 5 MiB in total).
 - **On the panel:** hold the screensaver for 3 seconds to pick another one.
-- **From Home Assistant:** the integration's **Screensaver** select entity (`clock`, `sensors`, `weather`, `photo`, `shuffle`) switches it in automations — for example the Home essentials screensaver while the air is poor.
+- **From Home Assistant:** the integration's **Screensaver** select entity (`clock`, `sensors`, `weather`, `photo`, `moon`, `shuffle`) switches it in automations — for example the Home essentials screensaver while the air is poor.
 
 <br clear="right">
 
@@ -49,18 +50,18 @@ The screensaver appears after the **idle timeout** and goes away on a touch.
 | **Then turn off, sec** | Optional: turn the screen off this many seconds later (0 = never) |
 | **Scheduled sleep** | **Sleep at** / **Wake at**: the screen stays dark at night |
 
-Home Assistant gets the screen as a **light** entity (on / off and brightness) and the night mode as a **binary sensor**, so the screen can follow presence or a "good night" scene. A screen-off or night mode set from Home Assistant takes priority over the screensaver.
+Home Assistant gets the screen as a **light** entity (on / off and brightness) and the night mode as a **binary sensor**, so the screen can follow presence or a "good night" scene. Turned on from Home Assistant (motion in the room, say), the panel wakes on the screensaver; a touch opens the cards. A screen-off or night mode set from Home Assistant takes priority over the screensaver.
 
 ## Notifications
 
-<img src="assets/en/screen-notification-weather.png" alt="Weather notification on an animated sky" width="240" align="right">
+<img src="assets/en/screen-notification-parts.png" alt="Weather notification with morning, day and evening in a row" width="240" align="right">
 
 Home Assistant sends messages to the panel with the integration's action **`s1e_panel.show_message`**:
 
 - title, text, icon and type (`info`, `success`, `warning`, `error`);
 - **priority:** `high` shows it at once over anything; `normal` waits until the panel is idle;
 - how long it stays on screen and how long it stays relevant;
-- a **weather forecast** item from Home Assistant, shown on the animated sky of that weather;
+- a **weather forecast** item from Home Assistant, shown on the animated sky of that weather; with `parts` it also shows morning, day and evening in a row, each with its own sky and temperature;
 - a **photo** from a `camera.*` or `image.*` entity, optionally refreshed every second while shown (`live`) — a doorbell camera, for example.
 
 `s1e_panel.dismiss_notification` and `s1e_panel.clear_notifications` remove messages; on the panel a tap dismisses them. The editor has a **Test notification** button. Ready-made automations (doorbell, tomorrow's weather, presence): [AUTOMATIONS.md](https://github.com/alexshemr/ha-s1e-panel/blob/main/AUTOMATIONS.md). For scripts without Home Assistant, the same is available through the [local API](../API.md#notifications).
@@ -99,9 +100,10 @@ Only entities that are on the panel's cards can be controlled from the panel, an
 
 ## Pairing and access
 
-<img src="assets/en/screen-pairing.png" alt="Pair a device screen on the panel" width="200" align="right">
+<img src="assets/en/screen-pairing-request.png" alt="An access request on the panel: the number to compare and the Allow button" width="200" align="right">
 
-- **Settings → Pair a device** on the panel shows a code for a new browser, phone or script; each new client must be confirmed on the panel's screen.
+- A new browser, phone or Home Assistant asks for access, and the panel lights up with the request — even when its screen is off. Check that the number on both screens matches and tap **Allow**.
+- **Settings → Pair a device** shows the panel's address with a QR code and a six-digit code for the release installer.
 - The editor lists paired clients; revoke the ones you no longer use.
 - The panel's HTTPS certificate is its own (self-signed). The editor shows its fingerprint so you can check it.
 

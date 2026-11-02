@@ -18,13 +18,13 @@ Problems during the first installation are covered in the [installation guide](i
 
 ## Pairing does not finish
 
-- If the code is not accepted, open **Settings → Pair a device** again for a fresh code.
-- After typing the code, look at the panel: the request must be confirmed on its screen.
+- The request waits two minutes for **Allow** on the panel. If the panel did not light up, check that the browser reached `https://<panel-ip>:8443`, then request access again.
+- Closing the request with × on the panel leaves it unanswered; request access again to see it.
 
 ## Home Assistant does not find the panel
 
 - Discovery uses mDNS (IPv4) on the local network. Across VLANs or with mDNS blocked on the router, use an mDNS repeater or add the integration manually: **Settings → Devices & services → Add integration → S1E Panel**, address `https://<panel-ip>:8443`.
-- To pair again, open **Settings → Pair a device** on the panel first, then add the integration.
+- To pair again, add the integration and tap **Allow** on the panel.
 - Requirements: Home Assistant 2026.10.1 or newer and the latest S1E Panel integration from HACS.
 
 ## Cards show "unavailable" or do not react
