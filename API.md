@@ -44,6 +44,8 @@ The panel is also announced over mDNS as `_s1e-panel._tcp.local.` with its id an
 
 `DELETE /api/v1/notifications/{id}` removes one message; `DELETE /api/v1/notifications` removes all.
 
+`GET /api/v1/notifications/history` lists the messages of the last day (newest first, with `at` in UTC seconds and `seen`); `DELETE /api/v1/notifications/history/{id}` deletes one, `DELETE /api/v1/notifications/history` clears the history.
+
 ## Configuration
 
 `GET /api/v1/config` returns the versioned configuration (pages, cards, screensaver, screen, relays). `PUT /api/v1/config` takes `{"expected_revision":12,"config":{...}}` and answers HTTP 409 if someone else changed it first. Cards sit on an 8 × 8 grid (`x`, `y`, `w`, `h`); `GET /api/v1/templates` lists the card types and their sizes. Secrets and photos are not part of the configuration.

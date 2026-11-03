@@ -44,6 +44,8 @@
 
 `DELETE /api/v1/notifications/{id}` убирает одно сообщение; `DELETE /api/v1/notifications` — все.
 
+`GET /api/v1/notifications/history` — сообщения за сутки (новые первыми, `at` — UTC в секундах, `seen`); `DELETE /api/v1/notifications/history/{id}` удаляет одно, `DELETE /api/v1/notifications/history` очищает историю.
+
 ## Конфигурация
 
 `GET /api/v1/config` возвращает конфигурацию с ревизией (страницы, карточки, заставки, экран, реле). `PUT /api/v1/config` принимает `{"expected_revision":12,"config":{...}}` и отвечает HTTP 409, если кто-то успел изменить её раньше. Карточки стоят на сетке 8 × 8 (`x`, `y`, `w`, `h`); `GET /api/v1/templates` перечисляет типы карточек и их размеры. Секреты и фотографии в конфигурацию не входят.

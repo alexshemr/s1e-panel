@@ -64,6 +64,10 @@ Home Assistant sends messages to the panel with the integration's action **`s1e_
 - a **weather forecast** item from Home Assistant, shown on the animated sky of that weather; with `parts` it also shows morning, day and evening in a row, each with its own sky and temperature;
 - a **photo** from a `camera.*` or `image.*` entity, optionally refreshed every second while shown (`live`) — a doorbell camera, for example.
 
+<img src="assets/en/screen-notification-history.png" alt="The shade with the last day's notifications and Clear all" width="240" align="right">
+
+**History:** pull the shade down from the top edge — under the quick controls are the last day's messages by title, newest first, a dot on the ones not seen yet. Tap one to see it in full again (with **Delete**); **Clear all** asks once more and removes them for good. The history lives in the panel's memory and starts anew after a restart.
+
 `s1e_panel.dismiss_notification` and `s1e_panel.clear_notifications` remove messages; on the panel a tap dismisses them. The editor has a **Test notification** button. Ready-made automations (doorbell, tomorrow's weather, presence): [AUTOMATIONS.md](https://github.com/alexshemr/ha-s1e-panel/blob/main/AUTOMATIONS.md). For scripts without Home Assistant, the same is available through the [local API](../API.md#notifications).
 
 <br clear="right">
