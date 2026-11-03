@@ -44,6 +44,10 @@ The panel is also announced over mDNS as `_s1e-panel._tcp.local.` with its id an
 
 `DELETE /api/v1/notifications/{id}` removes one message; `DELETE /api/v1/notifications` removes all.
 
+## Device search
+
+`POST /api/v1/catalog` with `{"query":"","offset":0,"limit":200,"area_id":"","domains":["script"],"air":[],"include_disabled":false,"include_hidden":false}` lists Home Assistant entities: `domains` narrows by domain, `air` by the kind of air reading (`temperature`, `humidity`, `co2`, `pm25`, `pm1`, `tvoc`), `include_hidden` adds entities hidden in HA. `POST /api/v1/catalog/refresh` makes the panel read HA's registries and states again (at most every 10 s).
+
 `GET /api/v1/notifications/history` lists the messages of the last day (newest first, with `at` in UTC seconds and `seen`); `DELETE /api/v1/notifications/history/{id}` deletes one, `DELETE /api/v1/notifications/history` clears the history.
 
 ## Configuration

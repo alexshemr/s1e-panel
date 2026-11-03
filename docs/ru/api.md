@@ -44,6 +44,10 @@
 
 `DELETE /api/v1/notifications/{id}` убирает одно сообщение; `DELETE /api/v1/notifications` — все.
 
+## Поиск устройств
+
+`POST /api/v1/catalog` с `{"query":"","offset":0,"limit":200,"area_id":"","domains":["script"],"air":[],"include_disabled":false,"include_hidden":false}` возвращает сущности Home Assistant: `domains` — по домену, `air` — по виду показателя воздуха (`temperature`, `humidity`, `co2`, `pm25`, `pm1`, `tvoc`), `include_hidden` добавляет скрытые в HA. `POST /api/v1/catalog/refresh` — панель заново читает реестры и состояния HA (не чаще раза в 10 с).
+
 `GET /api/v1/notifications/history` — сообщения за сутки (новые первыми, `at` — UTC в секундах, `seen`); `DELETE /api/v1/notifications/history/{id}` удаляет одно, `DELETE /api/v1/notifications/history` очищает историю.
 
 ## Конфигурация

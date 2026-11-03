@@ -87,7 +87,9 @@ Target temperature of a Home Assistant `climate` entity with − and + (hold to 
 A Home Assistant `climate` entity that cools: cool, heat, dry, fan and auto. The card takes the colour of the mode (cold blue, warm orange, teal for drying) and air flows from the vent while the unit works — faster on a higher fan speed, sideways while the vanes swing.
 
 - **Layout:** the target between − and + over the vent air; on 8×4 a large target on the left, the rows on the right.
-- **Controls:** −/+ (hold to repeat), on / off, the HVAC modes as a row of icons, fan speed (`fan_modes`) and swing (`swing_modes`) when the entity has them. A row that does not fit becomes one button that steps through it.
+- **Controls:** −/+ (hold to repeat), on / off, the HVAC modes as a row of icons, fan speed (`fan_modes`, the automatic one first), swing (`swing_modes`) and presets (`preset_modes`) when the entity has them. On a card too small for all the rows, fan, swing and preset become one row of buttons that each step through their choices.
+- **Entities of their own:** many units expose fan speed, swing or presets as separate entities. In **Card settings** bind **Fan speed** and **Presets** to a `select`, and **Swing** to a `switch` or a `select`; the card then reads and sets those.
+- **Choices:** pick which modes, fan speeds and presets show, in which order, with which icon and caption.
 - **States:** cooling, heating, drying, ventilating, holding the temperature, off, unavailable.
 - **Try it:** [air conditioner demo](https://alexshemr.github.io/s1e-panel/demo/stands/ac-stand.html?lang=en)
 
