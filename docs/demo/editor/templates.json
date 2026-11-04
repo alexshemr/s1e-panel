@@ -348,12 +348,12 @@
     "domains": [
       "media_player"
     ],
-    "hidden": true,
-    "icon": "mdi:music",
+    "hidden": false,
+    "icon": "mdi:television",
     "id": "media",
     "name": {
-      "en": "Media",
-      "ru": "Медиаплеер"
+      "en": "TV and media",
+      "ru": "Телевизор и медиа"
     },
     "sizes": [
       [
@@ -387,6 +387,10 @@
       [
         8,
         2
+      ],
+      [
+        8,
+        4
       ],
       [
         8,

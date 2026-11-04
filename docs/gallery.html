@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Card gallery — S1E Panel for Aqara S1E and Home Assistant</title>
-<meta name="description" content="Every card of S1E Panel, the Home Assistant firmware for the Aqara Magic Switch S1E, live in your browser: light, curtains, thermostat, humidifier, fan, breezer, climate, switches, helpers, weather and a 3D printer.">
+<meta name="description" content="Every card of S1E Panel, the Home Assistant firmware for the Aqara Magic Switch S1E, live in your browser: light, curtains, thermostat, humidifier, fan, breezer, climate, TV, switches, helpers, weather and a 3D printer.">
 <link rel="canonical" href="https://alexshemr.github.io/s1e-panel/gallery.html">
 <meta property="og:title" content="S1E Panel card gallery">
 <meta property="og:description" content="Interactive Home Assistant cards for the Aqara S1E touch panel.">
@@ -109,9 +109,9 @@ const CARDS = [
     sizes: { en: "9 sizes, 2×2 … 8×8", ru: "9 размеров, 2×2 … 8×8" },
     text: { en: "The current print: status, model, progress, time left, layers, temperatures, pause and stop, live camera.",
             ru: "Текущая печать: статус, модель, прогресс, остаток времени, слои, температуры, пауза и стоп, камера." } },
-  { id: "media", image: "card-media.png", name: { en: "Media", ru: "Медиаплеер" }, entities: "media_player", sizes: { en: "10 sizes", ru: "10 размеров" },
-    text: { en: "On / off and volume on the card, play / pause in its control sheet. Shown as rendered by the firmware.",
-            ru: "Включение и громкость на карточке, пуск и пауза — в панели управления. Кадр отрисован прошивкой." } },
+  { id: "media", stand: "media", live: ["2x6", "8x6"], name: { en: "TV", ru: "Телевизор" }, entities: "media_player (Android TV Remote) + remote, number", sizes: ALL,
+    text: { en: "Power, play / pause, skip, volume, apps and the remote's d-pad, plus the screen backlight. The screen on the card glows in the app's colour.",
+            ru: "Питание, пауза, перемотка, громкость, приложения и крестовина пульта, отдельно — подсветка экрана. Экран на карточке светится цветом приложения." } },
   { id: "sensors", image: "card-sensors.png", name: { en: "Reading and Readings", ru: "Показание и показания" }, entities: "sensor, binary_sensor", sizes: { en: "10 sizes", ru: "10 размеров" },
     text: { en: "Simple value tiles. For readings with norms and colours, use the Climate card. Shown as rendered by the firmware.",
             ru: "Простые плитки значений. Для показателей с нормами и цветами используйте «Микроклимат». Кадр отрисован прошивкой." } },

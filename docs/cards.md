@@ -26,6 +26,7 @@ Every card type in the current release, with the Home Assistant entities it acce
 | [Number](#number-select-and-text) | `number`, `input_number` | 2×2, 2×4, 4×2, 4×4, 8×2 |
 | [Select](#number-select-and-text) | `select`, `input_select` | 2×2, 2×4, 4×2, 4×4, 8×2 |
 | [Text](#number-select-and-text) | `text`, `input_text` | 4×2, 4×4, 8×2, 8×4 |
+| [TV](#tv) | `media_player` + `remote`, `number` | 11 |
 | [Weather](#weather) | `weather` | 11 |
 | [3D printer](#3d-printer) | Bambu Lab printer sensors | 9 |
 | [Reading, Binary sensor](#reading-readings-and-binary-sensor) | `sensor`, `binary_sensor` | 10 |
@@ -161,11 +162,25 @@ Home Assistant helpers and device settings:
 - **Text** (`text`, `input_text`): shows the text and how long ago it changed — a message board for the family.
 - **Try it:** [number, select and text demo](https://alexshemr.github.io/s1e-panel/demo/stands/inputs-stand.html?lang=en)
 
+## TV
+
+<img src="assets/en/card-media.png" alt="TV card: a column with the volume and backlight bars, 4×4, 8×6 with the screen and the d-pad" width="100%">
+
+A TV through the Home Assistant **Android TV Remote** integration: power, play/pause, skip, volume with − and + (hold to repeat) or a bar, mute, the apps set in the integration's options and the remote's d-pad with Back and Home. The screen on the card glows in the colour of the running app.
+
+- **Binding:** the TV's `media_player`. In the card settings: **Remote** — the `remote` entity of the same TV for the d-pad; **Screen backlight** — any `number` that sets the backlight, e.g. a script-backed `number.xiaomi_tv_screen_backlight`. Both are optional; **Apps on the card** hides the app row.
+- **Layout:** 2×2 turns the TV on and off; 2×N is a column with vertical volume and backlight bars; 4×2 and 8×2 a row of buttons; from 4×4 rows for the keys, volume, backlight and apps; the d-pad on 8×6 and 8×8.
+- **States:** on with the app and volume, muted, off (the controls rest), unavailable. Android TV does not report playing or paused, so play and pause is one button.
+- **Needs** the S1E Panel integration 0.5.4 or newer (firmware 0.8.8) (volume steps, apps, remote keys).
+- **Try it:** [TV demo](https://alexshemr.github.io/s1e-panel/demo/stands/media-stand.html?lang=en)
+
 ## Weather
 
 <img src="assets/en/card-weather.png" alt="Weather card with animated rain in three sizes" width="100%">
 
 A Home Assistant `weather` entity on an animated sky: every weather condition has its own scene, by day and by night, with temperature, condition, feels-like and humidity on larger cards. The same scenes run on the weather screensaver and on weather notifications.
+
+A tap on the card opens the forecast over the whole screen: the live sky and the next hours in six 3-hour windows with an icon, the temperature and the chance of rain. A window shows the most serious weather of its three hours: one rainy hour makes it rainy. Tap a window to see its sky. The forecast is the entity's hourly forecast.
 
 - **Try it:** [weather demo](https://alexshemr.github.io/s1e-panel/demo/stands/weather-stand.html?lang=en)
 
