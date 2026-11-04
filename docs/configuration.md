@@ -87,7 +87,8 @@ The [S1E Panel integration](https://github.com/alexshemr/ha-s1e-panel) gives the
 | Entity / action | Use |
 | --- | --- |
 | Screen (`light`) | On / off and brightness |
-| Night mode (`binary_sensor`) | Whether scheduled sleep is active |
+| Night mode (`switch`) | The screen sleeps now. Turned on or off by hand, it holds until the schedule next turns: at its start time or in the morning |
+| Night mode schedule (`switch`), start and end (`time`) | The same schedule as in the panel settings |
 | Relays (`switch`) | The three relays |
 | Screensaver (`select`) | Which screensaver is shown |
 | Diagnostics | Connection and health of the panel |

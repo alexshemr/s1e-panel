@@ -25,6 +25,7 @@ The panel is also announced over mDNS as `_s1e-panel._tcp.local.` with its id an
 | `GET /api/v1/status` | Version, Home Assistant connection, screen, entities on the panel, metrics |
 | `POST /api/v1/commands` | `{"entity_id":"light.kitchen","action":"turn_on","data":{"brightness":128}}`. `local.relay1`–`local.relay3` switch the panel's relays. |
 | `PUT /api/v1/screen` | `{"on":true,"brightness":60}` — brightness 1–100 |
+| `PUT /api/v1/sleep` | Night mode: `{"active":true}` now, until the schedule next turns; the schedule `{"enabled":true,"start":"23:30","end":"09:00"}`, any of the fields. Status shows `sleep_active`, `sleep_manual`, `sleep_schedule` in `runtime` |
 | `GET` / `PUT /api/v1/screensaver` | `{"selected":"weather","options":["clock","sensors","weather","photo","moon","shuffle"]}`; PUT takes `{"selected":"sensors"}` |
 | `WS /api/v1/events` | Status, configuration and state changes |
 
